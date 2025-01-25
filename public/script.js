@@ -1,68 +1,68 @@
-const chatMessages = document.getElementById("chat-messages");
-const userInput = document.getElementById("user-input");
-const sendButton = document.getElementById("send-button");
-const typingIndicator = document.getElementById("typing-indicator");
+const chatBox = document.getElementById('chat-box');
+const userInput = document.getElementById('user-input');
+const sendBtn = document.getElementById('send-btn');
 
-sendButton.addEventListener("click", sendMessage);
+// Fonction pour afficher les messages
+function displayMessage(content, sender = 'bot') {
+    const message = document.createElement('div');
+    message.classList.add('message', sender);
 
-function appendMessage(text, sender, isImage = false) {
-  const messageDiv = document.createElement("div");
-  messageDiv.classList.add("message", sender);
+    const avatar = document.createElement('img');
+    avatar.src = sender === 'user' ? 'user.jpg' : 'chat.jpg';
 
-  const avatar = document.createElement("img");
-  avatar.src = sender === "user" ? "user.jpg" : "chat.jpg";
+    const messageContent = document.createElement('div');
+    messageContent.classList.add('message-content');
+    messageContent.textContent = content;
 
-  const messageText = document.createElement("div");
-  messageText.classList.add("message-text");
-
-  if (isImage) {
-    const img = document.createElement("img");
-    img.src = text;
-    img.style.maxWidth = "100%";
-    messageText.appendChild(img);
-
-    // Bouton de téléchargement
-    const downloadBtn = document.createElement("button");
-    downloadBtn.textContent = "Télécharger";
-    downloadBtn.onclick = () => window.open(text, "_blank");
-    messageText.appendChild(downloadBtn);
-  } else {
-    messageText.textContent = text;
-  }
-
-  messageDiv.appendChild(avatar);
-  messageDiv.appendChild(messageText);
-  chatMessages.appendChild(messageDiv);
-  chatMessages.scrollTop = chatMessages.scrollHeight;
+    message.appendChild(sender === 'user' ? messageContent : avatar);
+    message.appendChild(sender === 'user' ? avatar : messageContent);
+    chatBox.appendChild(message);
+    chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-function sendMessage() {
-  const text = userInput.value.trim();
-  if (!text) return;
+// Fonction pour envoyer le message
+async function sendMessage() {
+    const userMessage = userInput.value.trim();
+    if (!userMessage) return;
 
-  appendMessage(text, "user");
-  userInput.value = "";
+    // Affiche le message de l'utilisateur
+    displayMessage(userMessage, 'user');
+    userInput.value = '';
 
-  if (text.startsWith("image:")) {
-    const prompt = text.replace("image:", "").trim();
-    fetch("/generate-image", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
+    // Affiche une indication "Typing..."
+    const typingMessage = document.createElement('div');
+    typingMessage.classList.add('message', 'bot');
+    typingMessage.textContent = 'Typing...';
+    chatBox.appendChild(typingMessage);
+
+    try {
+        // Appeler le backend pour générer une image
+        const response = await fetch('/generate-image', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: userMessage }),
+        });
+        const data = await response.json();
+        chatBox.removeChild(typingMessage);
+
         if (data.success) {
-          appendMessage(data.imageUrl, "bot", true);
+            displayMessage('Voici votre image générée :');
+            const image = document.createElement('img');
+            image.src = data.imageUrl;
+            image.style.maxWidth = '100%';
+            chatBox.appendChild(image);
         } else {
-          appendMessage("Erreur lors de la génération de l'image.", "bot");
+            displayMessage("Désolé, je n'ai pas pu générer l'image.");
         }
-      });
-  } else {
-    typingIndicator.style.display = "block";
-    setTimeout(() => {
-      typingIndicator.style.display = "none";
-      appendMessage("Je ne comprends pas cette commande.", "bot");
-    }, 1000);
-  }
+    } catch (error) {
+        console.error('Erreur:', error);
+        chatBox.removeChild(typingMessage);
+        displayMessage("Une erreur est survenue.");
+    }
 }
+
+// Événements
+sendBtn.addEventListener('click', sendMessage);
+userInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') sendMessage();
+});
