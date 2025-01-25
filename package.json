@@ -1,13 +1,14 @@
 {
-  "name": "chatbot-project",
+  "name": "image-chat",
   "version": "1.0.0",
-  "description": "Chatbot avec génération d'images",
+  "description": "Chatbot générateur d'images avec une interface type Messenger.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
     "express": "^4.18.2",
-    "node-fetch": "^3.3.1"
+    "axios": "^1.4.0",
+    "cors": "^2.8.5"
   }
 }
