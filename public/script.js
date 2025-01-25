@@ -1,66 +1,68 @@
-const chatMessages = document.querySelector(".chat-messages");
-const inputField = document.querySelector("#chat-input");
-const sendButton = document.querySelector("#send-button");
-const typingIndicator = document.querySelector(".typing-indicator");
+const chatMessages = document.getElementById("chat-messages");
+const userInput = document.getElementById("user-input");
+const sendButton = document.getElementById("send-button");
+const typingIndicator = document.getElementById("typing-indicator");
 
-function addMessage(text, type = "bot", imageUrl = null) {
+sendButton.addEventListener("click", sendMessage);
+
+function appendMessage(text, sender, isImage = false) {
   const messageDiv = document.createElement("div");
-  messageDiv.className = `message ${type}`;
+  messageDiv.classList.add("message", sender);
 
-  if (imageUrl) {
-    const imgElement = document.createElement("img");
-    imgElement.src = imageUrl;
-    imgElement.className = "generated-image";
-    messageDiv.appendChild(imgElement);
+  const avatar = document.createElement("img");
+  avatar.src = sender === "user" ? "user.jpg" : "chat.jpg";
 
-    const downloadButton = document.createElement("button");
-    downloadButton.textContent = "Télécharger";
-    downloadButton.className = "download-button";
-    downloadButton.onclick = () => {
-      const link = document.createElement("a");
-      link.href = imageUrl;
-      link.download = "image.jpg";
-      link.click();
-    };
-    messageDiv.appendChild(downloadButton);
+  const messageText = document.createElement("div");
+  messageText.classList.add("message-text");
+
+  if (isImage) {
+    const img = document.createElement("img");
+    img.src = text;
+    img.style.maxWidth = "100%";
+    messageText.appendChild(img);
+
+    // Bouton de téléchargement
+    const downloadBtn = document.createElement("button");
+    downloadBtn.textContent = "Télécharger";
+    downloadBtn.onclick = () => window.open(text, "_blank");
+    messageText.appendChild(downloadBtn);
   } else {
-    const textDiv = document.createElement("div");
-    textDiv.className = "text";
-    textDiv.textContent = text;
-    messageDiv.appendChild(textDiv);
+    messageText.textContent = text;
   }
 
+  messageDiv.appendChild(avatar);
+  messageDiv.appendChild(messageText);
   chatMessages.appendChild(messageDiv);
   chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-sendButton.addEventListener("click", async () => {
-  const userInput = inputField.value.trim();
-  if (!userInput) return;
+function sendMessage() {
+  const text = userInput.value.trim();
+  if (!text) return;
 
-  addMessage(userInput, "user");
-  inputField.value = "";
+  appendMessage(text, "user");
+  userInput.value = "";
 
-  typingIndicator.style.display = "flex";
-
-  if (userInput.startsWith("image:")) {
-    const prompt = userInput.replace("image:", "").trim();
-    const response = await fetch("/generate-image", {
+  if (text.startsWith("image:")) {
+    const prompt = text.replace("image:", "").trim();
+    fetch("/generate-image", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt }),
-    });
-
-    if (response.ok) {
-      const imageBlob = await response.blob();
-      const imageUrl = URL.createObjectURL(imageBlob);
-      addMessage("", "bot", imageUrl);
-    } else {
-      addMessage("Impossible de générer l'image.", "bot");
-    }
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          appendMessage(data.imageUrl, "bot", true);
+        } else {
+          appendMessage("Erreur lors de la génération de l'image.", "bot");
+        }
+      });
   } else {
-    setTimeout(() => addMessage("Je ne sais pas répondre à ça pour l'instant.", "bot"), 1000);
+    typingIndicator.style.display = "block";
+    setTimeout(() => {
+      typingIndicator.style.display = "none";
+      appendMessage("Je ne comprends pas cette commande.", "bot");
+    }, 1000);
   }
-
-  typingIndicator.style.display = "none";
-});
+}
