@@ -3,21 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chatbot</title>
+  <title>Chatbot Générateur d'Images</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="chat-container">
     <div class="chat-header">
-      <img src="chat.jpg" alt="Chatbot">
-      <h1>Chatbot</h1>
+      <img src="chat.jpg" alt="Bot Avatar">
+      <h2>ImageBot</h2>
     </div>
-    <div class="chat-messages"></div>
-    <div class="typing-indicator">
-      <span></span><span></span><span></span>
+    <div class="chat-messages" id="chat-messages">
+      <!-- Messages apparaîtront ici -->
     </div>
-    <div class="input-container">
-      <input id="chat-input" type="text" placeholder="Écrivez votre message... (image:prompt)">
+    <div class="typing-indicator" id="typing-indicator">Bot est en train d'écrire...</div>
+    <div class="chat-input">
+      <input type="text" id="user-input" placeholder="Écrivez un message ou demandez une image (e.g., image:chat)" />
       <button id="send-button">Envoyer</button>
     </div>
   </div>
