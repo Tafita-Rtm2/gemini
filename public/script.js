@@ -30,12 +30,13 @@ function displayMessage(content, sender = 'bot') {
 function displayImage(url) {
     const image = document.createElement('img');
     image.src = url;
+    image.alt = "Image générée";
     image.style.maxWidth = '100%';
     chatBox.appendChild(image);
 
     // Activer les options de téléchargement
     downloadOptions.classList.remove('hidden');
-    currentImageUrl = url;
+    currentImageUrl = url; // Stocker l'URL de l'image affichée
 }
 
 // Fonction pour envoyer le message
@@ -65,7 +66,7 @@ async function sendMessage() {
 
         if (data.success) {
             displayMessage('Voici votre image générée :');
-            displayImage(data.imageUrl);
+            displayImage(data.imageUrl); // Affiche la même image que celle téléchargée
         } else {
             displayMessage("Désolé, je n'ai pas pu générer l'image.");
         }
@@ -78,11 +79,17 @@ async function sendMessage() {
 
 // Fonction pour télécharger l'image
 function downloadImage() {
+    if (!currentImageUrl) {
+        alert("Aucune image à télécharger !");
+        return;
+    }
+
     const filename = filenameInput.value.trim() || 'image';
     const format = formatSelect.value;
-    const link = document.createElement('a');
 
-    link.href = currentImageUrl;
+    // Création d'un lien temporaire pour télécharger l'image
+    const link = document.createElement('a');
+    link.href = currentImageUrl; // Utilise l'URL stockée
     link.download = `${filename}.${format}`;
     link.click();
 }
