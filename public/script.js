@@ -1,6 +1,12 @@
 const chatBox = document.getElementById('chat-box');
 const userInput = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
+const downloadOptions = document.getElementById('download-options');
+const downloadBtn = document.getElementById('download-btn');
+const filenameInput = document.getElementById('filename');
+const formatSelect = document.getElementById('format');
+
+let currentImageUrl = ''; // Stocke l'URL de l'image générée
 
 // Fonction pour afficher les messages
 function displayMessage(content, sender = 'bot') {
@@ -18,6 +24,18 @@ function displayMessage(content, sender = 'bot') {
     message.appendChild(sender === 'user' ? avatar : messageContent);
     chatBox.appendChild(message);
     chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+// Fonction pour afficher une image avec les options de téléchargement
+function displayImage(url) {
+    const image = document.createElement('img');
+    image.src = url;
+    image.style.maxWidth = '100%';
+    chatBox.appendChild(image);
+
+    // Activer les options de téléchargement
+    downloadOptions.classList.remove('hidden');
+    currentImageUrl = url;
 }
 
 // Fonction pour envoyer le message
@@ -47,10 +65,7 @@ async function sendMessage() {
 
         if (data.success) {
             displayMessage('Voici votre image générée :');
-            const image = document.createElement('img');
-            image.src = data.imageUrl;
-            image.style.maxWidth = '100%';
-            chatBox.appendChild(image);
+            displayImage(data.imageUrl);
         } else {
             displayMessage("Désolé, je n'ai pas pu générer l'image.");
         }
@@ -61,8 +76,20 @@ async function sendMessage() {
     }
 }
 
+// Fonction pour télécharger l'image
+function downloadImage() {
+    const filename = filenameInput.value.trim() || 'image';
+    const format = formatSelect.value;
+    const link = document.createElement('a');
+
+    link.href = currentImageUrl;
+    link.download = `${filename}.${format}`;
+    link.click();
+}
+
 // Événements
 sendBtn.addEventListener('click', sendMessage);
 userInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') sendMessage();
 });
+downloadBtn.addEventListener('click', downloadImage);
