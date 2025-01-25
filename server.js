@@ -1,40 +1,27 @@
 const express = require("express");
-const fetch = require("node-fetch");
-const path = require("path");
+const cors = require("cors");
+const axios = require("axios");
 
 const app = express();
+app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static("public"));
 
-const IMAGE_API_URL = "https://betadash-api-swordslush.vercel.app/flux?prompt=";
-
-// Endpoint pour générer une image
+// Endpoint pour l'API génératrice d'images
 app.post("/generate-image", async (req, res) => {
-  const { prompt } = req.body;
-
+  const prompt = req.body.prompt;
   if (!prompt) {
-    return res.status(400).json({ error: "Le prompt est requis." });
+    return res.status(400).json({ error: "Prompt manquant" });
   }
 
   try {
-    const response = await fetch(`${IMAGE_API_URL}${encodeURIComponent(prompt)}`);
-    const data = await response.json();
-
-    if (data.ok && data.data.imageUrl) {
-      // Télécharger l'image brute et la renvoyer
-      const imageResponse = await fetch(data.data.imageUrl);
-      const imageBuffer = await imageResponse.buffer();
-      res.writeHead(200, { "Content-Type": "image/jpeg" });
-      res.end(imageBuffer);
-    } else {
-      res.status(500).json({ error: "Impossible de générer l'image." });
-    }
+    const response = await axios.get(`https://betadash-api-swordslush.vercel.app/flux?prompt=${prompt}`);
+    const imageUrl = response.data.data.imageUrl;
+    res.json({ success: true, imageUrl });
   } catch (error) {
-    res.status(500).json({ error: "Erreur lors de la requête." });
+    res.status(500).json({ success: false, error: "Erreur lors de la génération de l'image" });
   }
 });
 
-// Lancer le serveur
-app.get("/", (req, res) => res.sendFile(path.join(__dirname, "public", "index.html")));
 const PORT = 3000;
 app.listen(PORT, () => console.log(`Serveur lancé sur http://localhost:${PORT}`));
