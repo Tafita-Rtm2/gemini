@@ -1,0 +1,13 @@
+{
+  "name": "chatbot-project",
+  "version": "1.0.0",
+  "description": "Chatbot avec génération d'images",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "node-fetch": "^3.3.1"
+  }
+}
