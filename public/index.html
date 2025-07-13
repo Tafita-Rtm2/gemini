@@ -167,16 +167,18 @@
             <div id="gemini-all-model-chat-messages-area">
                 <!-- Chat messages will appear here -->
             </div>
-            <div id="gemini-all-model-chat-input-bar">
-                <input type="file" id="gemini-all-model-file-upload" accept="image/*,application/pdf,text/plain,video/*,audio/*,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none;">
-                <button id="gemini-all-model-attach-file-button" class="icon-button" title="Attach File" data-translate="gemini_all_model_attach_file_title">
-                    <svg viewBox="0 0 24 24" class="icon"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5a2.5 2.5 0 015 0v10.5c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-3.04-2.46-5.5-5.5-5.5S4 1.96 4 5v11.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"></path></svg>
-                </button>
-                <div id="gemini-all-model-file-preview-container"></div>
-                <input type="text" id="gemini-all-model-chat-input-field" placeholder="Ask Gemini (any model)..." data-translate="gemini_all_model_placeholder">
-                <button id="gemini-all-model-chat-send-button" class="icon-button" title="Send" data-translate="send_button_title">
-                    <svg viewBox="0 0 24 24" class="icon"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
-                </button>
+            <div class="chat-input-bar-container">
+                <div id="gemini-all-model-chat-input-bar">
+                    <input type="file" id="gemini-all-model-file-upload" accept="image/*,application/pdf,text/plain,video/*,audio/*,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none;">
+                    <button id="gemini-all-model-attach-file-button" class="icon-button" title="Attach File" data-translate="gemini_all_model_attach_file_title">
+                        <svg viewBox="0 0 24 24" class="icon"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5a2.5 2.5 0 015 0v10.5c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-3.04-2.46-5.5-5.5-5.5S4 1.96 4 5v11.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"></path></svg>
+                    </button>
+                    <div id="gemini-all-model-file-preview-container"></div>
+                    <input type="text" id="gemini-all-model-chat-input-field" placeholder="Ask Gemini (any model)..." data-translate="gemini_all_model_placeholder">
+                    <button id="gemini-all-model-chat-send-button" class="icon-button" title="Send" data-translate="send_button_title">
+                        <svg viewBox="0 0 24 24" class="icon"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -190,16 +192,18 @@
             <div id="all-chatgpt-chat-messages-area">
                 <!-- Chat messages will appear here -->
             </div>
-            <div id="all-chatgpt-chat-input-bar">
-                <input type="file" id="all-chatgpt-file-upload" accept="image/*,application/pdf,text/plain,video/*,audio/*,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none;">
-                <button id="all-chatgpt-attach-file-button" class="icon-button" title="Attach File" data-translate="all_chatgpt_attach_file_title">
-                    <svg viewBox="0 0 24 24" class="icon"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5a2.5 2.5 0 015 0v10.5c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-3.04-2.46-5.5-5.5-5.5S4 1.96 4 5v11.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"></path></svg>
-                </button>
-                <div id="all-chatgpt-file-preview-container"></div>
-                <input type="text" id="all-chatgpt-chat-input-field" placeholder="Ask ChatGPT (any model)..." data-translate="all_chatgpt_placeholder">
-                <button id="all-chatgpt-chat-send-button" class="icon-button" title="Send" data-translate="send_button_title">
-                    <svg viewBox="0 0 24 24" class="icon"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
-                </button>
+            <div class="chat-input-bar-container">
+                <div id="all-chatgpt-chat-input-bar">
+                    <input type="file" id="all-chatgpt-file-upload" accept="image/*,application/pdf,text/plain,video/*,audio/*,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none;">
+                    <button id="all-chatgpt-attach-file-button" class="icon-button" title="Attach File" data-translate="all_chatgpt_attach_file_title">
+                        <svg viewBox="0 0 24 24" class="icon"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5a2.5 2.5 0 015 0v10.5c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-3.04-2.46-5.5-5.5-5.5S4 1.96 4 5v11.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"></path></svg>
+                    </button>
+                    <div id="all-chatgpt-file-preview-container"></div>
+                    <input type="text" id="all-chatgpt-chat-input-field" placeholder="Ask ChatGPT (any model)..." data-translate="all_chatgpt_placeholder">
+                    <button id="all-chatgpt-chat-send-button" class="icon-button" title="Send" data-translate="send_button_title">
+                        <svg viewBox="0 0 24 24" class="icon"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -213,16 +217,18 @@
             <div id="claude-all-model-chat-messages-area">
                 <!-- Chat messages will appear here -->
             </div>
-            <div id="claude-all-model-chat-input-bar">
-                <input type="file" id="claude-all-model-file-upload" accept="image/*,application/pdf,text/plain,video/*,audio/*,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none;">
-                <button id="claude-all-model-attach-file-button" class="icon-button" title="Attach File" data-translate="claude_all_model_attach_file_title">
-                    <svg viewBox="0 0 24 24" class="icon"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5a2.5 2.5 0 015 0v10.5c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-3.04-2.46-5.5-5.5-5.5S4 1.96 4 5v11.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"></path></svg>
-                </button>
-                <div id="claude-all-model-file-preview-container"></div>
-                <input type="text" id="claude-all-model-chat-input-field" placeholder="Ask Claude (any model)..." data-translate="claude_all_model_placeholder">
-                <button id="claude-all-model-chat-send-button" class="icon-button" title="Send" data-translate="send_button_title">
-                    <svg viewBox="0 0 24 24" class="icon"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
-                </button>
+            <div class="chat-input-bar-container">
+                <div id="claude-all-model-chat-input-bar">
+                    <input type="file" id="claude-all-model-file-upload" accept="image/*,application/pdf,text/plain,video/*,audio/*,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none;">
+                    <button id="claude-all-model-attach-file-button" class="icon-button" title="Attach File" data-translate="claude_all_model_attach_file_title">
+                        <svg viewBox="0 0 24 24" class="icon"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5a2.5 2.5 0 015 0v10.5c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-3.04-2.46-5.5-5.5-5.5S4 1.96 4 5v11.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"></path></svg>
+                    </button>
+                    <div id="claude-all-model-file-preview-container"></div>
+                    <input type="text" id="claude-all-model-chat-input-field" placeholder="Ask Claude (any model)..." data-translate="claude_all_model_placeholder">
+                    <button id="claude-all-model-chat-send-button" class="icon-button" title="Send" data-translate="send_button_title">
+                        <svg viewBox="0 0 24 24" class="icon"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+                    </button>
+                </div>
             </div>
         </div>
 
