@@ -56,6 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Global Navigation Elements ---
     const allViewElements = document.querySelectorAll('.view');
     const homeBottomAppIcons = document.getElementById('home-bottom-app-icons');
+    const featureGrid = document.querySelector('#home-view .feature-grid');
     const subViewMenuTrigger = document.getElementById('sub-view-menu-trigger');
     const sideMenu = document.getElementById('side-menu');
     const homeMenuTriggerIcon = document.getElementById('home-menu-trigger-icon');
@@ -211,10 +212,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
         if (viewIdToShow === 'home-view') {
-            if (homeBottomAppIcons) homeBottomAppIcons.style.display = 'flex';
+            if (homeBottomAppIcons) homeBottomAppIcons.style.display = 'none';
             if (subViewMenuTrigger) subViewMenuTrigger.style.display = 'none';
             if (homeMenuTriggerIcon) homeMenuTriggerIcon.style.display = 'inline-flex';
             if (sideMenu && sideMenu.classList.contains('visible')) sideMenu.classList.remove('visible');
+            populateFeatureGrid();
         } else {
             if (homeBottomAppIcons) homeBottomAppIcons.style.display = 'none';
             if (subViewMenuTrigger) subViewMenuTrigger.style.display = 'inline-flex';
@@ -279,12 +281,59 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- Navigation Event Listeners ---
-    if (homeBottomAppIcons) {
-        homeBottomAppIcons.querySelectorAll('.home-app-btn').forEach(button => {
+    function populateFeatureGrid() {
+        if (!featureGrid) return;
+        featureGrid.innerHTML = '';
+        const features = [
+            {
+                view: 'gemini-all-model-view',
+                title: 'Gemini All Models',
+                description: 'Chat with various Gemini models & upload files.',
+                icon: 'https://www.gstatic.com/images/branding/product/2x/gemini_48dp.png'
+            },
+            {
+                view: 'all-chatgpt-models-view',
+                title: 'All ChatGPT Models',
+                description: 'Chat with various ChatGPT models.',
+                icon: 'chatgpt.jpg'
+            },
+            {
+                view: 'claude-all-model-view',
+                title: 'Claude All Models',
+                description: 'Chat with Claude models, with file upload.',
+                icon: 'claude.jpg'
+            },
+            {
+                view: 'image-generator-view',
+                title: "Générateur d'Images",
+                description: 'Create stunning images from text prompts.',
+                icon: '<svg viewBox="0 0 24 24" class="icon"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"></path></svg>'
+            }
+        ];
+
+        features.forEach(feature => {
+            const card = document.createElement('div');
+            card.className = 'feature-card';
+            card.dataset.view = feature.view;
+
+            const icon = feature.icon.startsWith('<svg')
+                ? feature.icon
+                : `<img src="${feature.icon}" alt="${feature.title}" class="icon">`;
+
+            card.innerHTML = `
+                ${icon}
+                <h3>${feature.title}</h3>
+                <p>${feature.description}</p>
+                <a href="#" class="btn" data-view="${feature.view}">Access</a>
+            `;
+            featureGrid.appendChild(card);
+        });
+
+        featureGrid.querySelectorAll('.btn').forEach(button => {
             button.addEventListener('click', (e) => {
                 e.preventDefault();
                 const viewId = button.dataset.view;
-                if (viewId) { // Removed VIP direct redirect
+                if (viewId) {
                     window.showView(viewId);
                 }
             });
