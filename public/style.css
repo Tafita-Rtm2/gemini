@@ -2930,19 +2930,19 @@ body.dark-mode #gemini-model-selector {
 #gemini-all-model-chat-input-bar {
     display: flex;
     align-items: center;
-    padding: 12px 15px; /* Adjusted padding */
+    padding: 8px 10px; /* Adjusted padding */
     background-color: var(--primary-bg);
     border-top: 1px solid var(--surface-color);
-    min-height: 70px; /* Ensure enough height */
+    min-height: 60px; /* Ensure enough height */
     flex-shrink: 0;
-    gap: 10px; /* Gap between input bar items */
+    gap: 5px; /* Gap between input bar items */
 }
 
 #gemini-all-model-attach-file-button {
     background-color: var(--surface-color);
     border: 1px solid var(--border-color);
-    width: 48px; /* Consistent size */
-    height: 48px;
+    width: 40px; /* Consistent size */
+    height: 40px;
     border-radius: 50%;
     flex-shrink: 0;
     display: flex;
@@ -3005,8 +3005,8 @@ body.dark-mode #gemini-model-selector {
 
 #gemini-all-model-chat-send-button {
     background-color: var(--action-color);
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     border: none;
     flex-shrink: 0;
@@ -3179,19 +3179,19 @@ body.dark-mode #all-chatgpt-model-selector {
 #all-chatgpt-chat-input-bar {
     display: flex;
     align-items: center;
-    padding: 12px 15px;
+    padding: 8px 10px;
     background-color: var(--primary-bg);
     border-top: 1px solid var(--surface-color);
-    min-height: 70px;
+    min-height: 60px;
     flex-shrink: 0;
-    gap: 10px;
+    gap: 5px;
 }
 
 #all-chatgpt-attach-file-button { /* Style for the attach button, even if disabled */
     background-color: var(--surface-color);
     border: 1px solid var(--border-color);
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     flex-shrink: 0;
     display: flex;
@@ -3248,8 +3248,8 @@ body.dark-mode #all-chatgpt-model-selector {
 
 #all-chatgpt-chat-send-button {
     background-color: #10a37f; /* OpenAI-like color for send button */
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     border: none;
     flex-shrink: 0;
@@ -3393,19 +3393,19 @@ body.dark-mode #claude-model-selector {
 #claude-all-model-chat-input-bar {
     display: flex;
     align-items: center;
-    padding: 12px 15px;
+    padding: 8px 10px;
     background-color: var(--primary-bg);
     border-top: 1px solid var(--surface-color);
-    min-height: 70px;
+    min-height: 60px;
     flex-shrink: 0;
-    gap: 10px;
+    gap: 5px;
 }
 
 #claude-all-model-attach-file-button {
     background-color: var(--surface-color);
     border: 1px solid var(--border-color);
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     flex-shrink: 0;
     display: flex;
@@ -3454,8 +3454,8 @@ body.dark-mode #claude-model-selector {
 
 #claude-all-model-chat-send-button {
     background-color: #d66800; /* Claude-associated orange/brownish color for send button */
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     border: none;
     flex-shrink: 0;
