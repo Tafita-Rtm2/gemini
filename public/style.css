@@ -6,28 +6,29 @@
 }
 
 :root {
-    /* Light Theme Variables */
-    --primary-bg: #f4f7f9;
-    --secondary-bg: #ffffff;
-    --surface-color: #ffffff;
-    --text-color: #2c3e50;
-    --text-muted-color: #8492a6;
-    --border-color: #e0e6ed;
-    --accent-color: #3498db;
-    --primary-accent-color: #2980b9;
+    /* Light Theme Variables (Original Dark Theme Inverted for Light) */
+    --primary-bg: #F0F2F5; /* Light Gray */
+    --secondary-bg: #FFFFFF; /* White */
+    --surface-color: #FFFFFF; /* White for cards */
+    --text-color: #1C1E21; /* Dark Gray */
+    --text-muted-color: #606770; /* Medium Gray */
+    --border-color: #CED0D4; /* Light Border Gray */
+    --accent-color: #1877F2; /* Facebook Blue (example) */
+    --primary-accent-color: #166FE5; /* Darker Facebook Blue */
 
-    /* Shared accent colors */
-    --secondary-accent-color: #e74c3c;
-    --action-color: #f39c12;
-    --highlight-yellow: #f1c40f;
-    --success-green: #2ecc71;
-    --info-blue: #3498db;
+    /* Shared accent colors (can be overridden in dark-mode if needed) */
+    --secondary-accent-color: #E94560; /* Magenta/Red */
+    --action-color: #FF9900;  /* Vibrant Orange */
+    --highlight-yellow: #FFD700; /* Gold/Yellow */
+    --success-green: #4CAF50; /* Softer Green for light mode success */
+    --info-blue: #007bff; /* Standard Info Blue */
 
     --icon-fill-default: var(--accent-color);
-    --icon-fill-hover: var(--primary-accent-color);
+    --icon-fill-hover: var(--text-color); /* Icons on hover in light mode */
     --font-primary: 'Exo 2', sans-serif;
 
     --top-bar-height: 60px;
+    --bottom-app-bar-height: 70px; /* For home page app icons */
 }
 
 @media (max-width: 768px) {
@@ -125,29 +126,31 @@
 
 
 body.dark-mode {
-    --primary-bg: #1a202c;
-    --secondary-bg: #2d3748;
-    --surface-color: #2d3748;
-    --text-color: #e2e8f0;
-    --text-muted-color: #a0aec0;
-    --border-color: #4a5568;
-    --accent-color: #4299e1;
-    --primary-accent-color: #2b6cb0;
-    --icon-fill-hover: var(--accent-color);
+    --primary-bg: #0a0f1e; /* Darker space blue */
+    --secondary-bg: #1a1a2e; /* Existing dark blue */
+    --surface-color: #1f1f38; /* For cards, modals */
+    --text-color: #e0e0e0; /* Light text for dark mode */
+    --text-muted-color: #a0a0a0; /* Muted light text */
+    --border-color: #00c2cb; /* Teal border for dark mode, distinct from accent */
+    --accent-color: #00ffff; /* Cyan */
+    --primary-accent-color: #00c2cb; /* Teal */
+
+    /* Dark mode specific accents if needed, or inherit from :root */
+    --secondary-accent-color: #e94560; /* Keep magenta/red */
+    --action-color: #ff9900; /* Keep orange */
+    --highlight-yellow: #ffd700; /* Keep gold */
+    --success-green: #39FF14; /* Neon Green for dark mode success */
+    --info-blue: #007bff; /* Keep info blue */
+
+    --icon-fill-default: var(--accent-color); /* Cyan icons in dark mode */
+    --icon-fill-hover: #ffffff; /* White icon hover in dark mode */
 }
 
 /* Top Bar Model Selector Styles */
 #top-bar-model-controls-container {
-    position: fixed;
-    top: var(--top-bar-height);
-    left: 0;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    padding: 10px 0;
-    background-color: var(--secondary-bg);
-    border-bottom: 1px solid var(--border-color);
-    z-index: 999;
+    /* display: flex; align-items: center; gap: 15px; -- Already set inline, but can be reinforced */
+    margin-left: auto; /* Pushes it towards the right, adjust as needed */
+    padding-right: 15px; /* Space from the edge or next element */
 }
 
 .top-bar-model-selector-wrapper {
@@ -517,8 +520,6 @@ body:not(.dark-mode) .theme-switch input:checked + .slider:before {
     padding: 15px;
     display: flex;
     flex-direction: column;
-    padding-top: 70px;
-    padding-bottom: 80px;
 }
 
 /* --- View Management --- */
@@ -885,11 +886,6 @@ body:not(.dark-mode) .theme-switch input:checked + .slider:before {
     width: 20px;
     height: 20px;
 }
-#side-menu li a div {
-    display: flex;
-    flex-direction: column;
-}
-
 #side-menu li a span {
     font-size: 0.95em;
     display: block; /* Make title and description stack */
@@ -899,52 +895,6 @@ body:not(.dark-mode) .theme-switch input:checked + .slider:before {
     color: var(--text-muted-color);
     margin-top: 2px;
     font-style: italic;
-}
-
-.feature-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-    padding: 20px;
-}
-
-.feature-card {
-    background-color: var(--surface-color);
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    text-align: center;
-    transition: transform 0.2s ease-in-out;
-}
-
-.feature-card:hover {
-    transform: translateY(-5px);
-}
-
-.feature-card .icon {
-    width: 48px;
-    height: 48px;
-    margin-bottom: 15px;
-}
-
-.feature-card h3 {
-    font-size: 1.2em;
-    margin-bottom: 10px;
-}
-
-.feature-card p {
-    font-size: 0.9em;
-    color: var(--text-muted-color);
-    margin-bottom: 20px;
-}
-
-.feature-card .btn {
-    background-color: var(--accent-color);
-    color: var(--primary-bg);
-    padding: 10px 20px;
-    border-radius: 5px;
-    text-decoration: none;
-    font-weight: 500;
 }
 #side-menu li a:hover .menu-item-description {
     color: var(--primary-bg); /* Match title color on hover */
@@ -1059,7 +1009,7 @@ body:not(.dark-mode) .theme-switch input:checked + .slider:before {
 #deepseek-chat-messages-area .chat-bubble,
 #claude-chat-messages-area .chat-bubble,
 #gemini-all-model-chat-messages-area .chat-bubble {
-    max-width: 100% !important; /* Full width minus avatar, its margins, and a little extra padding */
+    max-width: calc(100% - 40px - 12px - 10px) !important; /* Full width minus avatar, its margins, and a little extra padding */
     /* Example: 100% - avatar_width (30px) - avatar_margin (6px*2=12px) - extra_space (10px) */
     /* This allows the bubble to take almost all available horizontal space next to the small avatar */
     overflow-wrap: break-word; /* Ensure long words/strings break to prevent overflow */
@@ -1083,15 +1033,17 @@ body:not(.dark-mode) .theme-switch input:checked + .slider:before {
     flex-direction: row !important;
 }
 
+/* Mobile specific adjustments for avatar alignment - These are commented out to enforce desktop view */
+/*
 @media (max-width: 768px) {
     .chat-message-wrapper.user {
-        justify-content: flex-end;
+        justify-content: flex-end; 
     }
     .chat-message-wrapper.ai {
-        justify-content: flex-start;
+        justify-content: flex-start; 
     }
     .chat-message-wrapper.user .chat-avatar-container {
-        order: 1;
+        order: 1; 
         margin-left: 8px;
         margin-right: 0;
     }
@@ -1099,7 +1051,7 @@ body:not(.dark-mode) .theme-switch input:checked + .slider:before {
         order: 0;
     }
     .chat-message-wrapper.ai .chat-avatar-container {
-        order: 0;
+        order: 0; 
         margin-right: 8px;
         margin-left: 0;
     }
@@ -1114,68 +1066,10 @@ body:not(.dark-mode) .theme-switch input:checked + .slider:before {
     #deepseek-chat-messages-area .chat-bubble,
     #claude-chat-messages-area .chat-bubble,
     #gemini-all-model-chat-messages-area .chat-bubble {
-        max-width: 90% !important;
+        max-width: 90% !important; 
     }
 }
-
-@media (max-width: 768px) {
-    #top-bar {
-        padding: 0 10px;
-    }
-
-    #side-menu {
-        width: 250px;
-    }
-
-    #main-content {
-        padding: 10px;
-    }
-
-    .view {
-        padding: 15px;
-    }
-
-    #home-bottom-app-icons {
-        gap: 10px;
-        padding: 0 10px;
-        justify-content: space-between;
-    }
-
-    .home-app-btn {
-        width: 60px;
-        height: 60px;
-        font-size: 0.6em;
-    }
-
-    .chat-view-header h2 {
-        font-size: 1.1em;
-    }
-
-    #chat-input-bar,
-    #gemini-chat-input-bar,
-    #gpt4o-chat-input-bar,
-    #blackbox-chat-input-bar,
-    #deepseek-chat-input-bar,
-    #claude-chat-input-bar,
-    #gemini-all-model-chat-input-bar,
-    #all-chatgpt-chat-input-bar,
-    #claude-all-model-chat-input-bar {
-        padding: 10px;
-        flex-wrap: wrap;
-    }
-
-    #chat-input-field,
-    #gemini-chat-input-field,
-    #gpt4o-chat-input-field,
-    #blackbox-chat-input-field,
-    #deepseek-chat-input-field,
-    #claude-chat-input-field,
-    #gemini-all-model-chat-input-field,
-    #all-chatgpt-chat-input-field,
-    #claude-all-model-chat-input-field {
-        padding: 12px 15px;
-    }
-}
+*/
 .chat-avatar-container {
     width: 30px !important; /* Keep reduced avatar size */
     height: 30px !important; /* Reduced avatar size */
@@ -1231,8 +1125,8 @@ body:not(.dark-mode) .theme-switch input:checked + .slider:before {
 }
 
 .chat-message-wrapper.user .chat-bubble {
-    background-color: var(--accent-color) !important;
-    color: #ffffff !important;
+    background-color: var(--primary-accent-color) !important;
+    color: var(--secondary-bg) !important; /* Text on user bubble (e.g. white) */
     border-bottom-right-radius: 6px !important;
 }
 .chat-message-wrapper.user .chat-bubble strong { color: var(--secondary-bg) !important; }
@@ -1289,22 +1183,57 @@ body:not(.dark-mode) .theme-switch input:checked + .slider:before {
     40% { transform: scale(1.0); }
 }
 
-.chat-input-bar-container {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 10px;
-    background-color: var(--primary-bg);
-}
-
-#chat-input-bar {
+.chat-input-bar {
     display: flex;
     align-items: center;
+    padding: 10px;
+    background-color: var(--primary-bg);
+    border-top: 1px solid var(--border-color);
+}
+
+.chat-input-wrapper {
+    display: flex;
+    align-items: center;
+    width: 100%;
     background-color: var(--secondary-bg);
-    padding: 8px;
     border-radius: 25px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    padding: 5px 10px;
+}
+
+.chat-input-wrapper input[type="text"] {
+    flex-grow: 1;
+    border: none;
+    outline: none;
+    padding: 10px;
+    background-color: transparent;
+    color: var(--text-color);
+    font-size: 1em;
+}
+
+.chat-input-wrapper .icon-button {
+    background-color: transparent;
+    border: none;
+    border-radius: 50%;
+    padding: 8px;
+    margin: 0 5px;
+    cursor: pointer;
+}
+
+.chat-input-wrapper .icon-button .icon {
+    width: 24px;
+    height: 24px;
+}
+
+.chat-input-wrapper #gemini-all-model-chat-send-button,
+.chat-input-wrapper #all-chatgpt-chat-send-button,
+.chat-input-wrapper #claude-all-model-chat-send-button {
+    background-color: var(--accent-color);
+}
+
+.chat-input-wrapper #gemini-all-model-chat-send-button .icon,
+.chat-input-wrapper #all-chatgpt-chat-send-button .icon,
+.chat-input-wrapper #claude-all-model-chat-send-button .icon {
+    fill: #fff;
 }
 
 .web-search-container {
@@ -1332,27 +1261,42 @@ body:not(.dark-mode) .theme-switch input:checked + .slider:before {
 
 #chat-input-field {
     flex-grow: 1 !important;
-    padding: 10px !important;
-    border: none !important;
-    background-color: transparent !important;
+    padding: 14px 20px !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 25px !important;
+    background-color: var(--surface-color) !important;
     color: var(--text-color) !important;
     font-family: var(--font-primary) !important;
-    margin: 0 8px !important;
+    margin-right: 10px !important;
     outline: none !important;
+    display: block;
+    min-width: 50px !important;
+    visibility: visible;
+    opacity: 1;
+    min-height: 48px !important;
+    height: 48px !important;
+    position: relative !important;
+}
+#chat-input-field:focus {
+    border-color: var(--action-color) !important;
+    box-shadow: 0 0 8px rgba(255, 153, 0, 0.6) !important;
 }
 
 #chat-send-button {
-    background-color: var(--accent-color) !important;
-    width: 40px !important;
-    height: 40px !important;
+    background-color: var(--action-color) !important;
+    width: 48px !important;
+    height: 48px !important;
     border-radius: 50% !important;
-    border: none !important;
     display: flex;
     align-items: center !important;
     justify-content: center !important;
     cursor: pointer !important;
+    visibility: visible;
+    opacity: 1;
+    padding: 0 !important;
     flex-shrink: 0 !important;
-    transition: background-color 0.2s ease;
+    position: relative !important;
+    border: none !important;
 }
 #chat-send-button:hover {
     background-color: var(--primary-accent-color) !important; /* Example: Use primary accent for hover */
@@ -3829,8 +3773,7 @@ body.dark-mode .code-block-wrapper {
     margin: 0;
     padding: 15px;
     overflow-x: auto; /* Horizontal scroll for long lines */
-    white-space: pre-wrap; /* Preserve whitespace and line breaks, crucial for code */
-    word-wrap: break-word;
+    white-space: pre; /* Preserve whitespace and line breaks, crucial for code */
     font-family: 'Courier New', Courier, monospace;
     font-size: 0.9em;
     max-width: 100%; /* Ensures <pre> itself doesn't overflow its parent (.code-block-wrapper) */
