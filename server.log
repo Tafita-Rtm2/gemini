@@ -1,0 +1,7 @@
+Successfully connected to MongoDB Atlas!
+Indexes ensured for comments collection.
+Indexes ensured for userActivities collection.
+Unique indexes ensured for uid and name in users collection.
+Server is running on http://localhost:3000
+Comment submitted by verified user: CommenterAlpha001 (UID: commenterUID001)
+Activity tracking: User name not found for UID: nonExistentUID008. Storing activity with name 'Unknown'.
