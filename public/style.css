@@ -6,174 +6,189 @@
 }
 
 :root {
-    --primary-bg: #F0F2F5;
-    --secondary-bg: #FFFFFF;
-    --surface-color: #FFFFFF;
-    --text-color: #1C1E21;
-    --text-muted-color: #606770;
-    --border-color: #CED0D4;
-    --accent-color: #1877F2;
-    --primary-accent-color: #166FE5;
-    --secondary-accent-color: #E94560;
-    --action-color: #FF9900;
-    --highlight-yellow: #FFD700;
-    --success-green: #4CAF50;
-    --info-blue: #007bff;
+    /* Light Theme Variables (Original Dark Theme Inverted for Light) */
+    --primary-bg: #F0F2F5; /* Light Gray */
+    --secondary-bg: #FFFFFF; /* White */
+    --surface-color: #FFFFFF; /* White for cards */
+    --text-color: #1C1E21; /* Dark Gray */
+    --text-muted-color: #606770; /* Medium Gray */
+    --border-color: #CED0D4; /* Light Border Gray */
+    --accent-color: #1877F2; /* Facebook Blue (example) */
+    --primary-accent-color: #166FE5; /* Darker Facebook Blue */
+
+    /* Shared accent colors (can be overridden in dark-mode if needed) */
+    --secondary-accent-color: #E94560; /* Magenta/Red */
+    --action-color: #FF9900;  /* Vibrant Orange */
+    --highlight-yellow: #FFD700; /* Gold/Yellow */
+    --success-green: #4CAF50; /* Softer Green for light mode success */
+    --info-blue: #007bff; /* Standard Info Blue */
+
     --icon-fill-default: var(--accent-color);
-    --icon-fill-hover: var(--text-color);
+    --icon-fill-hover: var(--text-color); /* Icons on hover in light mode */
     --font-primary: 'Exo 2', sans-serif;
+
     --top-bar-height: 60px;
+    --bottom-app-bar-height: 70px; /* For home page app icons */
 }
 
-body.dark-mode {
-    --primary-bg: #0a0f1e;
-    --secondary-bg: #1a1a2e;
-    --surface-color: #1f1f38;
-    --text-color: #e0e0e0;
-    --text-muted-color: #a0a0a0;
-    --border-color: #00c2cb;
-    --accent-color: #00ffff;
-    --primary-accent-color: #00c2cb;
-    --success-green: #39FF14;
-    --icon-fill-default: var(--accent-color);
-    --icon-fill-hover: #ffffff;
+@media (max-width: 768px) {
+    :root {
+        --top-bar-height: 50px;
+        --bottom-app-bar-height: 60px;
+    }
 }
 
-body {
-    font-family: var(--font-primary);
-    background-color: var(--primary-bg);
-    color: var(--text-color);
-    margin: 0;
-    padding-top: var(--top-bar-height);
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    box-sizing: border-box;
-    overflow-x: hidden;
-    transition: background-color 0.3s ease, color 0.3s ease;
+.main-content-hidden {
+    display: none !important; /* Ensure this hides content effectively */
 }
 
-a {
-    color: var(--accent-color);
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-a:hover {
-    color: var(--primary-accent-color);
-}
-
-/* --- Top Bar --- */
-#top-bar {
+#welcome-screen {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: var(--top-bar-height);
-    background-color: var(--secondary-bg);
-    padding: 0 15px;
-    border-bottom: 1px solid var(--border-color);
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--primary-bg); /* Use theme background */
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 3000; /* Highest z-index to cover everything */
+    padding: 20px;
+    box-sizing: border-box;
+    text-align: center;
+    opacity: 1;
+    transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+}
+
+#welcome-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none; /* Prevent interaction when hidden */
+}
+
+.welcome-content {
+    background-color: var(--secondary-bg);
+    padding: 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    max-width: 500px;
+    width: 100%;
+}
+
+.welcome-content h1 {
+    color: var(--accent-color);
+    font-size: 1.8em;
+    margin-bottom: 15px;
+}
+
+.welcome-content p {
+    color: var(--text-muted-color);
+    margin-bottom: 25px;
+    font-size: 1.1em;
+}
+
+#user-name-input {
+    width: 100%;
+    padding: 12px 18px;
+    margin-bottom: 25px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--primary-bg);
+    color: var(--text-color);
+    font-size: 1.1em;
     box-sizing: border-box;
 }
+#user-name-input:focus {
+    outline: none;
+    border-color: var(--action-color);
+    box-shadow: 0 0 8px var(--action-color);
+}
 
-#top-left-menu-icon-container .icon-menu-main {
+#submit-name-button.btn-primary { /* Assuming .btn-primary exists or adding styles */
+    background-color: var(--action-color);
+    color: var(--primary-bg); /* Text color for action button */
+    border: none;
+    padding: 12px 30px;
+    font-size: 1.1em;
+    font-weight: 500;
+    border-radius: 8px;
     cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+#submit-name-button.btn-primary:hover {
+    background-color: var(--primary-accent-color);
+    transform: translateY(-2px);
+}
+#welcome-error-message { /* Styles for error message on welcome screen */
+    margin-top: 15px;
+    /* .error-message class already has color and basic styling */
 }
 
-#theme-toggle-container {
-    display: flex;
-    align-items: center;
-    margin-right: 20px;
+
+body.dark-mode {
+    --primary-bg: #0a0f1e; /* Darker space blue */
+    --secondary-bg: #1a1a2e; /* Existing dark blue */
+    --surface-color: #1f1f38; /* For cards, modals */
+    --text-color: #e0e0e0; /* Light text for dark mode */
+    --text-muted-color: #a0a0a0; /* Muted light text */
+    --border-color: #00c2cb; /* Teal border for dark mode, distinct from accent */
+    --accent-color: #00ffff; /* Cyan */
+    --primary-accent-color: #00c2cb; /* Teal */
+
+    /* Dark mode specific accents if needed, or inherit from :root */
+    --secondary-accent-color: #e94560; /* Keep magenta/red */
+    --action-color: #ff9900; /* Keep orange */
+    --highlight-yellow: #ffd700; /* Keep gold */
+    --success-green: #39FF14; /* Neon Green for dark mode success */
+    --info-blue: #007bff; /* Keep info blue */
+
+    --icon-fill-default: var(--accent-color); /* Cyan icons in dark mode */
+    --icon-fill-hover: #ffffff; /* White icon hover in dark mode */
 }
 
-.theme-switch {
-    position: relative;
-    display: inline-block;
-    width: 50px;
-    height: 26px;
-}
-
-.theme-switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.theme-switch .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: .4s;
-    border-radius: 26px;
-}
-
-.theme-switch .slider:before {
-    position: absolute;
-    content: "";
-    height: 20px;
-    width: 20px;
-    left: 3px;
-    bottom: 3px;
-    background-color: var(--surface-color);
-    transition: .4s;
-    border-radius: 50%;
-}
-
-body.dark-mode .theme-switch input:checked + .slider {
-    background-color: var(--accent-color);
-}
-
-.theme-switch input:checked + .slider:before {
-    transform: translateX(24px);
-}
-
+/* Top Bar Model Selector Styles */
 #top-bar-model-controls-container {
-    margin-left: auto;
-    padding-right: 15px;
+    /* display: flex; align-items: center; gap: 15px; -- Already set inline, but can be reinforced */
+    margin-left: auto; /* Pushes it towards the right, adjust as needed */
+    padding-right: 15px; /* Space from the edge or next element */
 }
 
 .top-bar-model-selector-wrapper {
-    align-items: center;
+    /* display: none; /* JS handles this */
+    align-items: center; /* Vertically align label and select if label were visible */
 }
 
 .top-bar-model-name {
+    /* display: none; /* JS handles this */
     font-size: 0.95em;
     font-weight: 500;
-    color: var(--accent-color);
-    margin-right: 10px;
+    color: var(--accent-color); /* Or var(--text-color) based on preference */
+    margin-right: 10px; /* Space between name and selector */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 200px;
+    max-width: 200px; /* Prevent very long names from breaking layout */
 }
 
 #top-bar-gemini-model-selector,
 #top-bar-all-chatgpt-model-selector,
 #top-bar-claude-model-selector {
-    min-width: 180px;
-    padding: 6px 10px;
-    padding-right: 30px;
+    min-width: 180px; /* Slightly reduced min-width for top bar context */
+    padding: 6px 10px; /* Reduced padding for top bar */
+    padding-right: 30px; /* Space for custom arrow */
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23a0a0a0' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: right 8px center;
-    background-size: 14px 12px;
+    background-position: right 8px center; /* Adjusted arrow position */
+    background-size: 14px 12px; /* Adjusted arrow size */
     border-radius: 6px;
     border: 1px solid var(--border-color);
     background-color: var(--primary-bg);
     color: var(--text-color);
     font-family: var(--font-primary);
-    font-size: 0.85em;
+    font-size: 0.85em; /* Smaller font for top bar */
     outline: none;
     cursor: pointer;
     box-shadow: 0 1px 2px rgba(0,0,0,0.05);
@@ -196,8 +211,634 @@ body.dark-mode #top-bar-claude-model-selector {
 #top-bar-all-chatgpt-model-selector:focus,
 #top-bar-claude-model-selector:focus {
     border-color: var(--accent-color);
-    box-shadow: 0 0 0 2px var(--accent-color);
+    box-shadow: 0 0 0 2px var(--accent-color); /* Adjusted focus shadow */
 }
+
+/* Basic styling for <option> elements - limited cross-browser support */
+#top-bar-gemini-model-selector option,
+#top-bar-all-chatgpt-model-selector option,
+#top-bar-claude-model-selector option {
+    font-family: var(--font-primary);
+    background-color: var(--secondary-bg); /* Or --surface-color */
+    color: var(--text-color);
+    padding: 5px 10px; /* Padding might not apply consistently */
+}
+/* Hover/selected state for options is very browser-dependent and hard to style consistently with pure CSS */
+
+
+body {
+    font-family: var(--font-primary);
+    background-color: var(--primary-bg); /* Use variable */
+    color: var(--text-color);           /* Use variable */
+    margin: 0;
+    padding-top: var(--top-bar-height); /* Space for fixed top bar */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    box-sizing: border-box;
+    overflow-x: hidden; /* Prevent horizontal scroll */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Add transition */
+}
+
+a {
+    color: var(--accent-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+a:hover {
+    color: var(--primary-accent-color);
+}
+
+/* General Webkit Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 10px; /* Slightly wider for general use */
+    height: 10px; /* For horizontal scrollbars */
+}
+::-webkit-scrollbar-track {
+    background: var(--primary-bg); /* Track color */
+    border-radius: 5px;
+}
+::-webkit-scrollbar-thumb {
+    background-color: var(--accent-color); /* Thumb color */
+    border-radius: 5px;
+    border: 2px solid var(--primary-bg); /* Creates padding around thumb */
+}
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--primary-accent-color); /* Thumb hover color */
+}
+/* Apply to specific scrollable containers if not all body */
+#side-menu::-webkit-scrollbar-thumb { /* Example for side menu */
+     background-color: var(--primary-accent-color);
+}
+#side-menu::-webkit-scrollbar-track { /* Example for side menu */
+     background: var(--secondary-bg);
+}
+.image-history-list::-webkit-scrollbar-thumb,
+.story-history-list::-webkit-scrollbar-thumb { /* Example for history lists */
+    background-color: var(--primary-accent-color);
+}
+.image-history-list::-webkit-scrollbar-track,
+.story-history-list::-webkit-scrollbar-track { /* Example for history lists */
+    background: var(--secondary-bg);
+}
+
+/* Card/Surface Styling Utility */
+.card-style {
+    background-color: var(--surface-color);
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    /* border: 1px solid var(--border-color); /* Optional: if cards need borders by default */
+}
+
+/* General Headings Styling */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-primary);
+    color: var(--accent-color); /* Default accent color for titles */
+    margin-top: 1em; /* Default margin, can be overridden */
+    margin-bottom: 0.5em; /* Default margin, can be overridden */
+}
+h1 { font-size: 2.2em; letter-spacing: 1px; }
+h2 { font-size: 1.8em; letter-spacing: 0.5px; } /* e.g., View titles */
+h3 { font-size: 1.5em; } /* e.g., Section titles within views */
+h4 { font-size: 1.2em; } /* e.g., Sub-section titles or item titles */
+/* Specific overrides exist in components like chat bubbles, story display etc. */
+
+
+/* --- SVG Icon Policy --- */
+.icon {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    fill: var(--icon-fill-default);
+    vertical-align: middle;
+    transition: fill 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.icon-button .icon {
+    /* Specific sizing for icons within buttons can be adjusted if needed */
+}
+
+.icon-button:hover .icon {
+    fill: var(--icon-fill-hover);
+    transform: scale(1.1);
+}
+
+/* --- General .icon-button Styling --- */
+.icon-button {
+    background-color: transparent;
+    border: 2px solid var(--border-color); /* Increased border thickness */
+    color: var(--text-color);
+    padding: 8px;
+    margin: 4px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease; /* Added box-shadow transition */
+    outline: none;
+    position: relative; /* For pseudo-elements if needed for more futuristic effects */
+}
+.icon-button::before { /* Subtle futuristic glow effect */
+    content: '';
+    position: absolute;
+    top: -3px; left: -3px; right: -3px; bottom: -3px;
+    border-radius: 50%;
+    border: 1px solid transparent;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    pointer-events: none; /* So it doesn't interfere with clicks */
+}
+
+.icon-button:hover {
+    background-color: var(--accent-color);
+    border-color: var(--primary-accent-color); /* Darker accent for border on hover */
+    color: var(--primary-bg);
+    transform: translateY(-2px) scale(1.05); /* Slightly larger pop */
+    box-shadow: 0 0 10px var(--accent-color), 0 0 20px var(--accent-color); /* Enhanced glow */
+}
+.icon-button:hover::before {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 8px var(--accent-color);
+}
+
+.icon-button:focus {
+    box-shadow: 0 0 0 2px var(--primary-bg), 0 0 0 4px var(--accent-color), 0 0 12px var(--accent-color); /* More prominent focus glow */
+    border-color: var(--accent-color);
+}
+.icon-button:disabled {
+    background-color: var(--text-muted-color) !important;
+    border-color: var(--text-muted-color) !important;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+.icon-button:disabled::before {
+    border-color: transparent !important;
+    box-shadow: none !important;
+}
+.icon-button:disabled .icon {
+    fill: var(--surface-color) !important;
+}
+
+/* --- Top Bar --- */
+/* Style for the dynamically added chat title in the top bar */
+.top-bar-chat-title-display {
+    font-size: 1.1em;
+    font-weight: 500;
+    color: var(--accent-color);
+    margin-left: 15px; /* Adjust as needed for spacing */
+    flex-grow: 1; /* Allow it to take available space */
+    text-align: center; /* Center the title */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+@media (max-width: 768px) {
+    .top-bar-chat-title-display {
+        margin-left: 10px;
+        font-size: 1em;
+        text-align: left; /* Align left on mobile for better use of space next to menu icon */
+    }
+}
+
+
+#top-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: var(--top-bar-height);
+    background-color: var(--secondary-bg);
+    padding: 0 15px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+    box-sizing: border-box;
+}
+
+#theme-toggle-container {
+    display: flex;
+    align-items: center;
+    margin-right: 20px; /* Adjust spacing as needed */
+}
+
+.theme-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px; /* Width of the switch */
+    height: 26px; /* Height of the switch */
+}
+
+.theme-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.theme-switch .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc; /* Default slider background for light mode */
+    transition: .4s;
+    border-radius: 26px; /* Rounded slider */
+}
+
+.theme-switch .slider:before {
+    position: absolute;
+    content: "";
+    height: 20px; /* Size of the knob */
+    width: 20px;  /* Size of the knob */
+    left: 3px;    /* Position of the knob */
+    bottom: 3px;  /* Position of the knob */
+    background-color: var(--surface-color); /* Knob color for light mode */
+    transition: .4s;
+    border-radius: 50%;
+}
+
+/* Styles for the switch when dark mode is active */
+body.dark-mode .theme-switch .slider {
+    background-color: #555; /* Slider background when dark mode is on, but toggle is for light */
+}
+body.dark-mode .theme-switch .slider:before {
+    background-color: #ccc; /* Knob color for dark mode's "light" setting */
+}
+body.dark-mode .theme-switch input:checked + .slider {
+    background-color: var(--accent-color); /* Slider background when dark mode is on AND toggle is for dark */
+}
+body.dark-mode .theme-switch input:checked + .slider:before {
+    background-color: var(--primary-bg); /* Knob color for dark mode's "dark" setting (e.g. matches dark bg) */
+}
+
+/* Styles for the switch when light mode is active (default) */
+body:not(.dark-mode) .theme-switch .slider {
+    background-color: #ccc; /* Slider background for light mode, "light" setting */
+}
+body:not(.dark-mode) .theme-switch .slider:before {
+    background-color: white; /* Knob color for light mode, "light" setting */
+}
+body:not(.dark-mode) .theme-switch input:checked + .slider {
+    background-color: var(--accent-color); /* This should not happen if JS is correct, dark mode is applied via class */
+                                         /* However, if checkbox is checked without JS, this is the visual */
+}
+body:not(.dark-mode) .theme-switch input:checked + .slider:before {
+    background-color: var(--primary-bg); /* Knob for "dark" setting in light mode context (if possible) */
+}
+
+
+.theme-switch input:focus + .slider {
+    box-shadow: 0 0 1px var(--accent-color); /* Focus outline using current accent color */
+}
+
+.theme-switch input:checked + .slider:before {
+    transform: translateX(24px); /* How far the knob moves */
+}
+
+#top-left-menu-icon-container .icon-menu-main {
+    cursor: pointer;
+}
+#weather-display-container {
+    min-width: 100px;
+    text-align: right;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    font-size: 0.9em;
+    height: 100%;
+}
+
+/* --- Main Content Area --- */
+#main-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- View Management --- */
+.view {
+    display: none;
+    width: 100%;
+    flex-grow: 1;
+    animation: fadeInView 0.5s ease-in-out;
+    background-color: var(--secondary-bg); /* Standardized background */
+    padding: 20px; /* Standardized padding */
+    border-radius: 8px; /* Standardized radius */
+    margin-bottom: 15px; /* Space from bottom or between views if stacked */
+}
+.view.active {
+    display: block;
+}
+
+@keyframes fadeInView {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Specific overrides for certain views */
+#ai-chat-view {
+    padding: 0 !important; /* Chat view manages its own internal padding for messages area */
+    border-radius: 10px !important;
+    /* background-color already set by .view, if #ai-chat-view needs specific bg, set it here */
+    display: flex;
+    flex-direction: column !important;
+    height: calc(100vh - var(--top-bar-height) - 30px) !important;
+    visibility: visible;
+    opacity: 1;
+}
+
+#home-view {
+    background-color: var(--primary-bg); /* Home view uses primary background */
+    padding: 15px; /* Retain specific padding for home */
+    /* margin-bottom might not be needed if it's the main view usually */
+}
+
+
+/* --- Home Page Specific --- */
+#home-bottom-app-icons {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: var(--bottom-app-bar-height);
+    background-color: var(--secondary-bg);
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 10px; /* Overall padding for the bar */
+    gap: 5px; /* Add a small gap between the buttons */
+    z-index: 1000;
+    overflow-x: auto; /* Enable horizontal scrolling */
+    overflow-y: hidden; /* Hide vertical scrollbar if any */
+}
+
+/* Inner wrapper for buttons to allow them to overflow */
+#home-bottom-app-icons-wrapper {
+    display: flex;
+    flex-wrap: nowrap; /* Prevent wrapping to new line */
+    padding: 0 5px; /* Padding for the ends of the scrollable content */
+    height: 100%;
+    align-items: center; /* Align buttons vertically */
+}
+
+.home-app-btn {
+    background-color: var(--surface-color);
+    border: 2px solid var(--primary-accent-color); /* Slightly thicker border */
+    border-radius: 15px;
+    width: 65px; /* Slightly larger */
+    height: 65px; /* Slightly larger */
+    padding: 5px;
+    color: var(--text-color);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    transition: transform 0.2s ease-out, box-shadow 0.3s ease-out, background-color 0.2s ease, border-color 0.3s ease; /* Added border-color transition */
+    font-size: 0.7em;
+    gap: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Subtle initial shadow */
+}
+.home-app-btn .icon {
+    width: 28px;
+    height: 28px;
+    fill: var(--icon-fill-default);
+    margin-bottom: 0;
+    transition: fill 0.2s ease;
+}
+.home-app-btn:hover {
+    transform: translateY(-4px) scale(1.05); /* More pronounced hover effect */
+    box-shadow: 0 8px 18px rgba(0, 255, 255, 0.5), 0 0 15px var(--action-color); /* Dual color futuristic glow */
+    background-color: var(--surface-color); /* Brighter background on hover */
+    color: var(--accent-color); /* Text color matches accent */
+    border-color: var(--action-color); /* Border color changes to action color */
+}
+.home-app-btn:hover .icon {
+    fill: var(--action-color); /* Icon color changes to action color */
+}
+
+
+/* Specific button styles with enhanced futuristic borders/glows */
+/* Chat send buttons */
+#chat-send-button,
+#gemini-chat-send-button,
+#gpt4o-chat-send-button,
+#blackbox-chat-send-button,
+#deepseek-chat-send-button,
+#claude-chat-send-button,
+#gemini-all-model-chat-send-button {
+    border-width: 2px; /* Ensure border is visible if it was none */
+    border-style: solid;
+    border-color: var(--action-color); /* Initial border matching background */
+    box-shadow: 0 0 8px transparent; /* Placeholder for transition */
+}
+#chat-send-button:hover,
+#gemini-chat-send-button:hover,
+#gpt4o-chat-send-button:hover,
+#blackbox-chat-send-button:hover,
+#deepseek-chat-send-button:hover,
+#claude-chat-send-button:hover,
+#gemini-all-model-chat-send-button:hover {
+    border-color: var(--highlight-yellow); /* Glowing border on hover */
+    box-shadow: 0 0 12px var(--highlight-yellow);
+}
+
+/* Primary action buttons (e.g., Generate Image, Generate Story) */
+#generate-image-button,
+#generate-story-button,
+.btn-submit-comment, /* Comment submit on home */
+#generate-temp-email-button { /* Email generator */
+    border: 2px solid transparent; /* Initial transparent border */
+    box-shadow: 0 0 8px transparent, inset 0 0 5px rgba(255,255,255,0.1); /* Subtle inset */
+    transition: background-color 0.3s ease, transform 0.2s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+#generate-image-button:hover,
+#generate-story-button:hover,
+.btn-submit-comment:hover,
+#generate-temp-email-button:hover {
+    border-color: var(--highlight-yellow); /* Or var(--accent-color) */
+    box-shadow: 0 0 10px var(--highlight-yellow), 0 0 20px var(--action-color), inset 0 0 8px rgba(255,255,255,0.2);
+}
+
+
+/* Secondary/Utility buttons (e.g., download, copy, refresh) */
+#download-image-button,
+#story-listen-button,
+#story-stop-speech-button,
+#story-translate-button,
+#story-download-button-text,
+#copy-email-button,
+#refresh-inbox-button,
+.btn-history-regenerate, /* Image history regenerate */
+.box-movie-back-btn, /* Movie detail back */
+.watch-trailer-btn, /* Movie trailer */
+.btn-action-movie { /* Other movie actions */
+    border-width: 2px;
+    border-style: solid;
+    border-color: var(--border-color); /* Default border */
+    box-shadow: 0 0 5px transparent;
+    transition: background-color 0.3s ease, transform 0.2s ease, border-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+}
+
+#download-image-button:hover,
+#story-listen-button:hover,
+#story-stop-speech-button:hover,
+#story-translate-button:hover,
+#story-download-button-text:hover,
+#copy-email-button:hover,
+#refresh-inbox-button:hover,
+.btn-history-regenerate:hover,
+.box-movie-back-btn:hover,
+.watch-trailer-btn:hover,
+.btn-action-movie:hover:not(:disabled) {
+    border-color: var(--secondary-accent-color); /* Example: Magenta/Red border */
+    box-shadow: 0 0 10px var(--secondary-accent-color);
+    color: var(--secondary-accent-color); /* Text color can also change */
+}
+#download-image-button:hover .icon, /* If icon color needs to match text */
+#story-listen-button:hover .icon,
+#story-stop-speech-button:hover .icon,
+#story-translate-button:hover .icon,
+#story-download-button-text:hover .icon,
+#copy-email-button:hover .icon {
+    fill: var(--secondary-accent-color);
+}
+
+
+/* --- TRAILER MODAL STYLES --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85); /* Darker overlay for more focus */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2500;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out, visibility 0s linear 0.3s; /* Delay visibility transition */
+}
+
+.modal-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.modal-content {
+    background-color: var(--secondary-bg);
+    padding: 20px; /* Slightly less padding */
+    border-radius: 8px; /* Consistent with other cards */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    position: relative;
+    width: 90vw; /* Use viewport width */
+    max-width: 880px; /* Max width for very large screens */
+    transform: translateY(-50px) scale(0.95); /* Initial state for animation */
+    opacity: 0;
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.3s ease-out; /* Smoother animation */
+}
+
+.modal-overlay.visible .modal-content {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+
+.modal-close-button {
+    position: absolute;
+    top: -15px;
+    right: -15px;
+    font-size: 1.8em;
+    font-weight: bold;
+    color: var(--primary-bg);
+    background-color: var(--accent-color);
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    line-height: 1; /* Better centering for × */
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border: 2px solid var(--primary-bg);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    z-index: 10; /* Ensure close button is above video container if overlapping */
+}
+.modal-close-button:hover {
+    transform: rotate(90deg) scale(1.1);
+    background-color: var(--secondary-accent-color);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+}
+
+.video-responsive-container {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 Aspect Ratio */
+    background-color: #000;
+    border-radius: 5px;
+}
+
+.video-responsive-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+/* --- END OF TRAILER MODAL STYLES --- */
+
+#public-comments-section { /* This is within #home-view */
+    margin-top: 20px;
+    padding: 15px;
+    background-color: var(--surface-color);
+    border-radius: 8px;
+    margin-bottom: calc(var(--bottom-app-bar-height) + 15px); /* Ensure space for fixed bottom bar */
+}
+
+#admin-login-trigger-icon {
+    position: fixed;
+    bottom: 15px; /* Adjust if #home-bottom-app-icons is not used, or relative to it */
+    left: 15px;
+    cursor: pointer;
+    z-index: 999;
+}
+#admin-login-trigger-icon .icon-admin-login {
+    width: 30px;
+    height: 30px;
+    fill: var(--text-muted-color);
+    background-color: var(--surface-color); /* Use CSS variable */
+    padding: 5px;
+    border-radius: 50%;
+}
+#admin-login-trigger-icon:hover .icon-admin-login {
+    fill: var(--accent-color);
+}
+
+
+/* --- Sub-View Menu Trigger (Top-Left) --- */
+#sub-view-menu-trigger {
+    position: fixed;
+    top: calc(var(--top-bar-height) / 2 - 22px / 2 - 8px); /* Approx vertical center, considering padding */
+    left: 15px;
+    z-index: 1010;
+}
+
 
 /* --- Side Menu --- */
 #side-menu {
@@ -216,75 +857,2121 @@ body.dark-mode #top-bar-claude-model-selector {
     z-index: 2000;
     box-sizing: border-box;
 }
-
 #side-menu.visible {
     transform: translateX(0);
 }
-
 #side-menu ul {
     list-style: none;
     padding: 0;
     margin: 0;
 }
-
 #side-menu li a {
     display: flex;
     align-items: center;
-    padding: 14px 20px;
+    padding: 14px 20px; /* Increased vertical padding slightly */
     color: var(--text-color);
     text-decoration: none;
     transition: background-color 0.2s ease, color 0.2s ease;
     border-bottom: 1px solid var(--surface-color);
 }
-
 #side-menu li a:hover {
     background-color: var(--accent-color);
     color: var(--primary-bg);
 }
-
 #side-menu li a:hover .icon {
     fill: var(--primary-bg);
 }
-
 #side-menu li a .icon {
     margin-right: 15px;
     width: 20px;
     height: 20px;
 }
-
 #side-menu li a span {
     font-size: 0.95em;
-    display: block;
+    display: block; /* Make title and description stack */
+}
+#side-menu li a .menu-item-description {
+    font-size: 0.75em;
+    color: var(--text-muted-color);
+    margin-top: 2px;
+    font-style: italic;
+}
+#side-menu li a:hover .menu-item-description {
+    color: var(--primary-bg); /* Match title color on hover */
 }
 
-/* --- Main Content --- */
-#main-content {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1rem;
-    padding: 1rem;
-    height: calc(100vh - var(--top-bar-height));
-    overflow: hidden;
+#side-menu li:last-child a {
+    border-bottom: none;
 }
 
-@media (min-width: 1024px) {
-    #main-content {
-        grid-template-columns: repeat(2, 1fr);
-        grid-template-rows: repeat(2, 1fr);
+/* --- Private Message Floating Button (Commented Out) --- */
+/*
+#private-message-trigger-container {
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
+    z-index: 999;
+}
+#private-message-float-btn {
+    background-color: var(--secondary-accent-color);
+    border-color: var(--secondary-accent-color);
+}
+#private-message-float-btn:hover {
+    background-color: var(--action-color); 
+    border-color: var(--action-color);
+}
+#private-message-float-btn .icon {
+    fill: var(--secondary-bg); 
+}
+#private-message-float-btn:hover .icon {
+    fill: var(--secondary-bg); 
+}
+*/
+/* --- EXISTING FEATURE STYLES (MERGED) --- */
+
+/* Weather Display (already partially in #top-bar section) */
+.weather-info { display: flex; align-items: center; gap: 8px; }
+.weather-condition-svg {
+    width: 28px;
+    height: 28px;
+    fill: var(--accent-color);
+    flex-shrink: 0;
+}
+.weather-text p { margin: 0; line-height: 1.3; }
+.weather-location { font-weight: 500; font-size: 0.9em; }
+.weather-temp { font-size: 1.1em; font-weight: bold; color: var(--highlight-yellow); }
+.weather-description { font-size: 0.8em; color: var(--text-muted-color); }
+.weather-loading, .weather-error { font-style: italic; color: var(--text-muted-color); }
+
+/* Comments Section (already partially in #home-view section) */
+#public-comments-section h3 { color: var(--accent-color); margin-top: 0; border-bottom: 1px solid var(--primary-accent-color); padding-bottom: 10px; margin-bottom: 20px; }
+#comment-form .form-group { margin-bottom: 15px; }
+#comment-form label { display: block; margin-bottom: 5px; color: var(--text-muted-color); font-size: 0.9em; }
+#comment-form input[type="text"], #comment-form textarea { width: 100%; padding: 10px; background-color: var(--primary-bg); border: 1px solid var(--border-color); border-radius: 5px; color: var(--text-color); font-family: var(--font-primary); box-sizing: border-box; transition: border-color 0.3s ease, box-shadow 0.3s ease; }
+#comment-form input[type="text"]:focus, #comment-form textarea:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 8px var(--accent-color); }
+#comment-form input[type="text"].prefilled {
+    background-color: var(--surface-color); /* Slightly different background */
+    color: var(--text-muted-color); /* Dimmer text color */
+    cursor: not-allowed;
+    /* border-style: dashed; Optional: make border look different */
+}
+#comment-form textarea { resize: vertical; min-height: 80px; }
+.btn-submit-comment { background-color: var(--accent-color); color: var(--primary-bg); border: none; padding: 10px 20px; border-radius: 5px; font-family: var(--font-primary); font-weight: 500; cursor: pointer; transition: background-color 0.3s ease, transform 0.2s ease; text-transform: uppercase; letter-spacing: 1px; }
+.btn-submit-comment:hover { background-color: var(--primary-accent-color); transform: translateY(-2px); }
+#comments-display-area { margin-top: 30px; }
+.comment-item { background-color: var(--secondary-bg); padding: 15px; margin-bottom: 15px; border-radius: 5px; border-left: 3px solid var(--accent-color); box-shadow: 2px 2px 5px rgba(0,0,0,0.2); }
+.comment-item strong { color: var(--accent-color); display: block; margin-bottom: 5px; }
+.comment-item p { margin: 0 0 8px 0; color: var(--text-color); word-wrap: break-word; }
+.comment-item .comment-timestamp { font-size: 0.8em; color: var(--text-muted-color); display: block; text-align: right; }
+
+/* AI CHAT */
+#ai-chat-view {
+    display: flex;
+    flex-direction: column !important;
+    height: calc(100vh - var(--top-bar-height) - 30px) !important;
+    padding:0 !important;
+    box-sizing: border-box !important;
+    background-color: var(--secondary-bg) !important;
+    border-radius: 10px !important;
+    overflow: hidden !important;
+    visibility: visible;
+    opacity: 1;
+}
+
+#chat-messages-area {
+    flex-grow: 1 !important;
+    overflow-y: auto !important;
+    padding: 20px !important;
+    background-color: var(--primary-bg) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 15px !important;
+}
+
+#chat-messages-area::-webkit-scrollbar { width: 8px; }
+#chat-messages-area::-webkit-scrollbar-track { background: var(--primary-bg); }
+#chat-messages-area::-webkit-scrollbar-thumb { background-color: var(--accent-color); border-radius: 4px; }
+#chat-messages-area::-webkit-scrollbar-thumb:hover { background-color: var(--primary-accent-color); }
+
+.chat-message-wrapper {
+    display: flex !important;
+    align-items: flex-end !important;
+    margin-bottom: 0 !important;
+    /* max-width: 85% !important; */ /* Adjusted by new rule below */
+}
+/* Increase max-width of chat bubbles for wider appearance */
+.chat-messages-area .chat-bubble, /* Generic for all chat areas if a common class is added to message areas */
+#chat-messages-area .chat-bubble,
+#gemini-chat-messages-area .chat-bubble,
+#gpt4o-chat-messages-area .chat-bubble,
+#blackbox-chat-messages-area .chat-bubble,
+#deepseek-chat-messages-area .chat-bubble,
+#claude-chat-messages-area .chat-bubble,
+#gemini-all-model-chat-messages-area .chat-bubble {
+    max-width: calc(100% - 40px - 12px - 10px) !important; /* Full width minus avatar, its margins, and a little extra padding */
+    /* Example: 100% - avatar_width (30px) - avatar_margin (6px*2=12px) - extra_space (10px) */
+    /* This allows the bubble to take almost all available horizontal space next to the small avatar */
+    overflow-wrap: break-word; /* Ensure long words/strings break to prevent overflow */
+    word-wrap: break-word; /* Legacy support */
+    word-break: break-word; /* Added for better CJK character handling and aggressive breaking */
+}
+
+/* Remove the media query that was reducing max-width on larger screens,
+   as the new calc() based max-width should adapt well.
+   If specific desktop adjustments are needed, they can be added back carefully. */
+/* @media (min-width: 769px) { ... } */
+
+
+.chat-message-wrapper.user {
+    align-self: flex-end !important;
+    flex-direction: row-reverse !important;
+}
+
+.chat-message-wrapper.ai {
+    align-self: flex-start !important;
+    flex-direction: row !important;
+}
+
+/* Mobile specific adjustments for avatar alignment - These are commented out to enforce desktop view */
+/*
+@media (max-width: 768px) {
+    .chat-message-wrapper.user {
+        justify-content: flex-end; 
+    }
+    .chat-message-wrapper.ai {
+        justify-content: flex-start; 
+    }
+    .chat-message-wrapper.user .chat-avatar-container {
+        order: 1; 
+        margin-left: 8px;
+        margin-right: 0;
+    }
+    .chat-message-wrapper.user .chat-bubble {
+        order: 0;
+    }
+    .chat-message-wrapper.ai .chat-avatar-container {
+        order: 0; 
+        margin-right: 8px;
+        margin-left: 0;
+    }
+    .chat-message-wrapper.ai .chat-bubble {
+        order: 1;
+    }
+    .chat-messages-area .chat-bubble,
+    #chat-messages-area .chat-bubble,
+    #gemini-chat-messages-area .chat-bubble,
+    #gpt4o-chat-messages-area .chat-bubble,
+    #blackbox-chat-messages-area .chat-bubble,
+    #deepseek-chat-messages-area .chat-bubble,
+    #claude-chat-messages-area .chat-bubble,
+    #gemini-all-model-chat-messages-area .chat-bubble {
+        max-width: 90% !important; 
     }
 }
+*/
+.chat-avatar-container {
+    width: 30px !important; /* Keep reduced avatar size */
+    height: 30px !important; /* Reduced avatar size */
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 6px !important; /* Reduced margin around avatar */
+    flex-shrink: 0 !important;
+    border: 1px solid var(--border-color) !important;
+}
+.chat-avatar-container .icon,
+.chat-avatar-container img { /* Ensure img/svg inside also scale down */
+    width: 18px !important; /* Smaller icon/image inside avatar */
+    height: 18px !important;
+}
 
-.view {
+
+.chat-message-wrapper.user .chat-avatar-container {
+    background-color: var(--accent-color) !important;
+}
+.chat-message-wrapper.user .chat-avatar-container .icon {
+    fill: var(--primary-bg) !important;
+}
+.chat-message-wrapper.ai .chat-avatar-container {
+    background-color: var(--surface-color) !important;
+}
+.chat-message-wrapper.ai .chat-avatar-container .icon {
+    fill: var(--accent-color) !important;
+}
+
+.chat-avatar-container .icon {
+    width: 20px !important;
+    height: 20px !important;
+}
+
+
+.chat-bubble {
+    padding: 14px 20px !important; /* Slightly increased padding */
+    border-radius: 22px !important;
+    max-width: calc(100% - 40px - 16px) !important; /* Max width of bubble itself */
+    line-height: 1.6 !important;
+    word-wrap: break-word !important;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.25) !important;
+}
+.chat-bubble a {
+    color: var(--accent-color); /* Use accent color for links */
+    text-decoration: underline;
+    font-weight: 500; /* Slightly bolder */
+}
+.chat-bubble a:hover {
+    color: var(--primary-accent-color); /* Darker accent on hover */
+}
+
+.chat-message-wrapper.user .chat-bubble {
+    background-color: var(--primary-accent-color) !important;
+    color: var(--secondary-bg) !important; /* Text on user bubble (e.g. white) */
+    border-bottom-right-radius: 6px !important;
+}
+.chat-message-wrapper.user .chat-bubble strong { color: var(--secondary-bg) !important; }
+.chat-message-wrapper.user .chat-bubble h3,
+.chat-message-wrapper.user .chat-bubble h4 { color: var(--secondary-bg) !important; }
+
+
+.chat-message-wrapper.ai .chat-bubble {
+    background-color: var(--surface-color) !important;
+    color: var(--text-color) !important;
+    border-bottom-left-radius: 6px !important;
+}
+
+.chat-bubble h3 {
+    font-size: 1.2em !important;
+    color: var(--secondary-accent-color) !important;
+    margin-top: 0.5em !important;
+    margin-bottom: 0.3em !important;
+    font-weight: 600 !important;
+}
+.chat-bubble h4 {
+    font-size: 1.1em !important;
+    color: var(--primary-accent-color) !important;
+    margin-top: 0.4em !important;
+    margin-bottom: 0.2em !important;
+    font-weight: 600 !important;
+}
+
+.chat-bubble .typing-indicator {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 10px 0 !important;
+}
+
+.typing-indicator span {
+    display: inline-block !important;
+    width: 8px !important;
+    height: 8px !important;
+    margin: 0 2px !important;
+    background-color: var(--text-muted-color) !important;
+    border-radius: 50% !important;
+    animation: typing-bounce 1.4s infinite ease-in-out both !important;
+}
+.chat-message-wrapper.ai .chat-bubble .typing-indicator span {
+     background-color: var(--accent-color) !important;
+}
+.typing-indicator span:nth-child(1) { animation-delay: -0.32s !important; }
+.typing-indicator span:nth-child(2) { animation-delay: -0.16s !important; }
+
+
+@keyframes typing-bounce {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1.0); }
+}
+
+#chat-input-bar {
+    display: flex;
+    align-items: center !important;
+    padding: 15px !important;
+    background-color: var(--primary-bg) !important;
+    border-top: 1px solid var(--surface-color) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    visibility: visible;
+    opacity: 1;
+    height: auto !important;
+    min-height: 70px !important;
+    position: relative !important;
+    z-index: 100 !important;
+    flex-shrink: 0 !important;
+}
+
+.web-search-container {
+    display: flex;
+    align-items: center !important;
+    margin-right: 15px !important;
+    font-size: 0.9em !important;
+    visibility: visible;
+    opacity: 1;
+}
+.web-search-container .web-search-label,
+.web-search-container .switch {
+    visibility: visible;
+    opacity: 1;
+    display: inline-block;
+}
+.web-search-container .switch input {
+    opacity: 1; /* Make the checkbox itself part of the visible logic if needed for interaction */
+}
+ .web-search-container .slider { /* Ensure slider part of switch is visible */
+    visibility: visible;
+    opacity: 1;
+}
+
+
+#chat-input-field {
+    flex-grow: 1 !important;
+    padding: 14px 20px !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 25px !important;
+    background-color: var(--surface-color) !important;
+    color: var(--text-color) !important;
+    font-family: var(--font-primary) !important;
+    margin-right: 10px !important;
+    outline: none !important;
+    display: block;
+    min-width: 50px !important;
+    visibility: visible;
+    opacity: 1;
+    min-height: 48px !important;
+    height: 48px !important;
+    position: relative !important;
+}
+#chat-input-field:focus {
+    border-color: var(--action-color) !important;
+    box-shadow: 0 0 8px rgba(255, 153, 0, 0.6) !important;
+}
+
+#chat-send-button {
+    background-color: var(--action-color) !important;
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 50% !important;
+    display: flex;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    visibility: visible;
+    opacity: 1;
+    padding: 0 !important;
+    flex-shrink: 0 !important;
+    position: relative !important;
+    border: none !important;
+}
+#chat-send-button:hover {
+    background-color: var(--primary-accent-color) !important; /* Example: Use primary accent for hover */
+}
+#chat-send-button:disabled {
+    background-color: var(--text-muted-color) !important;
+    cursor: not-allowed !important;
+}
+
+#chat-send-button .icon {
+    fill: var(--primary-bg) !important;
+    width: 26px !important;
+    height: 26px !important;
+    display: inline-block !important;
+}
+
+/* --- GEMINI CHAT VIEW STYLES (Part 1: Layout & Input Bar) --- */
+#gemini-chat-view {
+    display: flex;
+    flex-direction: column !important; /* Important to override .view if it's not flex column by default */
+    height: calc(100vh - var(--top-bar-height) - 30px) !important; /* Full height minus top bar and some padding */
+    padding: 0 !important; /* View itself has no padding, internal elements will */
+    box-sizing: border-box !important;
+    background-color: var(--secondary-bg) !important; /* Consistent background */
+    border-radius: 10px !important; /* Consistent radius */
+    overflow: hidden !important; /* Prevent content spill */
+}
+
+#gemini-chat-messages-area {
+    flex-grow: 1 !important;
+    overflow-y: auto !important;
+    padding: 20px !important;
+    background-color: var(--primary-bg) !important; /* Background for messages */
+    border-bottom: 1px solid var(--border-color) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 15px !important;
+}
+
+#gemini-chat-messages-area::-webkit-scrollbar { width: 8px; }
+#gemini-chat-messages-area::-webkit-scrollbar-track { background: var(--primary-bg); }
+#gemini-chat-messages-area::-webkit-scrollbar-thumb { background-color: var(--accent-color); border-radius: 4px; }
+#gemini-chat-messages-area::-webkit-scrollbar-thumb:hover { background-color: var(--primary-accent-color); }
+
+#gemini-chat-input-bar {
+    display: flex;
+    align-items: center !important;
+    padding: 15px !important;
+    background-color: var(--primary-bg) !important; /* Match messages area bg or slightly different */
+    border-top: 1px solid var(--surface-color) !important; /* Separator */
+    width: 100% !important;
+    box-sizing: border-box !important;
+    min-height: 70px !important; /* Ensure enough height */
+    flex-shrink: 0 !important; /* Prevent shrinking */
+}
+
+#gemini-chat-attach-image-button {
+    background-color: var(--surface-color); /* A neutral background */
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 50% !important;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+#gemini-chat-attach-image-button .icon {
+    fill: var(--accent-color); /* Icon color */
+}
+#gemini-chat-attach-image-button:hover {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+#gemini-chat-attach-image-button:hover .icon {
+    fill: var(--primary-bg);
+}
+
+
+#gemini-image-preview-container img {
+    display: block; /* Remove extra space below img */
+    border: 1px solid var(--border-color);
+}
+#gemini-chat-image-url-field { /* Styles for the temporary image URL field */
+    padding: 12px 15px !important; /* Adjusted padding */
+    border: 1px solid var(--border-color) !important;
+    border-radius: 20px !important; /* Rounded to match main input */
+    background-color: var(--surface-color) !important;
+    color: var(--text-color) !important;
+    font-family: var(--font-primary) !important;
+    margin-right: 10px !important; /* Space before main input */
+    outline: none !important;
+    font-size: 0.9em; /* Slightly smaller than main input */
+    height: 48px !important; /* Match other buttons/input height */
+    box-sizing: border-box;
+}
+#gemini-chat-image-url-field:focus {
+    border-color: var(--action-color) !important;
+    box-shadow: 0 0 6px rgba(255, 153, 0, 0.5) !important;
+}
+
+
+#gemini-chat-input-field {
+    flex-grow: 1 !important;
+    padding: 14px 20px !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 25px !important;
+    background-color: var(--surface-color) !important;
+    color: var(--text-color) !important;
+    font-family: var(--font-primary) !important;
+    margin-right: 10px !important;
+    outline: none !important;
+    min-height: 48px !important; /* Ensure height */
+    height: 48px !important;
+    box-sizing: border-box;
+}
+#gemini-chat-input-field:focus {
+    border-color: var(--action-color) !important; /* Use a vibrant color for focus */
+    box-shadow: 0 0 8px rgba(255, 153, 0, 0.6) !important;
+}
+
+#gemini-chat-send-button {
+    background-color: var(--action-color) !important; /* Vibrant send button */
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    border: none !important;
+    flex-shrink: 0 !important; /* Prevent shrinking */
+}
+#gemini-chat-send-button:hover {
+    background-color: var(--primary-accent-color) !important; /* Darker shade on hover */
+}
+#gemini-chat-send-button:disabled {
+    background-color: var(--text-muted-color) !important;
+    cursor: not-allowed !important;
+}
+#gemini-chat-send-button .icon {
+    fill: var(--primary-bg) !important; /* Icon color on button */
+    width: 26px !important;
+    height: 26px !important;
+}
+/* End of Gemini Chat View Styles Part 1 */
+
+/* --- GEMINI CHAT VIEW STYLES (Part 2: Messages Display) --- */
+/* Leveraging existing .chat-message-wrapper, .chat-avatar-container, .chat-bubble styles */
+
+#gemini-chat-messages-area .chat-message-wrapper {
+    /* Styles are inherited, explicitly define if overrides are needed */
+    /* e.g., max-width if different from AI chat */
+}
+
+#gemini-chat-messages-area .chat-message-wrapper.user .chat-bubble {
+    /* Styles inherited, e.g., background-color: var(--primary-accent-color) */
+    /* border-bottom-right-radius: 6px; */
+}
+
+#gemini-chat-messages-area .chat-message-wrapper.ai .chat-bubble {
+    /* Styles inherited, e.g., background-color: var(--surface-color) */
+    /* border-bottom-left-radius: 6px; */
+}
+
+/* Styling for images within chat bubbles in Gemini chat */
+#gemini-chat-messages-area .chat-bubble img {
+    max-width: 100%; /* Ensure image is responsive within the bubble */
+    max-height: 300px; /* Limit height to prevent overly large images */
+    border-radius: 6px; /* Rounded corners for the image */
+    margin-top: 10px; /* Space above the image if there's text */
+    display: block; /* Ensure it behaves as a block element for margin */
+    border: 1px solid var(--border-color); /* Subtle border for the image */
+}
+
+/* Specific styling for Gemini's typing indicator if needed, though it reuses .typing-indicator */
+#gemini-chat-messages-area .chat-bubble .typing-indicator span {
+    /* Inherits from general .typing-indicator span */
+    /* If Gemini needs different colors: */
+    /* background-color: var(--secondary-accent-color); */ /* Example */
+}
+
+/* Ensure text formatting (bold, headings from formatTextContent) looks good */
+#gemini-chat-messages-area .chat-bubble h3,
+#gemini-chat-messages-area .chat-bubble h4,
+#gemini-chat-messages-area .chat-bubble strong {
+    /* These will inherit from the general .chat-bubble h3, h4, strong styles if they exist */
+    /* Add specific overrides for Gemini if necessary */
+}
+/* End of Gemini Chat View Styles Part 2 */
+
+/* --- GEMINI CHAT VIEW STYLES (Part 3: Customizations) --- */
+
+/* Styling for Gemini Logo as avatar */
+#gemini-chat-messages-area .chat-avatar-container .gemini-avatar-logo {
+    width: 100%; /* Make image fill the container */
+    height: 100%; /* Make image fill the container */
+    border-radius: 50%; /* Ensure it's circular if the container is */
+    object-fit: cover; /* Cover the area, might crop if aspect ratio differs */
+}
+
+/* User message bubble background color in Gemini chat */
+#gemini-chat-messages-area .chat-message-wrapper.user .chat-bubble {
+    background-color: #008000 !important; /* Vert */
+    /* Ensure text color contrasts well with green, e.g., white */
+    color: #FFFFFF !important;
+}
+
+/* If the green background makes links or other elements hard to see, add specific styles */
+#gemini-chat-messages-area .chat-message-wrapper.user .chat-bubble a {
+    color: #FFFFE0 !important; /* Light Yellow for links on green background */
+    text-decoration: underline !important;
+}
+#gemini-chat-messages-area .chat-message-wrapper.user .chat-bubble a:hover {
+    color: #FAFAD2 !important; /* Lighter Yellow on hover */
+}
+#gemini-chat-messages-area .chat-message-wrapper.user .chat-bubble strong {
+    color: #FFFFFF !important; /* Ensure strong text is also white or a light contrast */
+}
+
+/* GPT-4o user chat bubble link colors */
+#gpt4o-chat-messages-area .chat-message-wrapper.user .chat-bubble a {
+    color: #FFFFE0 !important; /* Light Yellow for links on red background */
+    text-decoration: underline !important;
+}
+#gpt4o-chat-messages-area .chat-message-wrapper.user .chat-bubble a:hover {
+    color: #FAFAD2 !important; /* Lighter Yellow on hover */
+}
+#gpt4o-chat-messages-area .chat-message-wrapper.user .chat-bubble strong {
+    color: #FFFFFF !important; /* Ensure strong text is also white or a light contrast */
+}
+
+
+/* End of Gemini Chat View Styles Part 3 */
+
+/* Styles for Gemini Logo used as general icons (menu, home button) */
+.gemini-logo-icon { /* This class is added to the <img> tags in HTML */
+    object-fit: contain; /* Ensures the logo scales nicely without distortion */
+    /* The .icon class already provides width, height, and vertical-align for side menu */
+    /* For home-app-btn, the .icon class within it also sets size */
+}
+
+/* Specific adjustments if the .icon class defaults are not perfect for <img> */
+#side-menu li a .gemini-logo-icon.icon-side-menu-item {
+    /* width: 20px; height: 20px; are from .icon & .icon-side-menu-item */
+    /* No fill property for <img> */
+}
+
+.home-app-btn .gemini-logo-icon.icon {
+    /* width: 28px; height: 28px; are from .home-app-btn .icon */
+    /* No fill property for <img> */
+}
+
+/* --- GPT-4o CHAT VIEW STYLES --- */
+/* Basic structure and input bar will largely mimic Gemini's styles */
+#gpt4o-chat-view {
+    display: flex;
+    flex-direction: column !important;
+    height: calc(100vh - var(--top-bar-height) - 30px) !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    background-color: var(--secondary-bg) !important;
+    border-radius: 10px !important;
+    overflow: hidden !important;
+}
+
+#gpt4o-chat-messages-area {
+    flex-grow: 1 !important;
+    overflow-y: auto !important;
+    padding: 20px !important;
+    background-color: var(--primary-bg) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 15px !important;
+}
+
+#gpt4o-chat-messages-area::-webkit-scrollbar { width: 8px; }
+#gpt4o-chat-messages-area::-webkit-scrollbar-track { background: var(--primary-bg); }
+#gpt4o-chat-messages-area::-webkit-scrollbar-thumb { background-color: var(--accent-color); border-radius: 4px; }
+#gpt4o-chat-messages-area::-webkit-scrollbar-thumb:hover { background-color: var(--primary-accent-color); }
+
+#gpt4o-chat-input-bar {
+    display: flex;
+    align-items: center !important;
+    padding: 15px !important;
+    background-color: var(--primary-bg) !important;
+    border-top: 1px solid var(--surface-color) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    min-height: 70px !important;
+    flex-shrink: 0 !important;
+}
+
+#gpt4o-chat-attach-image-button { /* Assuming similar styling to Gemini's attach button */
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 50% !important;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+#gpt4o-chat-attach-image-button .icon { fill: var(--accent-color); }
+#gpt4o-chat-attach-image-button:hover { background-color: var(--accent-color); border-color: var(--accent-color); }
+#gpt4o-chat-attach-image-button:hover .icon { fill: var(--primary-bg); }
+
+#gpt4o-image-preview-container img {
+    display: block;
+    border: 1px solid var(--border-color);
+}
+
+#gpt4o-chat-input-field { /* Assuming similar styling to Gemini's input field */
+    flex-grow: 1 !important;
+    padding: 14px 20px !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 25px !important;
+    background-color: var(--surface-color) !important;
+    color: var(--text-color) !important;
+    font-family: var(--font-primary) !important;
+    margin-right: 10px !important;
+    outline: none !important;
+    min-height: 48px !important;
+    height: 48px !important;
+    box-sizing: border-box;
+}
+#gpt4o-chat-input-field:focus {
+    border-color: var(--action-color) !important;
+    box-shadow: 0 0 8px rgba(255, 153, 0, 0.6) !important;
+}
+
+#gpt4o-chat-send-button { /* Assuming similar styling to Gemini's send button */
+    background-color: var(--action-color) !important;
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 50% !important;
+    border: none !important;
+    flex-shrink: 0 !important;
+}
+#gpt4o-chat-send-button:hover { background-color: var(--primary-accent-color) !important; }
+#gpt4o-chat-send-button:disabled { background-color: var(--text-muted-color) !important; cursor: not-allowed !important; }
+#gpt4o-chat-send-button .icon { fill: var(--primary-bg) !important; width: 26px !important; height: 26px !important; }
+
+/* GPT-4o Chat Message Styling */
+/* Avatar for GPT-4o (using gpt.jpg or placeholder) */
+#gpt4o-chat-messages-area .chat-avatar-container .gpt4o-avatar-logo { /* Class for the <img> tag */
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+/* Fallback for SVG if image fails to load and onerror handler injects SVG with .icon */
+#gpt4o-chat-messages-area .chat-avatar-container .icon-chat-ai {
+    fill: var(--accent-color); /* Or a specific color for GPT-4o placeholder */
+}
+
+
+/* User message bubble background color in GPT-4o chat */
+#gpt4o-chat-messages-area .chat-message-wrapper.user .chat-bubble {
+    background-color: #d9534f !important; /* Red color - Bootstrap's btn-danger red */
+    color: #FFFFFF !important;
+}
+#gpt4o-chat-messages-area .chat-message-wrapper.user .chat-bubble a {
+    color: #f0f0f0 !important; /* Lighter color for links on red background */
+}
+#gpt4o-chat-messages-area .chat-message-wrapper.user .chat-bubble strong {
+    color: #FFFFFF !important;
+}
+
+/* Images within GPT-4o chat bubbles */
+#gpt4o-chat-messages-area .chat-bubble img {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 6px;
+    margin-top: 10px;
+    display: block;
+    border: 1px solid var(--border-color);
+}
+/* End of GPT-4o Chat View Styles */
+
+
+/* General Input and Textarea Styling */
+/* Ensure .icon-button is suitable for icon-only buttons */
+.icon-button { /* Reviewing existing styles for icon-only context */
+    /* padding: 8px; /* Base padding */
+    /* border-radius: 50%; /* Base is circular */
+    /* For non-circular icon buttons (like generate/download), these are overridden by specific ID styles */
+}
+.icon-button .icon {
+    margin: 0; /* Ensure no extra margin if it's truly icon-only */
+}
+
+/* Specific icon color adjustments based on new button backgrounds */
+#generate-image-button .icon,
+#generate-story-button .icon,
+/* #chat-send-button .icon, /* Already handled above */
+.btn-primary .icon { /* If .btn-primary can contain icons */
+    fill: var(--primary-bg); /* Icon color for --action-color background */
+}
+
+.btn-admin-reply .icon {
+    fill: var(--primary-bg); /* For --accent-color or --action-color background */
+}
+.btn-admin-delete .icon {
+    fill: var(--secondary-bg); /* For --secondary-accent-color background */
+}
+
+#story-listen-button .icon,
+#story-translate-button .icon,
+#story-download-button-text .icon {
+    fill: var(--secondary-bg); /* Assuming these buttons have a colored background */
+}
+
+
+input[type="text"],
+input[type="password"],
+input[type="email"], /* Adding for contact form later */
+textarea {
+    background-color: var(--primary-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 5px; /* Default radius, can be overridden */
+    color: var(--text-color);
+    font-family: var(--font-primary);
+    padding: 10px 15px; /* Default padding */
+    width: 100%; /* Default to full width within container */
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--action-color);
+    box-shadow: 0 0 8px var(--action-color); /* Use variable for glow */
+}
+textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+
+.web-search-container { display: flex; align-items: center; margin-right: 15px; font-size: 0.9em; }
+.web-search-label { color: var(--text-muted-color); margin-right: 8px; }
+.switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--surface-color); transition: .4s; border-radius: 20px; border: 1px solid var(--border-color); }
+.slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 2px; bottom: 2px; background-color: var(--text-muted-color); transition: .4s; border-radius: 50%; }
+input:checked + .slider { background-color: var(--accent-color); border-color: var(--accent-color); }
+input:checked + .slider:before { transform: translateX(20px); background-color: var(--primary-bg); }
+
+/* IMAGE GENERATOR */
+#image-generator-view {
+    background-color: var(--secondary-bg); /* Consistent with other views */
+    padding: 25px;
+    border-radius: 10px;
+    box-sizing: border-box;
+    /* Consider a subtle background pattern or gradient if desired */
+}
+
+#image-generator-view h2 {
+    color: var(--accent-color); /* Already there, ensure consistency */
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 30px; /* More space below title */
+}
+
+#image-prompt-area {
+    display: flex;
+    margin-bottom: 30px; /* More space after prompt area */
+    gap: 15px; /* More gap between input and button */
+}
+
+#image-prompt-field {
+    flex-grow: 1;
+    padding: 15px 22px; /* Increase padding */
+    background-color: var(--primary-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 30px; /* More rounded */
+    color: var(--text-color);
+    font-family: var(--font-primary);
+    outline: none;
+    font-size: 1.1em; /* Slightly larger font */
+    /* Add a subtle transition for focus */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+#image-prompt-field:focus {
+    border-color: var(--primary-accent-color); /* Different accent for focus */
+    box-shadow: 0 0 12px var(--primary-accent-color);
+}
+
+/* #generate-image-button, #download-image-button are .icon-button. Specific overrides: */
+#generate-image-button {
+    padding: 15px 25px; /* Increase padding */
+    /* background-color: var(--action-color); /* Handled by shared rule */
+    /* color: var(--primary-bg); /* Handled by shared rule */
+    border-radius: 30px; /* More rounded */
+    border: none;
+    font-weight: 500;
+    font-size: 1em;
+}
+#generate-image-button .icon {
+    fill: var(--primary-bg);
+    margin-right: 8px; /* Space between icon and text if any */
+}
+#generate-image-button:hover { background-color: var(--primary-accent-color); transform: translateY(-2px); }
+#generate-image-button:disabled { background-color: var(--text-muted-color) !important; cursor: not-allowed; }
+
+#image-display-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 350px; /* Slightly larger min-height */
+    max-height: 65vh;
+    background-color: var(--primary-bg); /* Darker background for contrast */
+    border: 2px dashed var(--primary-accent-color); /* More prominent border */
+    border-radius: 15px; /* More rounding */
+    margin-bottom: 20px;
+    padding: 20px; /* More padding */
+    text-align: center;
+    color: var(--text-muted-color);
+}
+#image-display-area p { /* Placeholder text styling */
+    font-size: 1.1em;
+    color: var(--text-muted-color);
+}
+#image-display-area img {
+    max-width: 100%;
+    max-height: calc(65vh - 40px); /* Adjusted for padding */
+    border-radius: 10px; /* Rounded corners for the image */
+    object-fit: contain;
+    box-shadow: 0 5px 20px var(--accent-color); /* Use variable with alpha for shadow */
+}
+.image-loading, .image-error {
+    font-style: italic;
+    font-size: 1.1em; /* Consistent with placeholder */
+}
+.image-error { color: var(--secondary-accent-color); }
+
+#download-image-button {
+    padding: 15px 25px; /* Increase padding */
+    background-color: var(--accent-color);
+    color: var(--primary-bg);
+    border-radius: 30px; /* More rounded */
+    border: none;
+    font-weight: 500;
+    font-size: 1em;
+    margin: 20px auto; /* Ensure it's centered and has space */
+    display: none; /* Keep initial display:none */
+}
+#download-image-button .icon {
+    fill: var(--primary-bg);
+    margin-right: 8px;
+}
+#download-image-button:hover { background-color: var(--primary-accent-color); transform: translateY(-2px); }
+
+
+#image-history-gallery {
+    margin-top: 35px;
+    padding-top: 25px;
+    border-top: 1px solid var(--surface-color); /* Softer separator */
+}
+#image-history-gallery h4 {
+    color: var(--primary-accent-color);
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 1.3em; /* Larger history title */
+}
+.image-history-list {
+    list-style-type: none;
+    padding: 0;
+    max-height: 250px; /* More space for history items */
+    overflow-y: auto;
+    border: 1px solid var(--surface-color); /* Softer border */
+    background-color: var(--primary-bg); /* Match input field bg */
+    border-radius: 5px;
+    padding: 10px;
+}
+.image-history-item {
+    background-color: var(--secondary-bg);
+    padding: 10px 15px; /* Adjust padding */
+    margin-bottom: 0; /* Using border as separator */
+    border-bottom: 1px solid var(--surface-color); /* Separator */
+    border-radius: 0; /* Items are flush */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.95em; /* Slightly larger font for history items */
+    color: var(--text-muted-color);
+}
+.image-history-item:last-child { border-bottom: none; }
+.image-history-item span {
+    flex-grow: 1;
+    margin-right: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text-color); /* Make prompt text clearer */
+}
+.btn-history-regenerate {
+    background-color: var(--accent-color);
+    color: var(--primary-bg);
+    border: none;
+    padding: 6px 12px; /* Adjust padding */
+    border-radius: 5px; /* More rounded */
+    font-size: 0.85em; /* Slightly larger font */
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    white-space: nowrap;
+}
+.btn-history-regenerate:hover { background-color: var(--primary-accent-color); }
+.history-empty-message {
+    text-align: center;
+    color: var(--text-muted-color);
+    font-style: italic;
+    font-size: 1em; /* Consistent font size */
+    padding: 15px; /* Add some padding */
+}
+
+/* STORY GENERATOR */
+#story-generator-view {
+    padding: 25px;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
+    gap: 20px;
+    background-color: var(--secondary-bg); /* Darker background for the view */
+    border-radius: 10px;
+}
+#story-generator-view h2 { color: var(--accent-color); text-align: center; margin-top: 0; margin-bottom: 10px; }
+
+#story-prompt-area {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+#story-theme-field {
+    flex-grow: 1;
+    padding: 15px 20px; /* Larger padding */
+    background-color: var(--primary-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 30px; /* More rounded */
+    color: var(--text-color);
+    font-family: var(--font-primary);
+    outline: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    font-size: 1.1em; /* Slightly larger font */
+}
+#story-theme-field:focus { border-color: var(--accent-color); box-shadow: 0 0 10px var(--accent-color); }
+
+/* #generate-story-button is an .icon-button. Specific overrides: */
+#generate-story-button {
+    padding: 15px 25px; /* Larger padding */
+    /* background-color: var(--action-color); /* Handled by shared rule */
+    /* color: var(--primary-bg); /* Handled by shared rule */
+    border-radius: 30px; /* More rounded */
+    border: none;
+    font-weight: 500;
+    font-size: 1em;
+}
+#generate-story-button .icon { fill: var(--primary-bg); }
+#generate-story-button:hover { background-color: var(--primary-accent-color); transform: translateY(-2px); }
+#generate-story-button:disabled { background-color: var(--text-muted-color) !important; cursor: not-allowed; }
+
+#generated-story-display {
+    min-height: 200px;
+    max-height: 40vh;
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px; /* Increased padding */
+    overflow-y: auto;
+    white-space: pre-wrap;
+    color: var(--text-color);
+    font-size: 1.05em; /* Slightly larger font */
+    line-height: 1.7; /* More line spacing */
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.3); /* Softer inset shadow */
+}
+#generated-story-display h3 { /* Styling for ### titles */
+    color: var(--accent-color);
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+    border-bottom: 1px solid var(--primary-accent-color);
+    padding-bottom: 0.3em;
+}
+#generated-story-display h4 { /* Styling for ## or *** subtitles */
+    color: var(--primary-accent-color);
+    margin-top: 1.2em;
+    margin-bottom: 0.4em;
+}
+#generated-story-display strong { /* Styling for bold */
+    font-weight: bold; /* browser default is usually bold already, but explicit */
+    color: var(--text-color); /* Ensure it stands out if base color is muted */
+}
+
+.story-loading, .story-error { font-style: italic; color: var(--text-muted-color); text-align: center; padding: 20px; }
+
+#story-vip-controls {
+    display: none;
+    justify-content: center;
+    align-items: center; /* Ensure vertical alignment */
+    gap: 10px;
+    padding-top: 15px; /* Adjusted padding */
+    padding-bottom: 15px; /* Adjusted padding */
+    border-top: 1px solid var(--surface-color);
+    border-bottom: 1px solid var(--surface-color);
+    margin-top: 20px; /* Adjusted margin */
+}
+/* #story-vip-controls button are .icon-button. Specific overrides: */
+#story-vip-controls button {
+    padding: 10px 20px; /* Adjust padding */
+    background-color: var(--secondary-accent-color);
+    border: 1px solid var(--secondary-accent-color);
+    border-radius: 8px; /* Slightly more rounded */
+    font-weight: 500;
+    color: var(--text-color);
+    font-size: 0.95em;
+}
+#story-vip-controls button:hover {
+    opacity: 0.85;
+    transform: translateY(-1px);
+    background-color: var(--action-color); /* Example: use action color for hover */
+}
+
+#story-history-area {
+    margin-top: 25px; /* Adjusted margin */
+}
+#story-history-area h4 { color: var(--primary-accent-color); margin-bottom: 10px; text-align: center; }
+#story-history-list {
+    list-style-type: none;
+    padding: 0;
+    max-height: 150px;
+    overflow-y: auto;
+    background-color: var(--primary-bg); /* Match input field bg */
+    border: 1px solid var(--border-color); /* Consistent border */
+    border-radius: 5px;
+    padding: 10px;
+}
+.story-history-item {
+    background-color: var(--secondary-bg);
+    padding: 12px 15px; /* Adjust padding */
+    margin-bottom: 0; /* Remove bottom margin, use border as separator */
+    border-bottom: 1px solid var(--surface-color); /* Separator */
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    font-size: 0.9em;
+    color: var(--text-muted-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.story-history-item:last-child {
+    border-bottom: none;
+}
+.story-history-item:hover {
+    background-color: var(--accent-color);
+    color: var(--primary-bg);
+}
+
+/* VIP AREA & TOOLS - REMOVED as #vip-view is deleted */
+/* Styling for #vip-view and #vip-iframe-container has been removed. */
+/* Commenting out old #vip-tools-container and related styles - REMOVED as parent is gone */
+/*
+#vip-tools-container { text-align: left; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+*/
+
+/* --- DETAILED WEATHER VIEW STYLES --- */
+#weather-view {
+    /* .view base styles are applied: background-color, padding, border-radius */
+    text-align: center;
+}
+.weather-location-title {
+    font-size: 1.8em;
+    color: var(--accent-color);
+    margin-bottom: 20px;
+}
+.current-conditions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 30px;
+    background-color: var(--surface-color);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+.current-temp {
+    font-size: 3.5em;
+    font-weight: bold;
+    color: var(--text-color);
+}
+.current-sky {
+    font-size: 1.3em;
+    color: var(--text-muted-color);
+    margin-bottom: 10px;
+}
+/* Targeting the SVG directly if getWeatherSvgIcon injects it */
+.current-conditions .weather-condition-svg {
+    width: 100px;
+    height: 100px;
+    fill: var(--accent-color);
+    margin-top: 10px;
+}
+
+.weather-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+    text-align: left;
+}
+.weather-details-grid > div {
+    background-color: var(--surface-color);
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 0.95em;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.weather-details-grid > div:nth-child(odd) { /* Optional: slightly different bg for alternating items */
+    /* background-color: #2a2a4e; */ /* Example if var(--surface-color) is too uniform */
+}
+
+
+.weather-forecast h4 {
+    font-size: 1.5em;
+    color: var(--primary-accent-color);
+    margin-bottom: 15px;
+    border-bottom: 1px solid var(--surface-color);
+    padding-bottom: 10px;
+}
+.forecast-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); /* Adjusted minmax for potentially smaller items */
+    gap: 15px;
+}
+.forecast-day {
+    background-color: var(--surface-color);
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 0.9em;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.forecast-day > div { margin-bottom: 5px; }
+.forecast-day .weather-condition-svg { /* if using SVG directly */
+    width: 50px;
+    height: 50px;
+    fill: var(--accent-color);
+    margin: 5px auto;
+}
+/* Ensure weather-loading and weather-error classes are styled for the detailed view */
+#weather-view .weather-loading,
+#weather-view .weather-error {
+    font-size: 1.2em;
+    color: var(--text-muted-color);
+    padding: 40px 20px;
+    text-align: center;
+}
+#weather-view .weather-error {
+    color: var(--secondary-accent-color);
+}
+/* --- END OF DETAILED WEATHER VIEW STYLES --- */
+#vip-tools-container h3 { color: var(--primary-accent-color); margin-top: 20px; margin-bottom: 15px; grid-column: 1 / -1; border-bottom: 1px solid var(--surface-color); padding-bottom: 10px; }
+#vip-tools-container h3:first-of-type { margin-top: 0; }
+.vip-tool { background-color: var(--surface-color); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 2px 10px rgba(0,0,0,0.2); transition: transform 0.3s ease, box-shadow 0.3s ease; display: flex; flex-direction: column; gap: 15px; }
+.vip-tool:hover { transform: translateY(-5px); box-shadow: 0 5px 15px var(--accent-color); } /* Use variable with alpha */
+.vip-tool h4 { color: var(--accent-color); margin-top: 0; margin-bottom: 10px; }
+.vip-tool > p { color: var(--text-muted-color); font-size: 0.9em; line-height: 1.5; }
+.vip-tool p:first-of-type { margin-bottom: 5px; }
+.vip-ai-input { width: 100%; min-height: 100px; padding: 10px; background-color: var(--primary-bg); border: 1px solid var(--border-color); border-radius: 5px; color: var(--text-color); font-family: var(--font-primary); resize: vertical; box-sizing: border-box; }
+.vip-ai-input:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 8px var(--accent-color); }
+.vip-ai-send-btn { padding: 10px 15px; background-color: var(--accent-color); color: var(--primary-bg); border-radius: 5px; border: none; font-weight: 500; align-self: flex-start; }
+.vip-ai-send-btn .icon { fill: var(--primary-bg); margin-right: 6px; width: 18px; height: 18px; }
+.vip-ai-send-btn:hover { background-color: var(--primary-accent-color); transform: translateY(-2px); }
+.vip-ai-send-btn:disabled { background-color: var(--text-muted-color) !important; cursor: not-allowed; transform: none; }
+.vip-ai-response { min-height: 80px; padding: 15px; background-color: var(--primary-bg); border: 1px dashed var(--border-color); border-radius: 5px; overflow-y: auto; white-space: pre-wrap; color: var(--text-color); font-size: 0.95em; line-height: 1.6; }
+.vip-ai-response p:first-child { margin-top: 0; color: var(--text-muted-color); font-style: italic; }
+.vip-ai-loading, .vip-ai-error { font-style: italic; text-align: center; padding: 20px; }
+.vip-ai-loading { color: var(--accent-color); }
+.vip-ai-error { color: var(--secondary-accent-color); }
+
+#file-reader-input { display: block; width: 100%; padding: 10px; margin-bottom: 10px; background-color: var(--primary-bg); border: 1px dashed var(--border-color); color: var(--text-muted-color); border-radius: 5px; box-sizing: border-box; cursor: pointer; transition: background-color 0.3s ease, border-color 0.3s ease; }
+#file-reader-input:hover { background-color: var(--secondary-bg); border-color: var(--accent-color); }
+#file-reader-input::file-selector-button { background-color: var(--accent-color); color: var(--primary-bg); border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; margin-right: 10px; font-family: var(--font-primary); transition: background-color 0.2s ease; }
+#file-reader-input::file-selector-button:hover { background-color: var(--primary-accent-color); }
+#file-reader-process-btn { background-color: var(--primary-accent-color); color: var(--primary-bg); border: none; border-radius: 5px; padding: 10px 15px; margin-bottom: 15px; align-self: flex-start; }
+#file-reader-process-btn .icon { fill: var(--primary-bg); }
+#file-reader-process-btn:hover { background-color: var(--accent-color); transform: translateY(-1px); }
+#file-reader-content-display { border-style: solid; background-color: var(--secondary-bg); font-size: 0.9em; }
+#file-reader-qa-area { border-top: 1px solid var(--surface-color); padding-top: 15px; margin-top: 20px; }
+#file-reader-qa-area #file-reader-question { min-height: 60px; }
+#file-reader-qa-area #file-reader-answer { margin-top: 10px; }
+*/
+
+/* --- ADMIN PANEL TABS AND ANALYTICS STYLES --- */
+.admin-panel-tabs {
+    display: flex;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--surface-color);
+}
+.admin-tab-button {
+    padding: 10px 20px;
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+    color: var(--text-muted-color);
+    font-size: 1.1em;
+    font-family: var(--font-primary);
+    font-weight: 500;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px; /* Align with parent border for active state */
+    transition: color 0.3s ease, border-bottom-color 0.3s ease;
+}
+.admin-tab-button.active {
+    color: var(--accent-color);
+    border-bottom-color: var(--accent-color);
+}
+.admin-tab-button:hover {
+    color: var(--primary-accent-color);
+}
+.admin-tab-content { display: none; }
+.admin-tab-content.active { display: block; }
+
+#admin-analytics-summary {
+    background-color: var(--surface-color);
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    border: 1px solid var(--border-color);
+}
+#admin-analytics-summary p {
+    margin: 5px 0;
+    font-size: 1.1em;
+    color: var(--text-color);
+}
+#admin-analytics-summary strong {
+    color: var(--action-color);
+    font-weight: 500;
+}
+
+#analytics-admin-tab h3, /* For "Site Analytics" title */
+#comments-admin-tab h3 { /* For "Manage Comments" title */
+    color: var(--primary-accent-color);
+    font-size: 1.4em;
+    margin-top: 0; /* As it's the first element in the tab content */
+    margin-bottom: 15px;
+}
+
+
+#admin-recent-activities {
+    margin-top: 10px;
+}
+#admin-recent-activities h4 { /* "Recent Activities:" title */
+    color: var(--accent-color);
+    font-size: 1.2em;
+    margin-bottom: 10px;
+}
+#admin-recent-activities ul { list-style: none; padding: 0; }
+#admin-recent-activities li {
+    background-color: var(--surface-color);
+    padding: 10px 15px;
+    margin-bottom: 8px;
+    border-radius: 5px;
+    font-size: 0.9em;
+    border-left: 3px solid var(--primary-accent-color);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+#admin-recent-activities li .activity-time {
+    color: var(--text-muted-color);
+    font-size: 0.85em;
+    display: block; /* Ensure it takes its own line or space */
+    margin-top: 4px;
+}
+#admin-recent-activities li .activity-uid {
+    font-weight: bold;
+    color: var(--action-color);
+}
+#admin-recent-activities li .activity-details {
+    font-style: italic;
+    color: var(--text-muted-color);
+    word-break: break-all; /* Prevent long details from breaking layout */
+}
+.activity-url-styled {
+    display: inline-block; /* Or block if it should take full width */
+    margin-top: 3px;
+    font-size: 0.8em;
+    color: var(--text-color);
+    background-color: var(--primary-bg); /* Subtle background */
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    font-family: 'Courier New', Courier, monospace; /* Monospace for URL-like text */
+}
+
+
+/* --- ADMIN PANEL STYLES --- */ /* Existing comment management styles follow */
+#admin-panel-view {
+    /* .view base styles are applied: background-color, padding, border-radius */
+    /* Specific padding for admin view if needed, otherwise defaults to .view padding */
+}
+
+#admin-panel-view h2 {
+    color: var(--secondary-accent-color); /* Distinct color for admin title */
+    text-align: center;
+    margin-bottom: 25px;
+    border-bottom: 1px solid var(--surface-color);
+    padding-bottom: 10px;
+}
+
+#admin-comments-list {
+    max-width: 800px; /* Limit width for readability */
+    margin: 0 auto;
+}
+
+.admin-comment-item {
+    background-color: var(--surface-color);
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    border-left: 4px solid var(--secondary-accent-color); /* Admin accent border */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+
+.admin-comment-item .comment-header {
+    font-size: 0.9em;
+    color: var(--text-muted-color);
+    margin-bottom: 8px;
+}
+.admin-comment-item .comment-header strong {
+    color: var(--primary-accent-color); /* User name color */
+    font-weight: 500;
+}
+.admin-comment-item .comment-header .comment-timestamp {
+    font-style: italic;
+}
+
+.comment-text-admin { /* Class for the user's comment text in admin panel */
+    margin-bottom: 15px;
+    padding-left: 10px;
+    border-left: 3px solid var(--border-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    font-style: italic; /* Differentiate user comment */
+}
+
+.admin-reply-display {
+    margin-bottom: 15px;
+}
+.admin-reply-display .admin-reply-text { /* Class for displaying existing admin reply */
+    background-color: var(--primary-bg); /* Slightly different bg for reply */
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 0.95em;
+    color: var(--text-color);
+    border: 1px dashed var(--primary-accent-color);
+}
+.admin-reply-display .admin-reply-text strong { /* "Admin Reply:" part */
+    color: var(--secondary-accent-color);
+}
+.admin-reply-display .admin-reply-text .comment-timestamp { /* Timestamp for reply */
+    font-size: 0.8em;
+    color: var(--text-muted-color);
+    display: block;
+    margin-top: 5px;
+}
+
+
+.admin-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.admin-reply-input { /* Textarea for admin to type reply */
+    width: 100%;
+    min-height: 70px;
+    padding: 10px;
+    background-color: var(--primary-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    color: var(--text-color);
+    font-family: var(--font-primary);
+    resize: vertical;
+}
+.admin-reply-input:focus {
+    outline: none;
+    border-color: var(--secondary-accent-color); /* Admin accent on focus */
+    box-shadow: 0 0 8px var(--secondary-accent-color); /* Use variable with alpha */
+}
+
+.admin-actions button { /* Base for admin action buttons */
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-family: var(--font-primary);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    border: none;
+}
+
+.btn-admin-reply {
+    background-color: var(--accent-color);
+    color: var(--primary-bg);
+}
+.btn-admin-reply:hover {
+    background-color: var(--primary-accent-color);
+    transform: translateY(-1px);
+}
+
+.btn-admin-delete {
+    background-color: var(--secondary-accent-color); /* Reddish for delete */
+    color: var(--secondary-bg); /* Text on delete button */
+}
+.btn-admin-delete:hover {
+    background-color: var(--action-color); /* Darker red or action color for hover */
+    transform: translateY(-1px);
+}
+
+#admin-comments-list hr {
+    border: none;
+    height: 1px;
+    background-color: var(--surface-color); /* Use a subtle color from palette */
+    margin-top: 20px; /* Space it out from the last action button */
+    margin-bottom: 20px; /* Ensure it's not too close to the next item */
+}
+/* Ensure the last item doesn't have an <hr> after it if it's the very last child of the list */
+.admin-comment-item:last-child hr {
+    display: none;
+}
+
+/* Styles for displaying admin reply on the public comments section */
+.admin-reply-public {
+    background-color: var(--surface-color); /* Or a slightly different shade like --primary-bg */
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+    border-left: 3px solid var(--secondary-accent-color); /* Admin accent */
+    font-size: 0.9em;
+}
+.admin-reply-public strong { /* "Admin Reply:" text */
+    color: var(--secondary-accent-color);
+    font-weight: bold;
+}
+.admin-reply-public .comment-timestamp { /* Timestamp for admin reply */
+    font-size: 0.85em;
+    color: var(--text-muted-color);
+    display: block;
+    margin-top: 4px;
+}
+
+/* General error message styling for forms (e.g., comment submission) */
+.error-message {
+    color: var(--secondary-accent-color);
+    font-size: 0.9em;
+    margin-top: 5px;
+    padding: 8px;
+    background-color: var(--surface-color); /* Use surface color for background */
+    border: 1px dashed var(--secondary-accent-color);
+    border-radius: 4px;
+    display: block; /* Or inline-block depending on context */
+}
+
+/* --- CONTACT VIEW STYLES --- */
+#contact-view { /* Uses .view base styles */
+    padding: 25px;
+    text-align: center; /* Center the content like title and map placeholder */
+}
+#contact-view h2 {
+    color: var(--primary-accent-color);
+    margin-bottom: 30px;
+}
+.contact-details {
+    max-width: 600px;
+    margin: 0 auto 30px auto; /* Center details block and add margin */
+    text-align: left; /* Align text within the block to the left */
+    background-color: var(--surface-color);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+.contact-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px;
+    border-bottom: 1px solid var(--primary-bg); /* Separator line */
+}
+.contact-item:last-child {
+    margin-bottom: 0;
+    border-bottom: none;
+}
+.contact-label {
+    font-weight: bold;
+    color: var(--accent-color);
+    margin-right: 15px;
+    display: inline-flex; /* Align icon and text */
+    align-items: center;
+    min-width: 120px; /* Give labels some consistent width */
+}
+.contact-icon {
+    margin-right: 8px;
+    fill: var(--accent-color); /* Ensure icon color */
+    width: 20px; /* Standardize icon size */
+    height: 20px;
+}
+.contact-value {
+    color: var(--text-color);
+    font-size: 1.05em;
+}
+.contact-value:hover {
+    color: var(--primary-accent-color);
+    text-decoration: underline;
+}
+.contact-map { /* Placeholder for map/image */
+    margin-top: 30px;
+    padding: 15px;
+    background-color: var(--surface-color);
+    border-radius: 8px;
+    color: var(--text-muted-color);
+}
+.contact-map iframe {
+    border-radius: 6px;
+    margin-top: 15px;
+    width: 100%; /* Ensure iframe is responsive if its parent is */
+    max-width: 600px; /* Optional: set a max-width for very large screens */
+}
+
+/* --- HOME PAGE WELCOME/DESCRIPTION SECTION --- */
+#welcome-description-section {
+    text-align: center;
+    padding: 20px 10px; /* Add some padding */
+    margin-bottom: 30px; /* Space before comments section */
+    background-color: var(--surface-color); /* Optional: a slightly different bg for this section */
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+#welcome-description-section h2 {
+    color: var(--highlight-yellow); /* Use a highlight color */
+    font-size: 1.8em; /* Adjust as needed */
+    margin-bottom: 10px;
+}
+
+#welcome-description-section .site-tagline {
+    font-size: 1.1em;
+    color: var(--text-color);
+    margin-bottom: 30px;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.feature-highlights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive grid */
+    gap: 20px;
+    text-align: left; /* Align text left within each item */
+}
+
+.feature-highlight-item {
+    background-color: var(--secondary-bg); /* Background for each feature card */
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.feature-highlight-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px var(--accent-color); /* Using --accent-color (Cyan) with transparency */
+}
+
+.feature-highlight-item .feature-icon {
+    margin-bottom: 15px;
+    text-align: center; /* Center the icon within this div */
+}
+
+.feature-highlight-item .feature-icon .icon {
+    width: 40px; /* Larger icons for feature highlights */
+    height: 40px;
+    fill: var(--action-color); /* Use a vibrant color for these icons */
+}
+
+.feature-highlight-item h3 {
+    color: var(--accent-color);
+    font-size: 1.3em;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.feature-highlight-item p {
+    font-size: 0.95em;
+    color: var(--text-muted-color);
+    line-height: 1.6;
+}
+.feature-highlight-item p.clickable-description {
+    cursor: pointer;
+}
+.feature-highlight-item p.clickable-description:hover {
+    text-decoration: underline;
+    color: var(--accent-color);
+}
+/* --- END OF HOME PAGE WELCOME/DESCRIPTION SECTION --- */
+
+/* --- STYLING FOR NEW AI CHAT VIEWS (Blackbox, Deepseek, Claude Haiku) --- */
+
+/* General structure for new AI views (mostly inherited from .view and specific JS display:flex) */
+#blackbox-ai-view,
+#deepseek-ai-view,
+#claude-haiku-view {
+    display: flex; /* Ensured by JS, but good to have a base */
+    flex-direction: column !important;
+    height: calc(100vh - var(--top-bar-height) - 30px) !important; /* Full height minus top bar and some padding */
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    background-color: var(--secondary-bg) !important;
+    border-radius: 10px !important;
+    overflow: hidden !important;
+}
+
+/* Message Areas */
+#blackbox-chat-messages-area,
+#deepseek-chat-messages-area,
+#claude-chat-messages-area {
+    flex-grow: 1 !important;
+    overflow-y: auto !important;
+    padding: 20px !important;
+    background-color: var(--primary-bg) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 15px !important;
+}
+
+/* Scrollbar for new message areas */
+#blackbox-chat-messages-area::-webkit-scrollbar,
+#deepseek-chat-messages-area::-webkit-scrollbar,
+#claude-chat-messages-area::-webkit-scrollbar { width: 8px; }
+
+#blackbox-chat-messages-area::-webkit-scrollbar-track,
+#deepseek-chat-messages-area::-webkit-scrollbar-track,
+#claude-chat-messages-area::-webkit-scrollbar-track { background: var(--primary-bg); }
+
+#blackbox-chat-messages-area::-webkit-scrollbar-thumb,
+#deepseek-chat-messages-area::-webkit-scrollbar-thumb,
+#claude-chat-messages-area::-webkit-scrollbar-thumb { background-color: var(--accent-color); border-radius: 4px; }
+
+#blackbox-chat-messages-area::-webkit-scrollbar-thumb:hover,
+#deepseek-chat-messages-area::-webkit-scrollbar-thumb:hover,
+#claude-chat-messages-area::-webkit-scrollbar-thumb:hover { background-color: var(--primary-accent-color); }
+
+
+/* Input Bars */
+#blackbox-chat-input-bar,
+#deepseek-chat-input-bar,
+#claude-chat-input-bar {
+    display: flex;
+    align-items: center !important;
+    padding: 15px !important;
+    background-color: var(--primary-bg) !important;
+    border-top: 1px solid var(--surface-color) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    min-height: 70px !important;
+    flex-shrink: 0 !important;
+}
+
+/* Input Fields */
+#blackbox-chat-input-field,
+#deepseek-chat-input-field,
+#claude-chat-input-field {
+    flex-grow: 1 !important;
+    padding: 14px 20px !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 25px !important;
+    background-color: var(--surface-color) !important;
+    color: var(--text-color) !important;
+    font-family: var(--font-primary) !important;
+    margin-right: 10px !important;
+    outline: none !important;
+    min-height: 48px !important;
+    height: 48px !important;
+    box-sizing: border-box;
+}
+#blackbox-chat-input-field:focus,
+#deepseek-chat-input-field:focus,
+#claude-chat-input-field:focus {
+    border-color: var(--action-color) !important;
+    box-shadow: 0 0 8px rgba(255, 153, 0, 0.6) !important;
+}
+
+/* Send Buttons */
+#blackbox-chat-send-button,
+#deepseek-chat-send-button,
+#claude-chat-send-button {
+    background-color: var(--action-color) !important;
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 50% !important;
+    border: none !important;
+    flex-shrink: 0 !important;
+}
+#blackbox-chat-send-button .icon,
+#deepseek-chat-send-button .icon,
+#claude-chat-send-button .icon {
+    fill: var(--primary-bg) !important;
+    width: 26px !important;
+    height: 26px !important;
+}
+#blackbox-chat-send-button:hover,
+#deepseek-chat-send-button:hover,
+#claude-chat-send-button:hover {
+    background-color: var(--primary-accent-color) !important;
+}
+#blackbox-chat-send-button:disabled,
+#deepseek-chat-send-button:disabled,
+#claude-chat-send-button:disabled {
+    background-color: var(--text-muted-color) !important;
+    cursor: not-allowed !important;
+}
+
+/* Blackbox AI Specific Web Search Toggle */
+#blackbox-chat-input-bar .web-search-container { /* Already styled by general .web-search-container */
+    margin-right: 10px; /* Ensure spacing */
+}
+
+
+/* Message Bubble Theming for New AIs */
+/* User messages for Blackbox AI */
+#blackbox-chat-messages-area .chat-message-wrapper.user .chat-bubble {
+    background-color: #007bff !important; /* Blue */
+    color: #ffffff !important;
+}
+#blackbox-chat-messages-area .chat-message-wrapper.user .chat-bubble a,
+#blackbox-chat-messages-area .chat-message-wrapper.user .chat-bubble strong {
+    color: #f0f8ff !important; /* AliceBlue for links/strong on blue */
+}
+
+
+/* User messages for Deepseek AI */
+#deepseek-chat-messages-area .chat-message-wrapper.user .chat-bubble {
+    background-color: #28a745 !important; /* Green */
+    color: #ffffff !important;
+}
+#deepseek-chat-messages-area .chat-message-wrapper.user .chat-bubble a,
+#deepseek-chat-messages-area .chat-message-wrapper.user .chat-bubble strong {
+    color: #f0fff0 !important; /* Honeydew for links/strong on green */
+}
+
+/* User messages for Claude Haiku AI */
+#claude-chat-messages-area .chat-message-wrapper.user .chat-bubble {
+    background-color: #6f42c1 !important; /* Purple */
+    color: #ffffff !important;
+}
+#claude-chat-messages-area .chat-message-wrapper.user .chat-bubble a,
+#claude-chat-messages-area .chat-message-wrapper.user .chat-bubble strong {
+    color: #e6e6fa !important; /* Lavender for links/strong on purple */
+}
+
+
+/* AI Avatars - using generic .chat-avatar-container and .icon-chat-ai for now. Specific SVGs are in JS. */
+/* If specific background colors for AI avatars are desired: */
+#blackbox-chat-messages-area .chat-message-wrapper.ai .chat-avatar-container,
+#deepseek-chat-messages-area .chat-message-wrapper.ai .chat-avatar-container,
+#claude-chat-messages-area .chat-message-wrapper.ai .chat-avatar-container {
+    /* Example: background-color: var(--surface-color); */
+    /* SVGs defined in JS will provide the icon fill */
+}
+
+/* Ensure feature highlight items are clickable */
+.feature-highlight-item {
+    cursor: pointer;
+}
+
+/* --- GEMINI ALL MODEL VIEW STYLES --- */
+#gemini-all-model-view {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - var(--top-bar-height) - 30px); /* Full height minus top bar and some padding */
+    padding: 0;
+    box-sizing: border-box;
     background-color: var(--secondary-bg);
     border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-/* --- Chat Views --- */
-.chat-view-header {
+#gemini-all-model-view .chat-view-header {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px; /* Adjusted padding */
+    background-color: var(--surface-color);
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+    gap: 15px; /* Added gap */
+}
+
+#gemini-all-model-view .chat-header-logo {
+    width: 36px; /* Standardized size */
+    height: 36px;
+    object-fit: contain; /* Ensure logo scales well */
+}
+
+#gemini-all-model-view .chat-view-header h2 {
+    margin: 0;
+    font-size: 1.3em; /* Enhanced size */
+    color: var(--accent-color);
+    flex-grow: 1;
+    font-weight: 500; /* Adjusted weight */
+    letter-spacing: 0.5px; /* Adjusted spacing */
+}
+
+#gemini-all-model-view .model-selector-container {
+    margin-left: auto;
+    position: relative;
+}
+
+#gemini-model-selector {
+    min-width: 220px; /* Increased width */
+    padding: 10px 15px;
+    padding-right: 40px; /* Space for custom arrow */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23a0a0a0' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center; /* Adjusted position */
+    background-size: 18px 14px; /* Adjusted size */
+    border-radius: 8px; /* More rounded */
+    border: 1px solid var(--border-color);
+    background-color: var(--primary-bg);
+    color: var(--text-color);
+    font-family: var(--font-primary);
+    font-size: 0.95em; /* Slightly larger font */
+    outline: none;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+body.dark-mode #gemini-model-selector {
+     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23e0e0e0' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+}
+#gemini-model-selector:hover {
+    border-color: var(--primary-accent-color);
+}
+#gemini-model-selector:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px var(--accent-color); /* More prominent focus */
+}
+
+/* Messages area for Gemini All Model - inherits from general chat styles but can be overridden */
+#gemini-all-model-chat-messages-area {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 20px;
+    background-color: var(--primary-bg);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 18px; /* Increased gap between messages */
+}
+#gemini-all-model-chat-messages-area::-webkit-scrollbar { width: 8px; }
+#gemini-all-model-chat-messages-area::-webkit-scrollbar-track { background: var(--primary-bg); }
+#gemini-all-model-chat-messages-area::-webkit-scrollbar-thumb { background-color: var(--accent-color); border-radius: 4px; }
+
+/* Input bar for Gemini All Model */
+#gemini-all-model-chat-input-bar {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px; /* Adjusted padding */
+    background-color: var(--primary-bg);
+    border-top: 1px solid var(--surface-color);
+    min-height: 70px; /* Ensure enough height */
+    flex-shrink: 0;
+    gap: 10px; /* Gap between input bar items */
+}
+
+#gemini-all-model-attach-file-button {
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    width: 48px; /* Consistent size */
+    height: 48px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#gemini-all-model-attach-file-button .icon { fill: var(--accent-color); width: 24px; height: 24px; }
+#gemini-all-model-attach-file-button:hover { background-color: var(--accent-color); border-color: var(--accent-color); }
+#gemini-all-model-attach-file-button:hover .icon { fill: var(--primary-bg); }
+
+#gemini-all-model-file-preview-container {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Space between icon/name and image */
+    margin-right: 5px; /* Reduced margin as gap is used in parent */
+    padding: 8px 10px; /* Adjusted padding */
+    background-color: var(--surface-color);
+    border: 1px dashed var(--border-color); /* Dashed border */
+    border-radius: 6px; /* Rounded corners */
+    font-size: 0.85em; /* Slightly larger font */
+    max-width: 200px; /* Adjusted max width */
+    min-height: 40px; /* Ensure some height */
+    box-sizing: border-box;
+    overflow: hidden; /* Clip content */
+}
+.file-preview-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text-muted-color);
+    flex-grow: 1; /* Allow name to take available space */
+}
+.file-preview-image {
+    max-height: 38px; /* Slightly larger preview image */
+    max-width: 50px;
+    border-radius: 4px; /* Rounded corners for image */
+    border: 1px solid var(--border-color);
+    object-fit: cover; /* Ensure image covers the area nicely */
+}
+
+#gemini-all-model-chat-input-field {
+    flex-grow: 1;
+    padding: 14px 20px;
+    border: 1px solid var(--border-color);
+    border-radius: 25px; /* Rounded input field */
+    background-color: var(--surface-color);
+    color: var(--text-color);
+    font-family: var(--font-primary);
+    outline: none;
+    min-height: 48px; /* Consistent height */
+    height: 48px;
+    box-sizing: border-box;
+    font-size: 1em; /* Standard font size */
+}
+#gemini-all-model-chat-input-field:focus {
+    border-color: var(--action-color);
+    box-shadow: 0 0 8px var(--action-color);
+}
+
+#gemini-all-model-chat-send-button {
+    background-color: var(--action-color);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: none;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#gemini-all-model-chat-send-button .icon {
+    fill: var(--primary-bg);
+    width: 26px;
+    height: 26px;
+}
+#gemini-all-model-chat-send-button:hover {
+    background-color: var(--primary-accent-color);
+}
+#gemini-all-model-chat-send-button:disabled {
+    background-color: var(--text-muted-color) !important;
+    cursor: not-allowed !important;
+}
+
+
+/* User message bubble color for Gemini All Model (Modernized) */
+/* This overrides the previous green color */
+#gemini-all-model-chat-messages-area .chat-message-wrapper.user .chat-bubble {
+    background-color: var(--accent-color) !important; /* Standard user bubble color (e.g., blue in light, cyan in dark) */
+    color: var(--primary-bg) !important; /* Text color for user bubble (e.g., white) */
+    border-bottom-right-radius: 6px !important; /* Common chat bubble styling */
+    border-bottom-left-radius: 22px !important; /* Keep other corners more rounded */
+}
+#gemini-all-model-chat-messages-area .chat-message-wrapper.user .chat-bubble a,
+#gemini-all-model-chat-messages-area .chat-message-wrapper.user .chat-bubble strong {
+    color: var(--primary-bg) !important; /* Ensure contrast for links/strong text */
+}
+
+/* AI (Gemini All Model) message bubble color */
+#gemini-all-model-chat-messages-area .chat-message-wrapper.ai .chat-bubble {
+    background-color: var(--surface-color) !important; /* Standard AI bubble color */
+    color: var(--text-color) !important;
+    border-bottom-left-radius: 6px !important; /* Common chat bubble styling */
+    border-bottom-right-radius: 22px !important;
+}
+#gemini-all-model-chat-messages-area .chat-message-wrapper.ai .chat-bubble a {
+    color: var(--accent-color) !important; /* Links in AI bubbles */
+}
+#gemini-all-model-chat-messages-area .chat-message-wrapper.ai .chat-bubble strong {
+    color: var(--text-color) !important; /* Or var(--accent-color) if preferred */
+}
+
+/* --- END OF GEMINI ALL MODEL VIEW STYLES --- */
+
+
+/* --- ALL CHATGPT MODELS VIEW STYLES --- */
+#all-chatgpt-models-view {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - var(--top-bar-height) - 30px);
+    padding: 0;
+    box-sizing: border-box;
+    background-color: var(--secondary-bg);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+#all-chatgpt-models-view .chat-view-header {
     display: flex;
     align-items: center;
     padding: 12px 20px;
@@ -294,31 +2981,103 @@ body.dark-mode #top-bar-claude-model-selector {
     gap: 15px;
 }
 
-.chat-header-logo {
+#all-chatgpt-models-view .chat-header-logo { /* Assuming .chat-header-logo is used */
     width: 36px;
     height: 36px;
     object-fit: contain;
+    fill: #10a37f; /* OpenAI-like teal/green for the placeholder icon */
+}
+body.dark-mode #all-chatgpt-models-view .chat-header-logo {
+    fill: #10a37f; /* Keep same color or adjust for dark mode if needed */
 }
 
-.chat-view-header h2 {
+
+#all-chatgpt-models-view .chat-view-header h2 {
     margin: 0;
     font-size: 1.3em;
     color: var(--accent-color);
     flex-grow: 1;
     font-weight: 500;
+    letter-spacing: 0.5px;
 }
 
-.chat-messages-area {
+#all-chatgpt-models-view .model-selector-container {
+    margin-left: auto;
+    position: relative;
+}
+
+#all-chatgpt-model-selector { /* Mirroring #gemini-model-selector styles */
+    min-width: 220px;
+    padding: 10px 15px;
+    padding-right: 40px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23a0a0a0' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 18px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--primary-bg);
+    color: var(--text-color);
+    font-family: var(--font-primary);
+    font-size: 0.95em;
+    outline: none;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+body.dark-mode #all-chatgpt-model-selector {
+     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23e0e0e0' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+}
+#all-chatgpt-model-selector:hover {
+    border-color: var(--primary-accent-color);
+}
+#all-chatgpt-model-selector:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px var(--accent-color);
+}
+
+#all-chatgpt-chat-messages-area {
     flex-grow: 1;
     overflow-y: auto;
     padding: 20px;
     background-color: var(--primary-bg);
+    border-bottom: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
     gap: 18px;
 }
+#all-chatgpt-chat-messages-area::-webkit-scrollbar { width: 8px; }
+#all-chatgpt-chat-messages-area::-webkit-scrollbar-track { background: var(--primary-bg); }
+#all-chatgpt-chat-messages-area::-webkit-scrollbar-thumb { background-color: var(--accent-color); border-radius: 4px; }
 
-.chat-input-bar {
+/* User message bubble for ChatGPT */
+#all-chatgpt-chat-messages-area .chat-message-wrapper.user .chat-bubble {
+    background-color: #20894d !important; /* Distinct green for ChatGPT user messages */
+    color: #ffffff !important;
+    border-bottom-right-radius: 6px !important;
+    border-bottom-left-radius: 22px !important;
+}
+#all-chatgpt-chat-messages-area .chat-message-wrapper.user .chat-bubble a,
+#all-chatgpt-chat-messages-area .chat-message-wrapper.user .chat-bubble strong {
+    color: #f0f0f0 !important; /* Lighter color for links/strong on this green */
+}
+
+/* AI (ChatGPT) message bubble */
+#all-chatgpt-chat-messages-area .chat-message-wrapper.ai .chat-bubble {
+    background-color: var(--surface-color) !important;
+    color: var(--text-color) !important;
+    border-bottom-left-radius: 6px !important;
+    border-bottom-right-radius: 22px !important;
+}
+#all-chatgpt-chat-messages-area .chat-message-wrapper.ai .chat-avatar-container .icon {
+     fill: #10a37f; /* OpenAI-like teal/green for AI avatar icon in this view */
+}
+
+
+#all-chatgpt-chat-input-bar {
     display: flex;
     align-items: center;
     padding: 12px 15px;
@@ -329,7 +3088,47 @@ body.dark-mode #top-bar-claude-model-selector {
     gap: 10px;
 }
 
-.chat-input-bar input[type="text"] {
+#all-chatgpt-attach-file-button { /* Style for the attach button, even if disabled */
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#all-chatgpt-attach-file-button .icon { fill: var(--accent-color); width: 24px; height: 24px; }
+#all-chatgpt-attach-file-button:hover:not(:disabled) { background-color: var(--accent-color); border-color: var(--accent-color); }
+#all-chatgpt-attach-file-button:hover:not(:disabled) .icon { fill: var(--primary-bg); }
+
+#all-chatgpt-attach-file-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+#all-chatgpt-attach-file-button:disabled .icon {
+    fill: var(--text-muted-color);
+}
+
+#all-chatgpt-file-preview-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-right: 5px;
+    padding: 8px 10px;
+    background-color: var(--surface-color);
+    border: 1px dashed var(--border-color);
+    border-radius: 6px;
+    font-size: 0.85em;
+    max-width: 200px;
+    min-height: 40px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+/* Re-use .file-preview-name and .file-preview-image from Gemini if structure is identical */
+
+#all-chatgpt-chat-input-field {
     flex-grow: 1;
     padding: 14px 20px;
     border: 1px solid var(--border-color);
@@ -343,52 +3142,199 @@ body.dark-mode #top-bar-claude-model-selector {
     box-sizing: border-box;
     font-size: 1em;
 }
-
-.chat-input-bar input[type="text"]:focus {
+#all-chatgpt-chat-input-field:focus {
     border-color: var(--action-color);
     box-shadow: 0 0 8px var(--action-color);
 }
 
-.icon-button {
-    background-color: transparent;
+#all-chatgpt-chat-send-button {
+    background-color: #10a37f; /* OpenAI-like color for send button */
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
     border: none;
-    cursor: pointer;
-    padding: 0;
-    display: inline-flex;
+    flex-shrink: 0;
+    display: flex;
     align-items: center;
     justify-content: center;
 }
+#all-chatgpt-chat-send-button .icon {
+    fill: var(--primary-bg);
+    width: 26px;
+    height: 26px;
+}
+#all-chatgpt-chat-send-button:hover {
+    background-color: #0d8c6c; /* Darker shade for hover */
+}
+#all-chatgpt-chat-send-button:disabled {
+    background-color: var(--text-muted-color) !important;
+    cursor: not-allowed !important;
+}
+/* --- END OF ALL CHATGPT MODELS VIEW STYLES --- */
 
-.icon {
-    width: 24px;
-    height: 24px;
-    fill: var(--icon-fill-default);
+/* --- CLAUDE ALL MODEL VIEW STYLES --- */
+#claude-all-model-view { /* Basic structure mirroring other "All Model" views */
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - var(--top-bar-height) - 30px);
+    padding: 0;
+    box-sizing: border-box;
+    background-color: var(--secondary-bg);
+    border-radius: 10px;
+    overflow: hidden;
 }
 
-.chat-input-bar .icon-button {
-    background-color: var(--action-color);
+#claude-all-model-view .chat-view-header {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    background-color: var(--surface-color);
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+    gap: 15px;
+}
+
+#claude-all-model-view .chat-header-logo.claude-logo-icon, /* For header */
+.claude-avatar-logo { /* For chat messages */
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    border-radius: 4px; /* Slight rounding for logos if they are square-ish */
+}
+/* Ensure side menu Claude icon is also styled if it uses claude-logo-icon */
+#side-menu li a .claude-logo-icon.icon-side-menu-item {
+    width: 20px; /* Standard side menu icon size */
+    height: 20px;
+    /* object-fit: contain; /* already applied */
+}
+
+
+#claude-all-model-view .chat-view-header h2 {
+    margin: 0;
+    font-size: 1.3em;
+    color: var(--accent-color);
+    flex-grow: 1;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+#claude-all-model-view .model-selector-container {
+    margin-left: auto;
+    position: relative;
+}
+
+#claude-model-selector { /* Mirroring other model selectors */
+    min-width: 220px;
+    padding: 10px 15px;
+    padding-right: 40px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23a0a0a0' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 18px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--primary-bg);
+    color: var(--text-color);
+    font-family: var(--font-primary);
+    font-size: 0.95em;
+    outline: none;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+body.dark-mode #claude-model-selector {
+     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23e0e0e0' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+}
+#claude-model-selector:hover {
+    border-color: var(--primary-accent-color);
+}
+#claude-model-selector:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px var(--accent-color);
+}
+
+#claude-all-model-chat-messages-area {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 20px;
+    background-color: var(--primary-bg);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+#claude-all-model-chat-messages-area::-webkit-scrollbar { width: 8px; }
+#claude-all-model-chat-messages-area::-webkit-scrollbar-track { background: var(--primary-bg); }
+#claude-all-model-chat-messages-area::-webkit-scrollbar-thumb { background-color: var(--accent-color); border-radius: 4px; }
+
+/* User message bubble for Claude All Model - using a distinct color */
+#claude-all-model-chat-messages-area .chat-message-wrapper.user .chat-bubble {
+    background-color: #b388ff !important; /* A pleasant lavender/purple for Claude user messages */
+    color: #ffffff !important;
+    border-bottom-right-radius: 6px !important;
+    border-bottom-left-radius: 22px !important;
+}
+#claude-all-model-chat-messages-area .chat-message-wrapper.user .chat-bubble a,
+#claude-all-model-chat-messages-area .chat-message-wrapper.user .chat-bubble strong {
+    color: #f5f0ff !important; /* Very light lavender for links/strong text */
+}
+
+/* AI (Claude All Model) message bubble */
+#claude-all-model-chat-messages-area .chat-message-wrapper.ai .chat-bubble {
+    background-color: var(--surface-color) !important;
+    color: var(--text-color) !important;
+    border-bottom-left-radius: 6px !important;
+    border-bottom-right-radius: 22px !important;
+}
+/* Avatar for Claude in chat messages is handled by .claude-avatar-logo */
+
+#claude-all-model-chat-input-bar {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    background-color: var(--primary-bg);
+    border-top: 1px solid var(--surface-color);
+    min-height: 70px;
+    flex-shrink: 0;
+    gap: 10px;
+}
+
+#claude-all-model-attach-file-button {
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
     width: 48px;
     height: 48px;
     border-radius: 50%;
     flex-shrink: 0;
-}
-
-.chat-input-bar .icon-button .icon {
-    fill: var(--primary-bg);
-}
-
-/* --- Image Generator --- */
-#image-generator-view {
-    padding: 20px;
-}
-
-#image-prompt-area {
     display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
+    align-items: center;
+    justify-content: center;
 }
+#claude-all-model-attach-file-button .icon { fill: var(--accent-color); width: 24px; height: 24px; }
+#claude-all-model-attach-file-button:hover { background-color: var(--accent-color); border-color: var(--accent-color); }
+#claude-all-model-attach-file-button:hover .icon { fill: var(--primary-bg); }
 
-#image-prompt-field {
+#claude-all-model-file-preview-container { /* Reusing Gemini's preview style structure */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-right: 5px;
+    padding: 8px 10px;
+    background-color: var(--surface-color);
+    border: 1px dashed var(--border-color);
+    border-radius: 6px;
+    font-size: 0.85em;
+    max-width: 200px;
+    min-height: 40px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+/* .file-preview-name and .file-preview-image are generic and should apply */
+
+#claude-all-model-chat-input-field {
     flex-grow: 1;
     padding: 14px 20px;
     border: 1px solid var(--border-color);
@@ -397,55 +3343,866 @@ body.dark-mode #top-bar-claude-model-selector {
     color: var(--text-color);
     font-family: var(--font-primary);
     outline: none;
+    min-height: 48px;
+    height: 48px;
+    box-sizing: border-box;
     font-size: 1em;
 }
+#claude-all-model-chat-input-field:focus {
+    border-color: var(--action-color);
+    box-shadow: 0 0 8px var(--action-color);
+}
 
-#generate-image-button {
-    background-color: var(--action-color);
+#claude-all-model-chat-send-button {
+    background-color: #d66800; /* Claude-associated orange/brownish color for send button */
     width: 48px;
     height: 48px;
     border-radius: 50%;
-}
-
-#generate-image-button .icon {
-    fill: var(--primary-bg);
-}
-
-#image-display-area {
-    flex-grow: 1;
+    border: none;
+    flex-shrink: 0;
     display: flex;
-    justify-content: center;
     align-items: center;
-    background-color: var(--primary-bg);
-    border-radius: 10px;
-    margin-bottom: 10px;
+    justify-content: center;
+}
+#claude-all-model-chat-send-button .icon {
+    fill: var(--primary-bg);
+    width: 26px;
+    height: 26px;
+}
+#claude-all-model-chat-send-button:hover {
+    background-color: #b35700; /* Darker shade for hover */
+}
+#claude-all-model-chat-send-button:disabled {
+    background-color: var(--text-muted-color) !important;
+    cursor: not-allowed !important;
 }
 
-#image-display-area img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
+/* Ensure ChatGPT logo icon specific class for side menu and header is targetable if needed */
+.chatgpt-logo-icon {
+    /* Base styles are from .icon or .chat-header-logo */
+    /* If specific adjustments for ChatGPT logo SVG are needed, add here */
+    /* e.g., if it has an odd aspect ratio or needs padding */
+}
+
+/* --- END OF CLAUDE ALL MODEL VIEW STYLES --- */
+
+/* --- DOWNLOAD FORMAT MODAL STYLES --- */
+/* .modal-overlay and .modal-content are already defined and styled for the trailer modal.
+   We can reuse them, but might need some specific adjustments if the content is very different. */
+
+#download-format-modal .modal-content {
+    max-width: 450px; /* Smaller modal for format selection */
+    padding: 25px; /* Standard padding */
+    text-align: center; /* Center content */
+}
+
+#download-format-modal h4 {
+    color: var(--accent-color);
+    margin-top: 0;
+    margin-bottom: 25px;
+    font-size: 1.4em;
+}
+
+#download-options-container {
+    display: flex;
+    flex-direction: column; /* Stack buttons vertically */
+    gap: 15px; /* Space between buttons */
+    align-items: stretch; /* Make buttons take full width available in flex column */
+}
+
+.download-option-btn {
+    padding: 12px 20px;
+    font-size: 1.1em;
+    font-family: var(--font-primary);
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    background-color: var(--surface-color);
+    color: var(--accent-color);
+    border: 2px solid var(--accent-color);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.download-option-btn:hover {
+    background-color: var(--accent-color);
+    color: var(--primary-bg);
+    border-color: var(--primary-accent-color);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 4px 10px var(--accent-color);
+}
+
+.download-option-btn:disabled {
+    background-color: var(--text-muted-color) !important;
+    color: var(--surface-color) !important;
+    border-color: var(--text-muted-color) !important;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+#download-format-status {
+    color: var(--text-muted-color);
+    min-height: 20px; /* Reserve space for status messages */
+}
+/* --- END OF DOWNLOAD FORMAT MODAL STYLES --- */
+
+/* --- BOX MOVIE VIEW STYLES --- */
+#box-movie-view {
+    /* .view base styles are applied */
+    padding: 20px;
+    background-color: var(--primary-bg); /* Darker, main background for the view */
+}
+
+#box-movie-view h2, #box-movie-view h3 {
+    color: var(--accent-color);
+    text-align: center;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+}
+#box-movie-view h3 {
+    text-align: left;
+    border-bottom: 1px solid var(--surface-color);
+    padding-bottom: 10px;
+    margin-top: 30px;
+}
+#box-movie-view h3:first-of-type {
+    margin-top: 0;
+}
+
+
+#box-movie-search-area {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    background-color: var(--secondary-bg);
+    padding: 15px;
     border-radius: 8px;
 }
 
-#download-image-button {
-    display: none;
-    margin: 0 auto;
-    background-color: var(--accent-color);
-    color: var(--primary-bg);
-    padding: 10px 20px;
-    border-radius: 20px;
+#box-movie-search-field {
+    flex-grow: 1;
+    padding: 12px 18px;
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 25px; /* Rounded input */
+    color: var(--text-color);
+    font-family: var(--font-primary);
+    font-size: 1em;
+    outline: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+#box-movie-search-field:focus {
+    border-color: var(--action-color);
+    box-shadow: 0 0 10px var(--action-color);
 }
 
-/* --- Mobile --- */
-@media (max-width: 1023px) {
-    #main-content {
-        display: flex;
-        flex-direction: column;
-        height: auto;
-        overflow-y: auto;
+#box-movie-search-button {
+    /* .icon-button base styles */
+    background-color: var(--action-color);
+    border-radius: 25px; /* Match input field */
+    padding: 0 15px; /* Adjust padding for text or just icon */
+}
+#box-movie-search-button .icon {
+    fill: var(--primary-bg);
+}
+#box-movie-search-button:hover {
+    background-color: var(--primary-accent-color);
+}
+
+.movie-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* Responsive grid for posters */
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.movie-card {
+    background-color: var(--secondary-bg); /* Card background */
+    border-radius: 8px;
+    overflow: hidden; /* To contain the image */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    border: 1px solid var(--surface-color);
+}
+.movie-card:hover {
+    transform: translateY(-5px) scale(1.03);
+    box-shadow: 0 10px 25px var(--accent-color);
+}
+
+.movie-card img {
+    width: 100%;
+    height: auto;
+    display: block;
+    aspect-ratio: 2 / 3; /* Maintain poster aspect ratio */
+    object-fit: cover;
+}
+
+.movie-card-info {
+    padding: 10px;
+    text-align: center;
+}
+.movie-card-info h4 {
+    font-size: 0.95em;
+    color: var(--text-color);
+    margin: 0 0 5px 0;
+    min-height: 3em; /* Ensure space for 2 lines of title */
+}
+.movie-card-info .movie-rating {
+    font-size: 0.85em;
+    color: var(--highlight-yellow);
+}
+.movie-card-info .star-icon {
+    color: var(--highlight-yellow);
+    font-size: 1.1em;
+}
+
+/* Movie Details Section */
+#box-movie-details-section {
+    background-color: var(--secondary-bg);
+    padding: 25px;
+    border-radius: 10px;
+    margin-top: 20px;
+    animation: fadeInView 0.5s ease; /* Re-use existing animation */
+}
+
+.box-movie-back-btn { /* Specific class for the back button */
+    background-color: var(--surface-color);
+    color: var(--accent-color);
+    border: 1px solid var(--accent-color);
+    padding: 8px 15px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+.box-movie-back-btn:hover {
+    background-color: var(--accent-color);
+    color: var(--primary-bg);
+}
+
+
+.movie-detail-header {
+    display: flex;
+    gap: 25px;
+    margin-bottom: 25px;
+    align-items: flex-start; /* Align items to the top */
+}
+.movie-detail-poster {
+    width: 250px; /* Fixed width for poster */
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    flex-shrink: 0;
+}
+.movie-detail-title-group {
+    flex-grow: 1;
+}
+.movie-detail-title-group h1 {
+    color: var(--accent-color);
+    font-size: 2.2em;
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+.movie-detail-title-group .tagline {
+    font-style: italic;
+    color: var(--text-muted-color);
+    margin-bottom: 15px;
+    font-size: 1.1em;
+}
+.movie-detail-title-group p {
+    margin-bottom: 8px;
+    font-size: 0.95em;
+    color: var(--text-color);
+}
+.movie-detail-title-group p strong {
+    color: var(--primary-accent-color);
+}
+.movie-detail-title-group .star-icon {
+    color: var(--highlight-yellow);
+}
+
+.movie-detail-overview h3, .movie-detail-meta h3 { /* For "Overview" and potential future "Meta Details" titles */
+    color: var(--primary-accent-color);
+    border-bottom: 1px solid var(--surface-color);
+    padding-bottom: 8px;
+    margin-bottom: 15px;
+    font-size: 1.4em;
+}
+.movie-detail-overview p {
+    line-height: 1.7;
+    color: var(--text-color);
+    font-size: 1em;
+    margin-bottom: 25px;
+}
+.movie-detail-meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+    background-color: var(--primary-bg);
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 25px;
+}
+.movie-detail-meta p {
+    margin: 5px 0;
+    font-size: 0.9em;
+    color: var(--text-muted-color);
+}
+.movie-detail-meta p strong {
+    color: var(--text-color);
+}
+
+.btn-movie-homepage {
+    display: inline-block;
+    background-color: var(--action-color);
+    color: var(--primary-bg);
+    padding: 10px 20px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-right: 10px; /* Space if other buttons are next to it */
+}
+.btn-movie-homepage:hover {
+    background-color: var(--primary-accent-color);
+    transform: translateY(-2px);
+}
+
+.movie-actions {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--surface-color);
+    display: flex;
+    gap: 15px;
+    justify-content: flex-start;
+}
+.btn-action-movie {
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    border: 1px solid var(--secondary-accent-color);
+    background-color: var(--secondary-accent-color);
+    color: var(--primary-bg);
+}
+.btn-action-movie:hover:not(:disabled) {
+    background-color: var(--accent-color); /* Using accent (cyan) for hover on these actions */
+    border-color: var(--accent-color);
+    transform: translateY(-2px);
+}
+.btn-action-movie:disabled {
+    background-color: var(--text-muted-color);
+    border-color: var(--text-muted-color);
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+
+/* Loading/Error/Info messages specific to Box Movie */
+.loading-movies, .error-movies, .info-movies {
+    text-align: center;
+    padding: 40px 20px;
+    font-size: 1.2em;
+    color: var(--text-muted-color);
+    grid-column: 1 / -1; /* Make it span all columns in a grid */
+}
+.error-movies {
+    color: var(--secondary-accent-color); /* Reddish for errors */
+}
+.info-movies {
+    color: var(--accent-color); /* Cyan for info messages */
+}
+
+/* --- END OF BOX MOVIE VIEW STYLES --- */
+
+
+/* --- STYLING FOR ENHANCED CONTENT FORMATTING (Code Blocks, Tables, Message Controls) --- */
+/* Code Blocks */
+.code-block-wrapper {
+    position: relative;
+    margin: 10px 0;
+    background-color: var(--primary-bg); /* Darker background for code */
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    overflow: hidden; /* Important for pre's horizontal scroll */
+}
+body.dark-mode .code-block-wrapper {
+    background-color: #0d1117; /* GitHub dark code bg */
+    border-color: #30363d;
+}
+
+.code-block-wrapper pre {
+    margin: 0;
+    padding: 15px;
+    overflow-x: auto; /* Horizontal scroll for long lines */
+    white-space: pre; /* Preserve whitespace and line breaks, crucial for code */
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9em;
+    max-width: 100%; /* Ensures <pre> itself doesn't overflow its parent (.code-block-wrapper) */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    line-height: 1.5;
+    background-color: transparent !important; /* Pre should be transparent, wrapper has bg */
+}
+.code-block-wrapper pre code {
+    display: block; /* Ensure code takes full width of pre for scrolling */
+    padding: 0 !important; /* Remove padding from Prism if it adds any */
+    background: none !important; /* Remove background from Prism if it adds any */
+    color: var(--text-color); /* Default code text color */
+    text-shadow: none !important; /* Remove Prism's text shadow if any */
+}
+body.dark-mode .code-block-wrapper pre code {
+    color: #c9d1d9; /* GitHub dark code text color */
+}
+
+.copy-code-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 4px 6px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+.code-block-wrapper:hover .copy-code-btn {
+    opacity: 1;
+}
+.copy-code-btn .icon {
+    width: 16px;
+    height: 16px;
+    fill: var(--text-muted-color);
+}
+.copy-code-btn:hover .icon {
+    fill: var(--accent-color);
+}
+body.dark-mode .copy-code-btn {
+    background-color: #21262d;
+    border-color: #30363d;
+}
+body.dark-mode .copy-code-btn .icon {
+    fill: #8b949e;
+}
+body.dark-mode .copy-code-btn:hover .icon {
+    fill: #58a6ff;
+}
+
+
+/* Basic Table Styling */
+.chat-bubble table {
+    width: auto; /* Let table size to content, or 100% if preferred */
+    max-width: 100%;
+    border-collapse: collapse;
+    margin: 15px 0;
+    font-size: 0.9em;
+    background-color: var(--surface-color);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.chat-bubble th, .chat-bubble td {
+    border: 1px solid var(--border-color);
+    padding: 10px 12px; /* More padding */
+    text-align: left;
+    color: var(--text-color);
+}
+.chat-bubble th {
+    background-color: var(--primary-bg); /* Header background */
+    color: var(--accent-color);
+    font-weight: 600; /* Bolder headers */
+}
+.chat-bubble tr:nth-child(even) td { /* Zebra striping for rows if desired */
+    background-color: var(--secondary-bg);
+}
+body.dark-mode .chat-bubble th {
+    background-color: #161b22; /* Darker header for dark mode */
+    color: var(--accent-color);
+}
+body.dark-mode .chat-bubble tr:nth-child(even) td {
+    background-color: #0d1117; /* Darker zebra for dark mode */
+}
+body.dark-mode .chat-bubble td, body.dark-mode .chat-bubble th {
+    border-color: #30363d; /* Darker borders for tables in dark mode */
+    color: #c9d1d9;
+}
+
+
+/* Per-Message Controls (Copy/Download) */
+.message-controls {
+    display: flex;
+    justify-content: flex-end;
+    gap: 5px;
+    margin-top: 8px;
+    opacity: 0.6; /* Slightly visible by default */
+    transition: opacity 0.2s ease-in-out;
+}
+.chat-bubble:hover .message-controls {
+    opacity: 1; /* Fully visible on bubble hover */
+}
+
+.message-copy-btn, .message-download-btn {
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    padding: 3px; /* Small padding */
+    border-radius: 4px;
+    width: 26px; /* Small square buttons */
+    height: 26px;
+}
+.message-copy-btn .icon, .message-download-btn .icon {
+    width: 16px;
+    height: 16px;
+    fill: var(--text-muted-color);
+}
+.message-copy-btn:hover .icon, .message-download-btn:hover .icon {
+    fill: var(--accent-color);
+}
+
+/* Specific user bubble message controls - if they need different base color */
+.chat-message-wrapper.user .chat-bubble .message-controls button {
+    background-color: rgba(255,255,255,0.1); /* Slightly transparent white on colored user bubble */
+    border-color: rgba(255,255,255,0.2);
+}
+.chat-message-wrapper.user .chat-bubble .message-controls button .icon {
+    fill: rgba(255,255,255,0.7);
+}
+.chat-message-wrapper.user .chat-bubble .message-controls button:hover .icon {
+    fill: #ffffff;
+}
+
+
+/* --- EMAIL GENERATOR VIEW STYLES --- */
+#email-generator-view {
+    /* .view base styles are applied */
+    padding: 25px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Space between main sections */
+}
+
+#email-generator-view h2 {
+    color: var(--primary-accent-color);
+    margin-bottom: 20px;
+}
+
+.email-generator-controls {
+    margin-bottom: 15px;
+}
+
+#generate-temp-email-button {
+    /* Assuming .btn-primary styles exist, or define specific ones */
+    padding: 12px 25px;
+    font-size: 1.1em;
+    background-color: var(--action-color);
+    color: var(--primary-bg);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+#generate-temp-email-button:hover {
+    background-color: var(--primary-accent-color);
+    transform: translateY(-2px);
+}
+#generate-temp-email-button:disabled {
+    background-color: var(--text-muted-color);
+    cursor: not-allowed;
+}
+
+
+.info-container {
+    background-color: var(--surface-color);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    margin-bottom: 15px;
+    text-align: left;
+}
+.info-container p {
+    margin: 0 0 10px 0;
+    line-height: 1.6;
+    color: var(--text-color);
+}
+.info-container p strong {
+    color: var(--accent-color);
+}
+.info-container em {
+    color: var(--text-muted-color);
+    font-size: 0.9em;
+}
+
+#generated-email-address-container {
+    /* Specific styles if needed, info-container provides base */
+}
+#generated-email-address {
+    font-weight: bold;
+    color: var(--secondary-accent-color); /* Make email address stand out */
+    word-break: break-all;
+}
+
+#copy-email-button {
+    /* .btn-secondary styles or define specific */
+    background-color: var(--surface-color);
+    color: var(--accent-color);
+    border: 1px solid var(--accent-color);
+    padding: 8px 15px;
+    border-radius: 5px;
+    margin-left: 10px; /* Space from the email text */
+    vertical-align: middle; /* Align with text if on same line */
+}
+#copy-email-button .icon {
+    margin-right: 5px;
+    fill: var(--accent-color);
+}
+#copy-email-button:hover {
+    background-color: var(--accent-color);
+    color: var(--primary-bg);
+}
+#copy-email-button:hover .icon {
+    fill: var(--primary-bg);
+}
+
+
+#email-inbox-messages-container h3 {
+    color: var(--primary-accent-color);
+    margin-top: 0;
+    margin-bottom: 15px;
+    border-bottom: 1px solid var(--surface-color);
+    padding-bottom: 10px;
+}
+
+#refresh-inbox-button {
+    /* .btn-secondary styles or define specific */
+    background-color: var(--accent-color);
+    color: var(--primary-bg);
+    border: 1px solid var(--accent-color);
+    padding: 8px 15px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    display: block; /* Make it block to center or use text-align on parent */
+    margin-left: auto;
+    margin-right: auto;
+}
+#refresh-inbox-button:hover {
+    background-color: var(--primary-accent-color);
+}
+#refresh-inbox-button:disabled {
+    background-color: var(--text-muted-color);
+    border-color: var(--text-muted-color);
+    cursor: not-allowed;
+}
+
+#email-inbox-messages {
+    min-height: 100px;
+    max-height: 300px;
+    overflow-y: auto;
+    background-color: var(--primary-bg);
+    padding: 15px;
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+}
+#email-inbox-messages .email-message-item {
+    background-color: var(--secondary-bg);
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border-left: 3px solid var(--action-color);
+}
+#email-inbox-messages .email-message-item:last-child {
+    margin-bottom: 0;
+}
+#email-inbox-messages .email-message-item strong { /* Subject/From */
+    display: block;
+    color: var(--accent-color);
+    margin-bottom: 5px;
+}
+#email-inbox-messages .email-message-item p { /* Body snippet */
+    font-size: 0.9em;
+    color: var(--text-muted-color);
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+#email-inbox-messages > p { /* Placeholder "No messages" text */
+    color: var(--text-muted-color);
+    font-style: italic;
+    text-align: center;
+}
+
+#email-expired-message {
+    text-align: center;
+    font-weight: bold;
+    color: var(--secondary-accent-color); /* Use a warning color */
+}
+
+/* Responsive adjustments for email generator if needed */
+@media (max-width: 600px) {
+    #email-generator-view {
+        padding: 15px;
     }
-    .view {
-        min-height: 500px;
+    .info-container {
+        padding: 15px;
+    }
+    #generate-temp-email-button {
+        font-size: 1em;
+        padding: 10px 20px;
+    }
+    #copy-email-button {
+        display: block; /* Stack copy button on small screens */
+        margin-left: 0;
+        margin-top: 10px;
+        width: 100%;
+        text-align: center;
     }
 }
+/* --- END OF EMAIL GENERATOR VIEW STYLES --- */
+
+
+/* --- USER ACTIVITY HISTORY VIEW STYLES --- */
+#user-history-view { /* Uses .view base styles */
+    padding: 20px;
+}
+
+#user-history-view h2 {
+    text-align: center;
+    color: var(--primary-accent-color);
+    margin-bottom: 25px;
+}
+
+#user-activity-list-container ul {
+    list-style: none;
+    padding: 0;
+}
+
+#user-activity-list-container li {
+    background-color: var(--surface-color);
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    border-left: 4px solid var(--action-color); /* Use a distinct accent color */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+#user-activity-list-container .user-activity-type {
+    display: block;
+    font-weight: bold;
+    color: var(--text-color);
+    font-size: 1.1em;
+    margin-bottom: 5px;
+    text-transform: capitalize; /* Nicer display for activity types */
+}
+
+#user-activity-list-container .user-activity-details {
+    display: block;
+    font-size: 0.9em;
+    color: var(--text-muted-color);
+    margin-bottom: 8px;
+    word-break: break-all; /* Prevent long details from breaking layout */
+}
+
+#user-activity-list-container .user-activity-meta {
+    font-size: 0.8em;
+    color: var(--text-muted-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* Allow meta items to wrap on small screens */
+}
+
+#user-activity-list-container .user-activity-url {
+    font-style: italic;
+    margin-left: 5px; /* Give a little space if it wraps under time */
+}
+
+#user-activity-list-container p { /* For loading/empty messages */
+    text-align: center;
+    font-size: 1.1em;
+    color: var(--text-muted-color);
+    padding: 20px;
+}
+/* --- END OF USER ACTIVITY HISTORY VIEW STYLES --- */
+
+/* --- DEDICATED COMMENTS VIEW (Phase 4.2) --- */
+#comments-view { /* Uses .view base styles */
+    padding: 20px;
+}
+#comments-view h2 {
+    text-align: center;
+    color: var(--primary-accent-color);
+    margin-bottom: 25px;
+}
+.all-comments-list-ul {
+    list-style: none;
+    padding: 0;
+    max-width: 800px;
+    margin: 0 auto;
+}
+.all-comment-item {
+    background-color: var(--surface-color);
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+.all-comment-item .comment-content strong {
+    color: var(--accent-color);
+}
+.all-comment-item .comment-content p {
+    margin: 5px 0 10px 0;
+    line-height: 1.6;
+    color: var(--text-color); /* Ensure text color is applied */
+}
+.comment-actions {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.comment-actions button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--text-muted-color);
+    padding: 5px;
+    border-radius: 4px;
+    transition: color 0.2s ease, background-color 0.2s ease; /* Added transitions */
+}
+.comment-actions button:hover {
+    color: var(--text-color);
+    background-color: var(--secondary-bg);
+}
+.comment-actions button.active {
+    color: var(--action-color);
+}
+.comment-actions button.active .icon {
+    fill: var(--action-color);
+}
+.comment-actions button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+.comment-actions .icon {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+}
+.comment-actions .like-count, .comment-actions .dislike-count {
+    font-size: 0.9em;
+}
+/* Styles for .admin-reply-public are already defined and should apply here too */
+.see-all-comments-link {
+    display: block;
+    text-align: center;
+    margin-top: 15px;
+    color: var(--accent-color);
+    font-weight: bold;
+}
+.see-all-comments-link:hover {
+    text-decoration: underline;
+    color: var(--primary-accent-color);
+}
+
+[end of public/style.css]
