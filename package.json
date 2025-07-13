@@ -1,15 +1,13 @@
 {
-  "name": "image-chat",
+  "name": "youtube-downloader-app",
   "version": "1.0.0",
-  "description": "Chatbot générateur d'images avec une interface type Messenger.",
+  "description": "Téléchargeur YouTube avec Express et Render",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
     "express": "^4.18.2",
-    "axios": "^1.4.0",
-    "cors": "^2.8.5",
-    "node-fetch": "*"
+    "node-fetch": "^*"
   }
 }
