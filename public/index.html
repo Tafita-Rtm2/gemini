@@ -1,34 +1,171 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Imagegenerator</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Futuristic Portfolio</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="chat-container">
-        <div class="chat-header">
-            <img src="chat.jpg" alt="Bot" class="chat-avatar">
-            <h2>Imagegenerator</h2>
+    <header id="top-bar">
+        <div id="top-left-menu-icon-container">
+            <svg viewBox="0 0 24 24" class="icon icon-menu-main" id="home-menu-trigger-icon">
+                <path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"></path>
+            </svg>
         </div>
-        <div id="chat-box" class="chat-box"></div>
-        <div class="chat-input">
-            <input type="text" id="user-input" placeholder="Écrivez un message ou une commande...">
-            <button id="send-btn">Envoyer</button>
+        <div id="theme-toggle-container">
+            <label class="theme-switch" for="theme-checkbox">
+                <input type="checkbox" id="theme-checkbox" />
+                <div class="slider round"></div>
+            </label>
         </div>
-        <div id="download-options" class="download-options hidden">
-            <label for="filename">Nom du fichier :</label>
-            <input type="text" id="filename" value="image">
-            <label for="format">Format :</label>
-            <select id="format">
-                <option value="png">PNG</option>
-                <option value="jpg">JPG</option>
-                <option value="webp">WEBP</option>
-            </select>
-            <button id="download-btn">Télécharger</button>
+        <div id="top-bar-model-controls-container" style="display: flex; align-items: center; gap: 15px;">
+            <span id="top-bar-model-name-display" class="top-bar-model-name" style="display: none;"></span>
+            <div id="top-bar-gemini-selector-wrapper" class="top-bar-model-selector-wrapper" style="display: none;">
+                <label for="top-bar-gemini-model-selector" class="sr-only" data-translate="gemini_model_selector_label_topbar">Gemini Model:</label>
+                <select id="top-bar-gemini-model-selector" name="gemini-model-selector">
+                    <option value="" data-translate="gemini_model_select_default_option_topbar">Select Gemini Model</option>
+                </select>
+            </div>
+            <div id="top-bar-chatgpt-selector-wrapper" class="top-bar-model-selector-wrapper" style="display: none;">
+                <label for="top-bar-all-chatgpt-model-selector" class="sr-only" data-translate="all_chatgpt_model_selector_label_topbar">ChatGPT Model:</label>
+                <select id="top-bar-all-chatgpt-model-selector" name="all-chatgpt-model-selector">
+                    <option value="" data-translate="all_chatgpt_model_select_default_option_topbar">Select ChatGPT Model</option>
+                </select>
+            </div>
+            <div id="top-bar-claude-selector-wrapper" class="top-bar-model-selector-wrapper" style="display: none;">
+                <label for="top-bar-claude-model-selector" class="sr-only" data-translate="claude_model_selector_label_topbar">Claude Model:</label>
+                <select id="top-bar-claude-model-selector" name="claude-model-selector">
+                    <option value="" data-translate="claude_model_select_default_option_topbar">Select Claude Model</option>
+                </select>
+            </div>
         </div>
-    </div>
+    </header>
+
+    <nav id="side-menu">
+        <ul>
+            <li><a href="#" data-view="gemini-all-model-view">
+                    <img src="https://www.gstatic.com/images/branding/product/2x/gemini_48dp.png" alt="Gemini All Models" class="icon icon-side-menu-item gemini-logo-icon">
+                    <span data-translate="gemini_all_model_view_title">Gemini All Models</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" data-view="all-chatgpt-models-view">
+                    <img src="chatgpt.jpg" alt="All ChatGPT Models" class="icon icon-side-menu-item chatgpt-logo-icon">
+                    <span data-translate="all_chatgpt_models_view_title">All ChatGPT Models</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" data-view="claude-all-model-view">
+                    <img src="claude.jpg" alt="Claude All Models" class="icon icon-side-menu-item claude-logo-icon">
+                    <span data-translate="claude_all_model_view_title">Claude All Models</span>
+                </a>
+            </li>
+            <li><a href="#" data-view="image-generator-view"><svg viewBox="0 0 24 24" class="icon icon-side-menu-item"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"></path></svg> <span data-translate="image_generator_view_title">Générateur d'Images</span></a></li>
+            <li><a href="#" data-view="admin-panel-view"><svg viewBox="0 0 24 24" class="icon icon-side-menu-item"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.34 8.42c-.11.2-.06.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.48-.41l.36 2.54c.59-.24 1.13-.57 1.62-.94l2.39.96c.22.08.47 0 .59.22l1.92-3.32c.12-.22.06-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"></path></svg> <span data-translate="admin_panel_view_title">Panneau Admin</span></a></li>
+        </ul>
+    </nav>
+    
+    <main id="main-content">
+        <div id="gemini-all-model-view" class="view active">
+            <div class="chat-view-header">
+                <img src="https://www.gstatic.com/images/branding/product/2x/gemini_48dp.png" alt="Gemini Logo" class="chat-header-logo gemini-logo-icon">
+                <h2 data-translate="gemini_all_model_chat_title">Gemini All Model Chat</h2>
+            </div>
+            <div id="gemini-all-model-chat-messages-area"></div>
+            <div id="gemini-all-model-chat-input-bar">
+                <input type="file" id="gemini-all-model-file-upload" accept="image/*,application/pdf,text/plain,video/*,audio/*,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none;">
+                <button id="gemini-all-model-attach-file-button" class="icon-button" title="Attach File" data-translate="gemini_all_model_attach_file_title">
+                    <svg viewBox="0 0 24 24" class="icon"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5a2.5 2.5 0 015 0v10.5c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-3.04-2.46-5.5-5.5-5.5S4 1.96 4 5v11.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"></path></svg>
+                </button>
+                <div id="gemini-all-model-file-preview-container"></div>
+                <input type="text" id="gemini-all-model-chat-input-field" placeholder="Ask Gemini (any model)..." data-translate="gemini_all_model_placeholder">
+                <button id="gemini-all-model-chat-send-button" class="icon-button" title="Send" data-translate="send_button_title">
+                    <svg viewBox="0 0 24 24" class="icon"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <div id="all-chatgpt-models-view" class="view">
+            <div class="chat-view-header">
+                <img src="chatgpt.jpg" alt="ChatGPT Logo" class="chat-header-logo chatgpt-logo-icon">
+                <h2 data-translate="all_chatgpt_models_chat_title">All ChatGPT Models</h2>
+            </div>
+            <div id="all-chatgpt-chat-messages-area"></div>
+            <div id="all-chatgpt-chat-input-bar">
+                <input type="file" id="all-chatgpt-file-upload" accept="image/*,application/pdf,text/plain,video/*,audio/*,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none;">
+                <button id="all-chatgpt-attach-file-button" class="icon-button" title="Attach File" data-translate="all_chatgpt_attach_file_title">
+                    <svg viewBox="0 0 24 24" class="icon"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5a2.5 2.5 0 015 0v10.5c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-3.04-2.46-5.5-5.5-5.5S4 1.96 4 5v11.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"></path></svg>
+                </button>
+                <div id="all-chatgpt-file-preview-container"></div>
+                <input type="text" id="all-chatgpt-chat-input-field" placeholder="Ask ChatGPT (any model)..." data-translate="all_chatgpt_placeholder">
+                <button id="all-chatgpt-chat-send-button" class="icon-button" title="Send" data-translate="send_button_title">
+                    <svg viewBox="0 0 24 24" class="icon"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <div id="claude-all-model-view" class="view">
+            <div class="chat-view-header">
+                <img src="claude.jpg" alt="Claude AI Logo" class="chat-header-logo claude-logo-icon">
+                <h2 data-translate="claude_all_model_chat_title">Claude All Models</h2>
+            </div>
+            <div id="claude-all-model-chat-messages-area"></div>
+            <div id="claude-all-model-chat-input-bar">
+                <input type="file" id="claude-all-model-file-upload" accept="image/*,application/pdf,text/plain,video/*,audio/*,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none;">
+                <button id="claude-all-model-attach-file-button" class="icon-button" title="Attach File" data-translate="claude_all_model_attach_file_title">
+                    <svg viewBox="0 0 24 24" class="icon"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5a2.5 2.5 0 015 0v10.5c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-3.04-2.46-5.5-5.5-5.5S4 1.96 4 5v11.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"></path></svg>
+                </button>
+                <div id="claude-all-model-file-preview-container"></div>
+                <input type="text" id="claude-all-model-chat-input-field" placeholder="Ask Claude (any model)..." data-translate="claude_all_model_placeholder">
+                <button id="claude-all-model-chat-send-button" class="icon-button" title="Send" data-translate="send_button_title">
+                    <svg viewBox="0 0 24 24" class="icon"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <div id="image-generator-view" class="view" style="display: none;">
+            <h2>Image Generator</h2>
+            <div id="image-prompt-area">
+                <input type="text" id="image-prompt-field" placeholder="Enter image description...">
+                <button id="generate-image-button" class="icon-button" title="Generate Image">
+                    <svg viewBox="0 0 24 24" class="icon"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"></path></svg>
+                </button>
+            </div>
+            <div id="image-display-area"><p>Generated image will appear here.</p></div>
+            <button id="download-image-button" class="icon-button" title="Download Image" style="display: none;">
+                 <svg viewBox="0 0 24 24" class="icon"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"></path></svg>
+            </button>
+            <div id="image-history-gallery"><h4>History</h4></div>
+        </div>
+
+        <div id="admin-panel-view" class="view" style="display: none;">
+            <h2>Admin Panel</h2>
+            <div class="admin-panel-tabs">
+                <button class="admin-tab-button active" data-tab="comments-admin">Manage Comments</button>
+                <button class="admin-tab-button" data-tab="analytics-admin">Site Analytics</button>
+            </div>
+            <div id="comments-admin-tab" class="admin-tab-content active">
+                <h3>Manage Comments</h3>
+                <div id="admin-comments-list">
+                    <p>Loading comments...</p>
+                </div>
+            </div>
+            <div id="analytics-admin-tab" class="admin-tab-content">
+                <h3>Site Analytics</h3>
+                <div id="admin-analytics-summary">
+                    <p>Loading analytics...</p>
+                </div>
+                <h4>Recent Activities:</h4>
+                <div id="admin-recent-activities">
+                    <p>Loading recent activities...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
     <script src="script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://unpkg.com/docx@7.3.0/build/index.js"></script>
 </body>
 </html>
