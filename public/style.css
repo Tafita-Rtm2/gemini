@@ -138,9 +138,16 @@ body.dark-mode {
 
 /* Top Bar Model Selector Styles */
 #top-bar-model-controls-container {
-    /* display: flex; align-items: center; gap: 15px; -- Already set inline, but can be reinforced */
-    margin-left: auto; /* Pushes it towards the right, adjust as needed */
-    padding-right: 15px; /* Space from the edge or next element */
+    position: fixed;
+    top: var(--top-bar-height);
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 10px 0;
+    background-color: var(--secondary-bg);
+    border-bottom: 1px solid var(--border-color);
+    z-index: 999;
 }
 
 .top-bar-model-selector-wrapper {
@@ -510,6 +517,8 @@ body:not(.dark-mode) .theme-switch input:checked + .slider:before {
     padding: 15px;
     display: flex;
     flex-direction: column;
+    padding-top: 70px;
+    padding-bottom: 80px;
 }
 
 /* --- View Management --- */
@@ -1281,17 +1290,11 @@ body:not(.dark-mode) .theme-switch input:checked + .slider:before {
 }
 
 #chat-input-bar {
-    display: flex;
-    align-items: center !important;
-    padding: 10px !important;
-    background-color: var(--secondary-bg) !important;
-    border-top: 1px solid var(--border-color) !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-    min-height: 60px !important;
-    flex-shrink: 0 !important;
-    position: sticky;
+    position: fixed;
     bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
 }
 
 .web-search-container {
@@ -3823,7 +3826,8 @@ body.dark-mode .code-block-wrapper {
     margin: 0;
     padding: 15px;
     overflow-x: auto; /* Horizontal scroll for long lines */
-    white-space: pre; /* Preserve whitespace and line breaks, crucial for code */
+    white-space: pre-wrap; /* Preserve whitespace and line breaks, crucial for code */
+    word-wrap: break-word;
     font-family: 'Courier New', Courier, monospace;
     font-size: 0.9em;
     max-width: 100%; /* Ensures <pre> itself doesn't overflow its parent (.code-block-wrapper) */
