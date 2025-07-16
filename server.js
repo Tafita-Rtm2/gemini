@@ -4,8 +4,6 @@ const path = require('path');
 const { MongoClient, ObjectId } = require('mongodb');
 const multer = require('multer'); // For handling file uploads
 const fs = require('fs'); // For file system operations like deleting files
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 
 // Configure Multer for disk storage
 
@@ -94,8 +92,6 @@ const TMDB_BASE_URL = 'https://api.themoviedb.org/3';
 // MongoDB Connection
 const mongoUri = "mongodb+srv://rtmtafita:tafitaniaina1206@rtmchat.pzebpqh.mongodb.net/?retryWrites=true&w=majority&appName=rtmchat";
 const client = new MongoClient(mongoUri);
-
-const JWT_SECRET = 'your_super_secret_jwt_key'; // Replace with a strong, secret key
 
 let portfolioDb;
 let commentsCollection;
@@ -419,59 +415,28 @@ app.post('/api/comments/:commentId/dislike', async (req, res) => {
 app.post('/api/users/register', async (req, res) => {
     if (!usersCollection) return res.status(503).json({ message: "User service not available." });
     try {
-        const { name, password } = req.body;
-        if (!name || !password) {
-            return res.status(400).json({ message: 'Name and password are required.' });
+        const { uid, name } = req.body;
+        if (!uid || typeof uid !== 'string' || uid.trim() === '') return res.status(400).json({ message: 'User ID (uid) is required.' });
+        if (!name || typeof name !== 'string' || name.trim() === '') return res.status(400).json({ message: 'Name is required.' });
+        const trimmedName = name.trim();
+        if (trimmedName.length < 3) return res.status(400).json({ message: 'Name must be at least 3 characters long.' });
+        const existingUserByUID = await usersCollection.findOne({ uid: uid });
+        if (existingUserByUID) {
+            if (existingUserByUID.name === trimmedName) return res.status(200).json({ uid: existingUserByUID.uid, name: existingUserByUID.name, message: "Welcome back!" });
+            return res.status(409).json({ message: "This User ID is already associated with a different name." });
         }
-        if (name.length < 3) return res.status(400).json({ message: 'Name must be at least 3 characters long.' });
-        if (password.length < 6) return res.status(400).json({ message: 'Password must be at least 6 characters long.' });
-
-        const existingUserByName = await usersCollection.findOne({ name });
+        const existingUserByName = await usersCollection.findOne({ name: trimmedName });
         if (existingUserByName) return res.status(409).json({ message: "This name is already taken." });
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = {
-            name,
-            password: hashedPassword,
-            approved: false,
-            active: true,
-            createdAt: new Date()
-        };
+        const newUser = { uid: uid, name: trimmedName, createdAt: new Date() };
         await usersCollection.insertOne(newUser);
-
-        res.status(201).json({ message: "User registered successfully. Waiting for administrator approval." });
+        res.status(201).json({ uid: newUser.uid, name: newUser.name, message: "User registered successfully." });
     } catch (error) {
         console.error("Error during user registration:", error);
         if (error.code === 11000) {
             if (error.message.includes('index: name_1')) return res.status(409).json({ message: "This name is already taken." });
+            if (error.message.includes('index: uid_1')) return res.status(409).json({ message: "This User ID is already registered." });
         }
         res.status(500).json({ message: "Server error during user registration." });
-    }
-});
-
-app.post('/api/users/login', async (req, res) => {
-    if (!usersCollection) return res.status(503).json({ message: "User service not available." });
-    try {
-        const { name, password } = req.body;
-        if (!name || !password) {
-            return res.status(400).json({ message: 'Name and password are required.' });
-        }
-
-        const user = await usersCollection.findOne({ name });
-        if (!user) return res.status(401).json({ message: "Invalid credentials." });
-
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        if (!isPasswordValid) return res.status(401).json({ message: "Invalid credentials." });
-
-        if (!user.approved) return res.status(403).json({ message: "Your account is not yet approved by an administrator." });
-        if (!user.active) return res.status(403).json({ message: "Your account is deactivated." });
-
-        const token = jwt.sign({ userId: user._id, name: user.name }, JWT_SECRET, { expiresIn: '1h' });
-        res.status(200).json({ token });
-
-    } catch (error) {
-        console.error("Error during user login:", error);
-        res.status(500).json({ message: "Server error during user login." });
     }
 });
 
@@ -486,101 +451,6 @@ app.get('/api/users/check/:uid', async (req, res) => {
     } catch (error) {
         console.error("Error checking user:", error);
         res.status(500).json({ message: "Server error while checking user." });
-    }
-});
-
-const authenticateJWT = (req, res, next) => {
-    const authHeader = req.headers.authorization;
-    if (authHeader) {
-        const token = authHeader.split(' ')[1];
-        jwt.verify(token, JWT_SECRET, (err, user) => {
-            if (err) {
-                return res.sendStatus(403);
-            }
-            req.user = user;
-            next();
-        });
-    } else {
-        res.sendStatus(401);
-    }
-};
-
-// Protect all routes except login, signup, and admin-related routes
-app.use((req, res, next) => {
-    if (
-        req.path.startsWith('/api/users/login') ||
-        req.path.startsWith('/api/users/register') ||
-        req.path.startsWith('/api/verify-admin') ||
-        req.path.startsWith('/api/comments') ||
-        req.path.startsWith('/api/activities')
-    ) {
-        return next();
-    }
-    authenticateJWT(req, res, next);
-});
-
-const verifyAdminCode = (req, res, next) => {
-    const adminCode = req.headers['x-admin-code'] || req.body.adminCode;
-    if (adminCode === ADMIN_VERIFICATION_CODE) {
-        next();
-    } else {
-        res.status(401).json({ success: false, message: "Invalid admin code" });
-    }
-};
-
-
-app.get('/api/admin/users', verifyAdminCode, async (req, res) => {
-    if (!usersCollection) return res.status(503).json({ message: "User service not available." });
-    try {
-        const users = await usersCollection.find({}, { projection: { password: 0 } }).toArray();
-        res.status(200).json(users);
-    } catch (error) {
-        console.error("Error fetching users:", error);
-        res.status(500).json({ message: "Server error while fetching users." });
-    }
-});
-
-app.put('/api/admin/users/:id/approve', verifyAdminCode, async (req, res) => {
-    if (!usersCollection) return res.status(503).json({ message: "User service not available." });
-    try {
-        const { id } = req.params;
-        if (!ObjectId.isValid(id)) return res.status(400).json({ message: "Invalid user ID format." });
-        const result = await usersCollection.updateOne({ _id: new ObjectId(id) }, { $set: { approved: true } });
-        if (result.matchedCount === 0) return res.status(404).json({ message: "User not found." });
-        res.status(200).json({ message: "User approved successfully." });
-    } catch (error) {
-        console.error("Error approving user:", error);
-        res.status(500).json({ message: "Server error while approving user." });
-    }
-});
-
-app.put('/api/admin/users/:id/toggle-active', verifyAdminCode, async (req, res) => {
-    if (!usersCollection) return res.status(503).json({ message: "User service not available." });
-    try {
-        const { id } = req.params;
-        if (!ObjectId.isValid(id)) return res.status(400).json({ message: "Invalid user ID format." });
-        const user = await usersCollection.findOne({ _id: new ObjectId(id) });
-        if (!user) return res.status(404).json({ message: "User not found." });
-        const newActiveState = !user.active;
-        await usersCollection.updateOne({ _id: new ObjectId(id) }, { $set: { active: newActiveState } });
-        res.status(200).json({ message: `User ${newActiveState ? 'activated' : 'deactivated'} successfully.` });
-    } catch (error) {
-        console.error("Error toggling user active state:", error);
-        res.status(500).json({ message: "Server error while toggling user active state." });
-    }
-});
-
-app.delete('/api/admin/users/:id', verifyAdminCode, async (req, res) => {
-    if (!usersCollection) return res.status(503).json({ message: "User service not available." });
-    try {
-        const { id } = req.params;
-        if (!ObjectId.isValid(id)) return res.status(400).json({ message: "Invalid user ID format." });
-        const result = await usersCollection.deleteOne({ _id: new ObjectId(id) });
-        if (result.deletedCount === 0) return res.status(404).json({ message: "User not found." });
-        res.status(200).json({ message: "User deleted successfully." });
-    } catch (error) {
-        console.error("Error deleting user:", error);
-        res.status(500).json({ message: "Server error while deleting user." });
     }
 });
 
