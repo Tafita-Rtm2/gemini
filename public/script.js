@@ -4926,8 +4926,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const adminCode = prompt('Enter admin code:');
             const response = await fetch('/api/admin/users', {
                 method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ adminCode })
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Admin-Code': adminCode
+                }
             });
             if (!response.ok) {
                 const errData = await response.json().catch(() => null);
@@ -4972,8 +4974,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const adminCode = prompt('Enter admin code:');
             const response = await fetch(`/api/admin/users/${userId}/approve`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ adminCode })
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Admin-Code': adminCode
+                }
             });
             const data = await response.json();
             alert(data.message);
@@ -4991,8 +4995,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const adminCode = prompt('Enter admin code:');
             const response = await fetch(`/api/admin/users/${userId}/toggle-active`, {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ adminCode })
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Admin-Code': adminCode
+                }
             });
             const data = await response.json();
             alert(data.message);
@@ -5013,8 +5019,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const adminCode = prompt('Enter admin code:');
             const response = await fetch(`/api/admin/users/${userId}`, {
                 method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ adminCode })
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Admin-Code': adminCode
+                }
             });
             const data = await response.json();
             alert(data.message);
