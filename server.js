@@ -520,7 +520,7 @@ app.use((req, res, next) => {
 });
 
 const verifyAdminCode = (req, res, next) => {
-    const adminCode = req.headers['x-admin-code'];
+    const adminCode = req.headers['x-admin-code'] || req.body.adminCode;
     if (adminCode === ADMIN_VERIFICATION_CODE) {
         next();
     } else {
