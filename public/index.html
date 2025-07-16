@@ -136,6 +136,7 @@
         <div class="admin-panel-tabs">
             <button class="admin-tab-button active" data-tab="comments-admin">Manage Comments</button>
             <button class="admin-tab-button" data-tab="analytics-admin">Site Analytics</button>
+            <button class="admin-tab-button" data-tab="users-admin">User Management</button>
         </div>
 
         <div id="comments-admin-tab" class="admin-tab-content active">
@@ -159,7 +160,18 @@
         <div id="users-admin-tab" class="admin-tab-content">
             <h3>User Management</h3>
             <div id="admin-users-list">
-                <p>Loading users...</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- User rows will be inserted here by script.js -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
