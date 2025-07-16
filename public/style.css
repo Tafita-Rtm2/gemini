@@ -1119,8 +1119,19 @@ body:not(.dark-mode) .theme-switch input:checked + .slider:before {
 }
 
 @media (max-width: 768px) {
-    #top-bar {
-        padding: 0 10px;
+    #all-chatgpt-chat-input-bar,
+    #claude-all-model-chat-input-bar {
+        flex-wrap: nowrap;
+    }
+
+    #all-chatgpt-file-preview-container,
+    #claude-all-model-file-preview-container {
+        max-width: 100px;
+    }
+
+    #all-chatgpt-chat-input-field,
+    #claude-all-model-chat-input-field {
+        max-width: calc(100% - 200px);
     }
 
     #side-menu {
@@ -3187,6 +3198,13 @@ body.dark-mode #all-chatgpt-model-selector {
     gap: 5px;
 }
 
+#all-chatgpt-chat-input-bar,
+#claude-all-model-chat-input-bar {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
 #all-chatgpt-attach-file-button { /* Style for the attach button, even if disabled */
     background-color: var(--surface-color);
     border: 1px solid var(--border-color);
@@ -3228,7 +3246,7 @@ body.dark-mode #all-chatgpt-model-selector {
 /* Re-use .file-preview-name and .file-preview-image from Gemini if structure is identical */
 
 #all-chatgpt-chat-input-field {
-    flex-grow: 1;
+    flex-grow: 1 !important;
     padding: 14px 20px;
     border: 1px solid var(--border-color);
     border-radius: 25px;
@@ -3240,6 +3258,7 @@ body.dark-mode #all-chatgpt-model-selector {
     height: 48px;
     box-sizing: border-box;
     font-size: 1em;
+    max-width: calc(100% - 150px);
 }
 #all-chatgpt-chat-input-field:focus {
     border-color: var(--action-color);
@@ -3434,7 +3453,7 @@ body.dark-mode #claude-model-selector {
 /* .file-preview-name and .file-preview-image are generic and should apply */
 
 #claude-all-model-chat-input-field {
-    flex-grow: 1;
+    flex-grow: 1 !important;
     padding: 14px 20px;
     border: 1px solid var(--border-color);
     border-radius: 25px;
@@ -3446,6 +3465,7 @@ body.dark-mode #claude-model-selector {
     height: 48px;
     box-sizing: border-box;
     font-size: 1em;
+    max-width: calc(100% - 150px);
 }
 #claude-all-model-chat-input-field:focus {
     border-color: var(--action-color);
