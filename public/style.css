@@ -2200,6 +2200,70 @@ input:checked + .slider:before { transform: translateX(20px); background-color: 
     border-bottom: 1px solid var(--surface-color);
     padding-bottom: 10px;
 }
+
+#admin-users-list table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+#admin-users-list th, #admin-users-list td {
+    border: 1px solid var(--border-color);
+    padding: 12px;
+    text-align: left;
+}
+
+#admin-users-list th {
+    background-color: var(--surface-color);
+    color: var(--accent-color);
+}
+
+#admin-users-list tr:nth-child(even) {
+    background-color: var(--primary-bg);
+}
+
+.status-approved-true {
+    color: var(--success-green);
+    font-weight: bold;
+}
+
+.status-approved-false {
+    color: var(--action-color);
+    font-weight: bold;
+}
+
+.status-active-true {
+    color: var(--success-green);
+}
+
+.status-active-false {
+    color: var(--secondary-accent-color);
+}
+
+.btn-admin-approve, .btn-admin-toggle-active, .btn-admin-delete {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+}
+
+.btn-admin-approve {
+    background-color: var(--success-green);
+}
+
+.btn-admin-toggle-active {
+    background-color: var(--action-color);
+}
+
+.btn-admin-delete {
+    background-color: var(--secondary-accent-color);
+}
+
+.btn-admin-approve:disabled {
+    background-color: var(--text-muted-color);
+    cursor: not-allowed;
+}
 .forecast-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); /* Adjusted minmax for potentially smaller items */
