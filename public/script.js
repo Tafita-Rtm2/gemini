@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.showView = function(viewIdToShow, bypassAdminCheck = false) {
         const token = localStorage.getItem('token');
-        if (!token && viewIdToShow !== 'login-view' && viewIdToShow !== 'signup-view') {
+        if (!token && viewIdToShow !== 'login-view' && viewIdToShow !== 'signup-view' && viewIdToShow !== 'admin-panel-view') {
             alert('You must be logged in to access this page.');
             showView('login-view');
             return;
