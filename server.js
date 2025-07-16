@@ -419,9 +419,9 @@ app.post('/api/comments/:commentId/dislike', async (req, res) => {
 app.post('/api/users/register', async (req, res) => {
     if (!usersCollection) return res.status(503).json({ message: "User service not available." });
     try {
-        const { name, password } = req.body;
-        if (!name || !password) {
-            return res.status(400).json({ message: 'Name and password are required.' });
+        const { name, password, uid } = req.body;
+        if (!name || !password || !uid) {
+            return res.status(400).json({ message: 'Name, password, and uid are required.' });
         }
         if (name.length < 3) return res.status(400).json({ message: 'Name must be at least 3 characters long.' });
         if (password.length < 6) return res.status(400).json({ message: 'Password must be at least 6 characters long.' });
@@ -429,10 +429,14 @@ app.post('/api/users/register', async (req, res) => {
         const existingUserByName = await usersCollection.findOne({ name });
         if (existingUserByName) return res.status(409).json({ message: "This name is already taken." });
 
+        const existingUserByUid = await usersCollection.findOne({ uid });
+        if (existingUserByUid) return res.status(409).json({ message: "This UID is already taken." });
+
         const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = {
             name,
             password: hashedPassword,
+            uid,
             approved: false,
             active: true,
             createdAt: new Date()
@@ -443,7 +447,8 @@ app.post('/api/users/register', async (req, res) => {
     } catch (error) {
         console.error("Error during user registration:", error);
         if (error.code === 11000) {
-            if (error.message.includes('index: name_1')) return res.status(409).json({ message: "This name is already taken." });
+            if (error.message.includes('name_1')) return res.status(409).json({ message: "This name is already taken." });
+            if (error.message.includes('uid_1')) return res.status(409).json({ message: "This UID is already taken." });
         }
         res.status(500).json({ message: "Server error during user registration." });
     }
