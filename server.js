@@ -466,7 +466,7 @@ app.post('/api/users/login', async (req, res) => {
         if (!user.approved) return res.status(403).json({ message: "Your account is not yet approved by an administrator." });
         if (!user.active) return res.status(403).json({ message: "Your account is deactivated." });
 
-        const token = jwt.sign({ userId: user._id, name: user.name, isAdmin: user.isAdmin }, JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ userId: user._id, name: user.name }, JWT_SECRET, { expiresIn: '1h' });
         res.status(200).json({ token });
 
     } catch (error) {
@@ -505,24 +505,31 @@ const authenticateJWT = (req, res, next) => {
     }
 };
 
-// Protect all routes except login, signup, and admin panel
+// Protect all routes except login, signup, and admin-related routes
 app.use((req, res, next) => {
-    if (req.path.startsWith('/api/users/login') || req.path.startsWith('/api/users/register') || req.path.startsWith('/api/verify-admin')) {
+    if (
+        req.path.startsWith('/api/users/login') ||
+        req.path.startsWith('/api/users/register') ||
+        req.path.startsWith('/api/verify-admin') ||
+        req.path.startsWith('/api/comments') ||
+        req.path.startsWith('/api/activities')
+    ) {
         return next();
     }
     authenticateJWT(req, res, next);
 });
 
-
-const isAdmin = (req, res, next) => {
-    if (req.user && req.user.isAdmin) {
+const verifyAdminCode = (req, res, next) => {
+    const adminCode = req.headers['x-admin-code'];
+    if (adminCode === ADMIN_VERIFICATION_CODE) {
         next();
     } else {
-        res.sendStatus(403);
+        res.status(401).json({ success: false, message: "Invalid admin code" });
     }
 };
 
-app.get('/api/admin/users', authenticateJWT, isAdmin, async (req, res) => {
+
+app.get('/api/admin/users', verifyAdminCode, async (req, res) => {
     if (!usersCollection) return res.status(503).json({ message: "User service not available." });
     try {
         const users = await usersCollection.find({}, { projection: { password: 0 } }).toArray();
@@ -533,7 +540,7 @@ app.get('/api/admin/users', authenticateJWT, isAdmin, async (req, res) => {
     }
 });
 
-app.put('/api/admin/users/:id/approve', authenticateJWT, isAdmin, async (req, res) => {
+app.put('/api/admin/users/:id/approve', verifyAdminCode, async (req, res) => {
     if (!usersCollection) return res.status(503).json({ message: "User service not available." });
     try {
         const { id } = req.params;
@@ -547,7 +554,7 @@ app.put('/api/admin/users/:id/approve', authenticateJWT, isAdmin, async (req, re
     }
 });
 
-app.put('/api/admin/users/:id/toggle-active', authenticateJWT, isAdmin, async (req, res) => {
+app.put('/api/admin/users/:id/toggle-active', verifyAdminCode, async (req, res) => {
     if (!usersCollection) return res.status(503).json({ message: "User service not available." });
     try {
         const { id } = req.params;
@@ -563,7 +570,7 @@ app.put('/api/admin/users/:id/toggle-active', authenticateJWT, isAdmin, async (r
     }
 });
 
-app.delete('/api/admin/users/:id', authenticateJWT, isAdmin, async (req, res) => {
+app.delete('/api/admin/users/:id', verifyAdminCode, async (req, res) => {
     if (!usersCollection) return res.status(503).json({ message: "User service not available." });
     try {
         const { id } = req.params;
