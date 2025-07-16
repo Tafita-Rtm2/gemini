@@ -2200,6 +2200,70 @@ input:checked + .slider:before { transform: translateX(20px); background-color: 
     border-bottom: 1px solid var(--surface-color);
     padding-bottom: 10px;
 }
+
+#admin-users-list table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+#admin-users-list th, #admin-users-list td {
+    border: 1px solid var(--border-color);
+    padding: 12px;
+    text-align: left;
+}
+
+#admin-users-list th {
+    background-color: var(--surface-color);
+    color: var(--accent-color);
+}
+
+#admin-users-list tr:nth-child(even) {
+    background-color: var(--primary-bg);
+}
+
+.status-approved-true {
+    color: var(--success-green);
+    font-weight: bold;
+}
+
+.status-approved-false {
+    color: var(--action-color);
+    font-weight: bold;
+}
+
+.status-active-true {
+    color: var(--success-green);
+}
+
+.status-active-false {
+    color: var(--secondary-accent-color);
+}
+
+.btn-admin-approve, .btn-admin-toggle-active, .btn-admin-delete {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+}
+
+.btn-admin-approve {
+    background-color: var(--success-green);
+}
+
+.btn-admin-toggle-active {
+    background-color: var(--action-color);
+}
+
+.btn-admin-delete {
+    background-color: var(--secondary-accent-color);
+}
+
+.btn-admin-approve:disabled {
+    background-color: var(--text-muted-color);
+    cursor: not-allowed;
+}
 .forecast-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); /* Adjusted minmax for potentially smaller items */
@@ -4323,6 +4387,206 @@ body.dark-mode .chat-bubble td, body.dark-mode .chat-bubble th {
 .see-all-comments-link:hover {
     text-decoration: underline;
     color: var(--primary-accent-color);
+}
+
+#login-view, #signup-view {
+    max-width: 400px;
+    margin: 40px auto;
+    padding: 40px;
+    background: var(--secondary-bg);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-color);
+}
+
+#login-view h2, #signup-view h2 {
+    text-align: center;
+    color: var(--accent-color);
+    margin-bottom: 30px;
+    font-size: 2em;
+    font-weight: 500;
+}
+
+#login-form, #signup-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+#login-form input, #signup-form input {
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--primary-bg);
+    color: var(--text-color);
+    font-size: 1em;
+    transition: all 0.3s ease;
+}
+
+#login-form input:focus, #signup-form input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.25);
+}
+
+#login-form button, #signup-form button {
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(45deg, var(--accent-color), var(--primary-accent-color));
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s, transform 0.2s;
+    font-size: 1.1em;
+    letter-spacing: 0.5px;
+}
+
+#login-form button:hover, #signup-form button:hover {
+    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+    transform: translateY(-3px);
+}
+
+#login-view p, #signup-view p {
+    text-align: center;
+    margin-top: 25px;
+    color: var(--text-muted-color);
+}
+
+#login-view a, #signup-view a {
+    color: var(--accent-color);
+    font-weight: bold;
+    text-decoration: none;
+}
+#login-view a:hover, #signup-view a:hover {
+    text-decoration: underline;
+}
+
+/* Login and Signup Forms */
+#login-view, #signup-view {
+    max-width: 400px;
+    margin: 40px auto;
+    padding: 40px;
+    background-color: var(--surface-color);
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    border: 1px solid var(--border-color);
+}
+
+#login-view h2, #signup-view h2 {
+    text-align: center;
+    color: var(--accent-color);
+    margin-bottom: 30px;
+    font-size: 1.8em;
+}
+
+#login-form, #signup-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+#login-form input, #signup-form input {
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--primary-bg);
+    color: var(--text-color);
+    font-size: 1em;
+    transition: all 0.3s ease;
+}
+
+#login-form input:focus, #signup-form input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+#login-form button, #signup-form button {
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    background-color: var(--accent-color);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    font-size: 1.1em;
+}
+
+#login-form button:hover, #signup-form button:hover {
+    background-color: var(--primary-accent-color);
+    transform: translateY(-2px);
+}
+
+#login-view p, #signup-view p {
+    text-align: center;
+    margin-top: 25px;
+    color: var(--text-muted-color);
+}
+
+#login-view a, #signup-view a {
+    color: var(--accent-color);
+    font-weight: bold;
+    text-decoration: none;
+}
+#login-view a:hover, #signup-view a:hover {
+    text-decoration: underline;
+}
+
+/* Login and Signup Forms */
+#login-view, #signup-view {
+    max-width: 400px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: var(--surface-color);
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+#login-view h2, #signup-view h2 {
+    text-align: center;
+    color: var(--accent-color);
+    margin-bottom: 25px;
+}
+
+#login-form, #signup-form {
+    display: flex;
+    flex-direction: column;
+}
+
+#login-form input, #signup-form input {
+    margin-bottom: 15px;
+    padding: 12px;
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+    background-color: var(--primary-bg);
+    color: var(--text-color);
+}
+
+#login-form button, #signup-form button {
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--accent-color);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#login-form button:hover, #signup-form button:hover {
+    background-color: var(--primary-accent-color);
+}
+
+#login-view p, #signup-view p {
+    text-align: center;
+    margin-top: 20px;
+}
+
+#login-view a, #signup-view a {
+    color: var(--accent-color);
+    font-weight: bold;
 }
 
 [end of public/style.css]

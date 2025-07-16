@@ -99,14 +99,17 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.reload();
     });
 
+    let adminCode = null;
+
     window.showView = function(viewIdToShow, bypassAdminCheck = false) {
         const token = localStorage.getItem('token');
         if (!token && viewIdToShow !== 'login-view' && viewIdToShow !== 'signup-view' && viewIdToShow !== 'admin-panel-view') {
             alert('You must be logged in to access this page.');
+            showView('login-view');
             return;
         }
         
-        if (viewIdToShow === 'admin-panel-view' && !bypassAdminCheck) {
+        if (viewIdToShow === 'admin-panel-view' && !bypassAdminCheck && !adminCode) {
             const enteredCode = prompt('Enter admin code:');
             if (enteredCode) {
                 fetch('/api/verify-admin', {
@@ -119,6 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
+                        adminCode = enteredCode;
                         window.showView('admin-panel-view', true);
                     } else {
                         alert(data.message || 'Invalid admin code.');
@@ -247,24 +251,44 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (viewIdToShow === 'admin-panel-view') {
             const adminPanel = document.getElementById('admin-panel-view');
             if (adminPanel) {
-                const commentsTabButton = adminPanel.querySelector('.admin-tab-button[data-tab="comments-admin"]');
-                const commentsTabContent = adminPanel.querySelector('#comments-admin-tab');
-                const analyticsTabButton = adminPanel.querySelector('.admin-tab-button[data-tab="analytics-admin"]');
-                const analyticsTabContent = adminPanel.querySelector('#analytics-admin-tab');
-                let analyticsWasActive = analyticsTabButton && analyticsTabButton.classList.contains('active');
-                adminPanel.querySelectorAll('.admin-tab-button').forEach(b => b.classList.remove('active'));
-                adminPanel.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
-                if (analyticsWasActive && analyticsTabContent) {
-                    analyticsTabButton.classList.add('active');
-                    analyticsTabContent.classList.add('active');
-                    if (typeof loadAdminAnalytics === 'function') loadAdminAnalytics();
-                } else {
-                    if (commentsTabButton) commentsTabButton.classList.add('active');
-                    if (commentsTabContent) commentsTabContent.classList.add('active');
-                    if (typeof loadAdminComments === 'function') loadAdminComments();
+                const tabButtons = adminPanel.querySelectorAll('.admin-tab-button');
+                const tabContents = adminPanel.querySelectorAll('.admin-tab-content');
+
+                tabButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const tab = button.dataset.tab;
+                        tabButtons.forEach(btn => btn.classList.remove('active'));
+                        button.classList.add('active');
+                        tabContents.forEach(content => {
+                            if (content.id === `${tab}-tab`) {
+                                content.classList.add('active');
+                            } else {
+                                content.classList.remove('active');
+                            }
+                        });
+
+                        if (tab === 'comments-admin') {
+                            loadAdminComments();
+                        } else if (tab === 'analytics-admin') {
+                            loadAdminAnalytics();
+                        } else if (tab === 'users-admin') {
+                            loadAdminUsers();
+                        }
+                    });
+                });
+
+                // Set initial tab
+                const initialTab = adminPanel.querySelector('.admin-tab-button.active');
+                if (initialTab) {
+                    const tab = initialTab.dataset.tab;
+                    if (tab === 'comments-admin') {
+                        loadAdminComments();
+                    } else if (tab === 'analytics-admin') {
+                        loadAdminAnalytics();
+                    } else if (tab === 'users-admin') {
+                        loadAdminUsers();
+                    }
                 }
-            } else {
-                 if (typeof loadAdminComments === 'function') loadAdminComments();
             }
         } else if (viewIdToShow === 'gemini-all-model-view') {
             if (typeof fetchAndPopulateGeminiModels === "function") fetchAndPopulateGeminiModels();
@@ -676,6 +700,36 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    const originalShowView = window.showView;
+    window.showView = function(viewIdToShow, bypassAdminCheck = false) {
+        if (viewIdToShow === 'admin-panel-view' && !adminCode) {
+            const enteredCode = prompt('Enter admin code:');
+            if (enteredCode) {
+                fetch('/api/verify-admin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ adminCode: enteredCode }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        adminCode = enteredCode;
+                        originalShowView(viewIdToShow, true);
+                    } else {
+                        alert(data.message || 'Invalid admin code.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error verifying admin code:', error);
+                    alert('Error verifying admin code. Please try again.');
+                });
+            }
+            return;
+        }
+
+        originalShowView(viewIdToShow, bypassAdminCheck);
+    };
     // --- END OF HOME PAGE COMMENTS SECTION LOGIC ---
 
     // --- DEDICATED COMMENTS PAGE LOGIC (Phase 4.2) ---
@@ -4885,12 +4939,13 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const name = document.getElementById('signup-name').value;
             const password = document.getElementById('signup-password').value;
+            const uid = getOrCreateUID();
 
             try {
                 const response = await fetch('/api/users/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, password })
+                    body: JSON.stringify({ name, password, uid })
                 });
                 const data = await response.json();
                 alert(data.message);
@@ -4921,9 +4976,14 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadAdminUsers() {
         const adminUsersList = document.getElementById('admin-users-list');
         if (!adminUsersList) return;
-        adminUsersList.innerHTML = '<p>Loading users...</p>';
+        const tbody = adminUsersList.querySelector('tbody');
+        if (!tbody) return;
+        tbody.innerHTML = '<tr><td colspan="3">Loading users...</td></tr>';
         try {
-            const adminCode = prompt('Enter admin code:');
+            if (!adminCode) {
+                alert("Admin code not provided.");
+                return;
+            }
             const response = await fetch('/api/admin/users', {
                 method: 'GET',
                 headers: {
@@ -4937,41 +4997,39 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const users = await response.json();
             if (users.length === 0) {
-                adminUsersList.innerHTML = '<p>No users to display.</p>';
+                tbody.innerHTML = '<tr><td colspan="3">No users to display.</td></tr>';
                 return;
             }
-            adminUsersList.innerHTML = '';
+            tbody.innerHTML = '';
             users.forEach(user => {
-                const item = document.createElement('div');
-                item.className = 'admin-user-item';
-                item.dataset.userId = user._id;
-                item.innerHTML = `
-                    <div>
-                        <strong>${escapeHTML(user.name)}</strong>
-                        <br>
-                        <span>Approved: ${user.approved}</span> | <span>Active: ${user.active}</span>
-                    </div>
-                    <div>
+                const row = document.createElement('tr');
+                row.dataset.userId = user._id;
+                row.innerHTML = `
+                    <td>${escapeHTML(user.name)}</td>
+                    <td>
+                        <span class="status-approved-${user.approved}">${user.approved ? 'Approved' : 'Pending'}</span> /
+                        <span class="status-active-${user.active}">${user.active ? 'Active' : 'Inactive'}</span>
+                    </td>
+                    <td>
                         <button class="btn-admin-approve" ${user.approved ? 'disabled' : ''}>Approve</button>
                         <button class="btn-admin-toggle-active">${user.active ? 'Deactivate' : 'Activate'}</button>
                         <button class="btn-admin-delete">Delete</button>
-                    </div>
+                    </td>
                 `;
-                adminUsersList.appendChild(item);
+                tbody.appendChild(row);
 
-                item.querySelector('.btn-admin-approve').addEventListener('click', () => approveUser(user._id));
-                item.querySelector('.btn-admin-toggle-active').addEventListener('click', () => toggleUserActive(user._id));
-                item.querySelector('.btn-admin-delete').addEventListener('click', () => deleteUser(user._id));
+                row.querySelector('.btn-admin-approve').addEventListener('click', () => approveUser(user._id));
+                row.querySelector('.btn-admin-toggle-active').addEventListener('click', () => toggleUserActive(user._id));
+                row.querySelector('.btn-admin-delete').addEventListener('click', () => deleteUser(user._id));
             });
         } catch (error) {
             console.error('Failed to load admin users:', error);
-            adminUsersList.innerHTML = `<p class="error-message">Error loading users: ${error.message}</p>`;
+            tbody.innerHTML = `<tr><td colspan="3" class="error-message">Error loading users: ${error.message}</td></tr>`;
         }
     }
 
     async function approveUser(userId) {
         try {
-            const adminCode = prompt('Enter admin code:');
             const response = await fetch(`/api/admin/users/${userId}/approve`, {
                 method: 'PUT',
                 headers: {
@@ -4992,7 +5050,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function toggleUserActive(userId) {
         try {
-            const adminCode = prompt('Enter admin code:');
             const response = await fetch(`/api/admin/users/${userId}/toggle-active`, {
                 method: 'PUT',
                 headers: {
@@ -5016,7 +5073,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         try {
-            const adminCode = prompt('Enter admin code:');
             const response = await fetch(`/api/admin/users/${userId}`, {
                 method: 'DELETE',
                 headers: {
@@ -5037,16 +5093,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const originalShowView = window.showView;
     window.showView = function(viewIdToShow, bypassAdminCheck = false) {
+        if (viewIdToShow === 'admin-panel-view' && !adminCode) {
+            const enteredCode = prompt('Enter admin code:');
+            if (enteredCode) {
+                fetch('/api/verify-admin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ adminCode: enteredCode }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        adminCode = enteredCode;
+                        originalShowView(viewIdToShow, true);
+                        loadAdminUsers();
+                    } else {
+                        alert(data.message || 'Invalid admin code.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error verifying admin code:', error);
+                    alert('Error verifying admin code. Please try again.');
+                });
+            }
+            return;
+        }
+
         originalShowView(viewIdToShow, bypassAdminCheck);
-        if (viewIdToShow === 'admin-panel-view') {
-            const usersTabButton = document.querySelector('.admin-tab-button[data-tab="users-admin"]');
-            if (usersTabButton) {
-                usersTabButton.classList.add('active');
-            }
-            const usersTabContent = document.getElementById('users-admin-tab');
-            if (usersTabContent) {
-                usersTabContent.classList.add('active');
-            }
+        if (viewIdToShow === 'admin-panel-view' && adminCode) {
             loadAdminUsers();
         }
     };
