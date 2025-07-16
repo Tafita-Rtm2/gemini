@@ -700,6 +700,36 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    const originalShowView = window.showView;
+    window.showView = function(viewIdToShow, bypassAdminCheck = false) {
+        if (viewIdToShow === 'admin-panel-view' && !adminCode) {
+            const enteredCode = prompt('Enter admin code:');
+            if (enteredCode) {
+                fetch('/api/verify-admin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ adminCode: enteredCode }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        adminCode = enteredCode;
+                        originalShowView(viewIdToShow, true);
+                    } else {
+                        alert(data.message || 'Invalid admin code.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error verifying admin code:', error);
+                    alert('Error verifying admin code. Please try again.');
+                });
+            }
+            return;
+        }
+        
+        originalShowView(viewIdToShow, bypassAdminCheck);
+    };
     // --- END OF HOME PAGE COMMENTS SECTION LOGIC ---
 
     // --- DEDICATED COMMENTS PAGE LOGIC (Phase 4.2) ---
@@ -4909,12 +4939,13 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const name = document.getElementById('signup-name').value;
             const password = document.getElementById('signup-password').value;
+            const uid = getOrCreateUID();
 
             try {
                 const response = await fetch('/api/users/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, password })
+                    body: JSON.stringify({ name, password, uid })
                 });
                 const data = await response.json();
                 alert(data.message);
@@ -5062,16 +5093,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const originalShowView = window.showView;
     window.showView = function(viewIdToShow, bypassAdminCheck = false) {
+        if (viewIdToShow === 'admin-panel-view' && !adminCode) {
+            const enteredCode = prompt('Enter admin code:');
+            if (enteredCode) {
+                fetch('/api/verify-admin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ adminCode: enteredCode }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        adminCode = enteredCode;
+                        originalShowView(viewIdToShow, true);
+                        loadAdminUsers();
+                    } else {
+                        alert(data.message || 'Invalid admin code.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error verifying admin code:', error);
+                    alert('Error verifying admin code. Please try again.');
+                });
+            }
+            return;
+        }
+        
         originalShowView(viewIdToShow, bypassAdminCheck);
-        if (viewIdToShow === 'admin-panel-view') {
-            const usersTabButton = document.querySelector('.admin-tab-button[data-tab="users-admin"]');
-            if (usersTabButton) {
-                usersTabButton.classList.add('active');
-            }
-            const usersTabContent = document.getElementById('users-admin-tab');
-            if (usersTabContent) {
-                usersTabContent.classList.add('active');
-            }
+        if (viewIdToShow === 'admin-panel-view' && adminCode) {
             loadAdminUsers();
         }
     };
