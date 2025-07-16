@@ -92,23 +92,11 @@ document.addEventListener('DOMContentLoaded', () => {
     window.showView = function(viewIdToShow, bypassAdminCheck = false) {
         if (viewIdToShow === 'admin-panel-view' && !bypassAdminCheck) {
             const token = localStorage.getItem('token');
-            if (!token) {
-                alert('You must be logged in as an admin to access this page.');
-                return;
-            }
-            // We can add a check here to verify the token with the server if needed
-            // For now, we assume if a token is present, the user is an admin
-            // This will be properly checked on the backend when making API calls
-        }
-
-        if (viewIdToShow === 'admin-panel-users-view' && !bypassAdminCheck) {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                alert('You must be logged in as an admin to access this page.');
+            if (!token && viewIdToShow !== 'login-view' && viewIdToShow !== 'signup-view') {
+                alert('You must be logged in to access this page.');
                 return;
             }
         }
-
 
         if (viewIdToShow === 'admin-panel-view' && !bypassAdminCheck) {
             const enteredCode = prompt('Enter admin code:');
@@ -4852,9 +4840,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    window.showView('login-view');
-
-    // Login and Signup form handling
     const loginForm = document.getElementById('login-form');
     const signupForm = document.getElementById('signup-form');
     const showSignup = document.getElementById('show-signup');
@@ -4865,13 +4850,12 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const name = document.getElementById('login-name').value;
             const password = document.getElementById('login-password').value;
-            const deviceId = getOrCreateUID(); // Using the existing UID function for deviceId
 
             try {
                 const response = await fetch('/api/users/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, password, deviceId })
+                    body: JSON.stringify({ name, password })
                 });
                 const data = await response.json();
                 if (response.ok) {
@@ -4892,14 +4876,12 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const name = document.getElementById('signup-name').value;
             const password = document.getElementById('signup-password').value;
-            const phoneNumber = document.getElementById('signup-phone').value;
-            const deviceId = getOrCreateUID();
 
             try {
                 const response = await fetch('/api/users/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, password, phoneNumber, deviceId })
+                    body: JSON.stringify({ name, password })
                 });
                 const data = await response.json();
                 alert(data.message);
@@ -4927,7 +4909,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Admin panel logic
     async function loadAdminUsers() {
         const adminUsersList = document.getElementById('admin-users-list');
         if (!adminUsersList) return;
@@ -4953,7 +4934,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 item.dataset.userId = user._id;
                 item.innerHTML = `
                     <div>
-                        <strong>${escapeHTML(user.name)}</strong> (${escapeHTML(user.phoneNumber)})
+                        <strong>${escapeHTML(user.name)}</strong>
                         <br>
                         <span>Approved: ${user.approved}</span> | <span>Active: ${user.active}</span>
                     </div>
@@ -5032,12 +5013,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Modify showView to load admin users when the admin panel is shown
     const originalShowView = window.showView;
     window.showView = function(viewIdToShow, bypassAdminCheck = false) {
         originalShowView(viewIdToShow, bypassAdminCheck);
-        if (viewIdToShow === 'admin-panel-users-view') {
+        if (viewIdToShow === 'admin-panel-view') {
+            const usersTabButton = document.querySelector('.admin-tab-button[data-tab="users-admin"]');
+            if (usersTabButton) {
+                usersTabButton.classList.add('active');
+            }
+            const usersTabContent = document.getElementById('users-admin-tab');
+            if (usersTabContent) {
+                usersTabContent.classList.add('active');
+            }
             loadAdminUsers();
         }
     };
+
+    const token = localStorage.getItem('token');
+    if (token) {
+        window.showView('home-view');
+    } else {
+        window.showView('login-view');
+    }
 });
