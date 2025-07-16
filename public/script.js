@@ -87,7 +87,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // --- Centralized showView Function ---
+    let currentView = 'login-view';
+
     window.showView = function(viewIdToShow, bypassAdminCheck = false) {
+        if (viewIdToShow === 'admin-panel-view' && !bypassAdminCheck) {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('You must be logged in as an admin to access this page.');
+                return;
+            }
+            // We can add a check here to verify the token with the server if needed
+            // For now, we assume if a token is present, the user is an admin
+            // This will be properly checked on the backend when making API calls
+        }
+
+        if (viewIdToShow === 'admin-panel-users-view' && !bypassAdminCheck) {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('You must be logged in as an admin to access this page.');
+                return;
+            }
+        }
+
+
         if (viewIdToShow === 'admin-panel-view' && !bypassAdminCheck) {
             const enteredCode = prompt('Enter admin code:');
             if (enteredCode) {
@@ -4830,5 +4852,192 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    window.showView('home-view');
+    window.showView('login-view');
+
+    // Login and Signup form handling
+    const loginForm = document.getElementById('login-form');
+    const signupForm = document.getElementById('signup-form');
+    const showSignup = document.getElementById('show-signup');
+    const showLogin = document.getElementById('show-login');
+
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('login-name').value;
+            const password = document.getElementById('login-password').value;
+            const deviceId = getOrCreateUID(); // Using the existing UID function for deviceId
+
+            try {
+                const response = await fetch('/api/users/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, password, deviceId })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    localStorage.setItem('token', data.token);
+                    window.showView('home-view');
+                } else {
+                    alert(data.message);
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('An error occurred during login.');
+            }
+        });
+    }
+
+    if (signupForm) {
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('signup-name').value;
+            const password = document.getElementById('signup-password').value;
+            const phoneNumber = document.getElementById('signup-phone').value;
+            const deviceId = getOrCreateUID();
+
+            try {
+                const response = await fetch('/api/users/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, password, phoneNumber, deviceId })
+                });
+                const data = await response.json();
+                alert(data.message);
+                if (response.ok) {
+                    window.showView('login-view');
+                }
+            } catch (error) {
+                console.error('Signup error:', error);
+                alert('An error occurred during signup.');
+            }
+        });
+    }
+
+    if (showSignup) {
+        showSignup.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.showView('signup-view');
+        });
+    }
+
+    if (showLogin) {
+        showLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.showView('login-view');
+        });
+    }
+
+    // Admin panel logic
+    async function loadAdminUsers() {
+        const adminUsersList = document.getElementById('admin-users-list');
+        if (!adminUsersList) return;
+        adminUsersList.innerHTML = '<p>Loading users...</p>';
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch('/api/admin/users', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!response.ok) {
+                const errData = await response.json().catch(() => null);
+                throw new Error(errData?.message || `Failed to fetch users: ${response.statusText}`);
+            }
+            const users = await response.json();
+            if (users.length === 0) {
+                adminUsersList.innerHTML = '<p>No users to display.</p>';
+                return;
+            }
+            adminUsersList.innerHTML = '';
+            users.forEach(user => {
+                const item = document.createElement('div');
+                item.className = 'admin-user-item';
+                item.dataset.userId = user._id;
+                item.innerHTML = `
+                    <div>
+                        <strong>${escapeHTML(user.name)}</strong> (${escapeHTML(user.phoneNumber)})
+                        <br>
+                        <span>Approved: ${user.approved}</span> | <span>Active: ${user.active}</span>
+                    </div>
+                    <div>
+                        <button class="btn-admin-approve" ${user.approved ? 'disabled' : ''}>Approve</button>
+                        <button class="btn-admin-toggle-active">${user.active ? 'Deactivate' : 'Activate'}</button>
+                        <button class="btn-admin-delete">Delete</button>
+                    </div>
+                `;
+                adminUsersList.appendChild(item);
+
+                item.querySelector('.btn-admin-approve').addEventListener('click', () => approveUser(user._id));
+                item.querySelector('.btn-admin-toggle-active').addEventListener('click', () => toggleUserActive(user._id));
+                item.querySelector('.btn-admin-delete').addEventListener('click', () => deleteUser(user._id));
+            });
+        } catch (error) {
+            console.error('Failed to load admin users:', error);
+            adminUsersList.innerHTML = `<p class="error-message">Error loading users: ${error.message}</p>`;
+        }
+    }
+
+    async function approveUser(userId) {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`/api/admin/users/${userId}/approve`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            alert(data.message);
+            if (response.ok) {
+                loadAdminUsers();
+            }
+        } catch (error) {
+            console.error('Error approving user:', error);
+            alert('An error occurred while approving the user.');
+        }
+    }
+
+    async function toggleUserActive(userId) {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`/api/admin/users/${userId}/toggle-active`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            alert(data.message);
+            if (response.ok) {
+                loadAdminUsers();
+            }
+        } catch (error) {
+            console.error('Error toggling user active state:', error);
+            alert('An error occurred while toggling the user active state.');
+        }
+    }
+
+    async function deleteUser(userId) {
+        if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+            return;
+        }
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`/api/admin/users/${userId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            alert(data.message);
+            if (response.ok) {
+                loadAdminUsers();
+            }
+        } catch (error) {
+            console.error('Error deleting user:', error);
+            alert('An error occurred while deleting the user.');
+        }
+    }
+
+    // Modify showView to load admin users when the admin panel is shown
+    const originalShowView = window.showView;
+    window.showView = function(viewIdToShow, bypassAdminCheck = false) {
+        originalShowView(viewIdToShow, bypassAdminCheck);
+        if (viewIdToShow === 'admin-panel-users-view') {
+            loadAdminUsers();
+        }
+    };
 });
