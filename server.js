@@ -21,7 +21,12 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Root route to serve index.html
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // Configure multer for file uploads
 const upload = multer({
@@ -31,7 +36,7 @@ const upload = multer({
 
 // ==================== CONSTANTS ====================
 const HF_API_KEY = process.env.HUGGINGFACE_API_KEY;
-const HF_API_URL = process.env.HUGGINGFACE_API_URL;
+const HF_API_URL = process.env.HUGGINGFACE_API_URL || 'https://api-inference.huggingface.co/models';
 const TEXT_MODEL = process.env.DEFAULT_LLM_MODEL || 'mistralai/Mistral-7B-Instruct-v0.3';
 const IMAGE_GEN_MODEL = process.env.DEFAULT_IMAGE_MODEL || 'stabilityai/stable-diffusion-3.5-large';
 const IMAGE_EDIT_MODEL = process.env.DEFAULT_EDIT_MODEL || 'Qwen/Qwen-Image-Edit-2511';
@@ -40,6 +45,37 @@ const IMAGE_EDIT_MODEL = process.env.DEFAULT_EDIT_MODEL || 'Qwen/Qwen-Image-Edit
 const conversations = new Map();
 
 // ==================== UTILITY FUNCTIONS ====================
+
+/**
+ * Query Pollinations API for Free AI
+ */
+async function queryPollinationsText(prompt, model = 'mistral') {
+  const models = {
+    'mistral': 'mistral',
+    'llama-3': 'llama',
+    'gpt-4o': 'openai',
+    'claude-3-5': 'anthropic',
+    'gemini-1.5': 'google',
+    'search': 'searchgpt',
+    'deepseek': 'deepseek'
+  };
+  
+  const selectedModel = models[model] || 'mistral';
+  const url = `https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=${selectedModel}`;
+  
+  const response = await fetch(url);
+  if (!response.ok) throw new Error('Pollinations API Error');
+  return await response.text();
+}
+
+async function queryPollinationsImage(prompt, options = {}) {
+  const { width = 512, height = 512, seed = Math.floor(Math.random() * 1000000), model = 'flux' } = options;
+  const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${width}&height=${height}&seed=${seed}&model=${model}&nologo=true`;
+  
+  const response = await fetch(url);
+  if (!response.ok) throw new Error('Pollinations Image API Error');
+  return await response.arrayBuffer();
+}
 
 /**
  * Query Hugging Face API
@@ -149,45 +185,42 @@ app.post('/api/chat', async (req, res) => {
     }
 
     // Prepare prompt
-    const systemMsg = systemPrompt || `You are an intelligent AI assistant. You help users with:
-- Answering questions
-- Writing and editing text
-- Generating images
-- Analyzing images
-- Providing coding help
-- And much more
-
-Be helpful, accurate, and concise. When asked about your capabilities, mention that you can generate and edit images.`;
+    const systemMsg = systemPrompt || `Tu es un assistant IA intelligent et serviable nommé AIVERSE. Tu aides les utilisateurs avec leurs questions, la rédaction de textes, la génération d'images et l'analyse visuelle. Réponds en français de manière élégante et concise.`;
 
     const chatHistory = formatMessagesForLLM(conversation.messages);
-    const fullPrompt = `${systemMsg}\n\nConversation:\n${chatHistory}`;
+    const fullPrompt = `${systemMsg}\n\nConversation:\n${chatHistory}\nAssistant:`;
 
-    // Query LLM
-    const result = await queryHuggingFace(TEXT_MODEL, {
-      inputs: fullPrompt,
-      parameters: {
-        max_new_tokens: 500,
-        temperature: 0.7,
-        top_p: 0.9,
-        do_sample: true
-      }
-    });
-
+    // Try Pollinations first (Unlimited & Free)
     let assistantMessage = '';
-    
-    if (Array.isArray(result)) {
-      assistantMessage = result[0]?.generated_text || 'No response generated';
-    } else if (result.generated_text) {
-      assistantMessage = result.generated_text;
-    } else {
-      throw new Error('Unexpected API response format');
-    }
+    try {
+      assistantMessage = await queryPollinationsText(fullPrompt, req.body.model);
+    } catch (e) {
+      console.log('Pollinations failed, falling back to HF');
+      // Query LLM via Hugging Face if Pollinations fails
+      const result = await queryHuggingFace(TEXT_MODEL, {
+        inputs: fullPrompt,
+        parameters: {
+          max_new_tokens: 500,
+          temperature: 0.7,
+          top_p: 0.9,
+          do_sample: true
+        }
+      });
 
-    // Extract only the new response (remove prompt from output)
-    const lastUserMsg = message;
-    const responseStart = assistantMessage.indexOf(lastUserMsg);
-    if (responseStart !== -1) {
-      assistantMessage = assistantMessage.substring(responseStart + lastUserMsg.length).trim();
+      if (Array.isArray(result)) {
+        assistantMessage = result[0]?.generated_text || 'No response generated';
+      } else if (result.generated_text) {
+        assistantMessage = result.generated_text;
+      } else {
+        throw new Error('Unexpected API response format');
+      }
+
+      // Extract only the new response (remove prompt from output)
+      const lastUserMsg = 'Assistant:';
+      const responseStart = assistantMessage.lastIndexOf(lastUserMsg);
+      if (responseStart !== -1) {
+        assistantMessage = assistantMessage.substring(responseStart + lastUserMsg.length).trim();
+      }
     }
 
     // Add assistant response
@@ -226,26 +259,29 @@ app.post('/api/generate-image', async (req, res) => {
       return res.status(400).json({ error: 'Prompt is required' });
     }
 
-    // For Stable Diffusion via HF
-    const result = await queryHuggingFace(IMAGE_GEN_MODEL, {
-      inputs: prompt,
-      parameters: {
-        height,
-        width,
-        num_inference_steps: numSteps,
-        guidance_scale: guidanceScale
-      }
-    });
-
-    // Result might be binary image data
-    if (Buffer.isBuffer(result)) {
+    // Use Pollinations for free unlimited image generation
+    try {
+      const buffer = await queryPollinationsImage(prompt, { 
+        width, 
+        height, 
+        model: req.body.model === 'flux' ? 'flux' : 'turbo' 
+      });
       res.set('Content-Type', 'image/png');
-      res.send(result);
-    } else if (result.error) {
-      throw new Error(result.error);
-    } else {
-      // Some APIs return base64 or URL
-      res.json(result);
+      res.send(Buffer.from(buffer));
+    } catch (e) {
+      console.log('Pollinations image failed, falling back to HF');
+      // For Stable Diffusion via HF fallback
+      const result = await queryHuggingFace(IMAGE_GEN_MODEL, {
+        inputs: prompt,
+        parameters: { height, width }
+      });
+
+      if (Buffer.isBuffer(result)) {
+        res.set('Content-Type', 'image/png');
+        res.send(result);
+      } else {
+        res.json(result);
+      }
     }
 
   } catch (error) {
