@@ -1,627 +1,677 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AIVERSE — Documentation</title>
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>AIVERSE — IA Gratuit</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Scripts for Markdown & Highlighting -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --primary: #6366f1;
-      --primary-dark: #4f46e5;
-      --bg: #0f0f1a;
-      --surface: rgba(255,255,255,.04);
-      --surface2: rgba(255,255,255,.08);
-      --border: rgba(255,255,255,.1);
+      --bg: #0a0b10;
+      --surface: #111218;
+      --surface2: #181920;
+      --surface3: #1e2029;
+      --border: #ffffff12;
+      --border2: #ffffff1e;
+      --primary: #7c6fff;
+      --primary2: #a78bfa;
+      --primary-glow: rgba(124,111,255,0.12);
+      --accent: #34d399;
+      --red: #f87171;
       --text: #f1f5f9;
-      --text-sub: #94a3b8;
-      --accent: #10b981;
-      --yellow: #f59e0b;
+      --text2: #94a3b8;
+      --text3: #64748b;
+      --radius: 14px;
+      --sidebar-w: 255px;
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'Sora', sans-serif;
     }
 
-    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+    html, body { height: 100%; overflow: hidden; background: var(--bg); }
+    body { font-family: var(--sans); color: var(--text); font-size: 14px; -webkit-font-smoothing: antialiased; }
 
-    /* ====== NAV ====== */
-    nav {
-      display:flex; align-items:center; justify-content:space-between;
-      padding:16px 32px; border-bottom:1px solid var(--border);
-      background:rgba(15,15,26,.8); backdrop-filter:blur(12px);
-      position:sticky; top:0; z-index:100;
-    }
-    .nav-logo { display:flex; align-items:center; gap:10px; font-weight:700; font-size:18px; }
-    .nav-badge {
-      width:32px; height:32px; background:linear-gradient(135deg,var(--primary),var(--primary-dark));
-      border-radius:8px; display:flex; align-items:center; justify-content:center;
-      font-weight:800; font-size:14px;
-    }
-    .nav-links { display:flex; gap:8px; }
-    .nav-link {
-      padding:7px 14px; border-radius:8px; font-size:13px; font-weight:500;
-      color:var(--text-sub); text-decoration:none; transition:.15s;
-    }
-    .nav-link:hover { background:var(--surface2); color:var(--text); }
-    .back-btn {
-      background:var(--primary); color:white; padding:7px 16px; border-radius:8px;
-      font-size:13px; font-weight:600; text-decoration:none; display:flex;
-      align-items:center; gap:6px; transition:.15s;
-    }
-    .back-btn:hover { opacity:.9; }
+    .layout { display: flex; height: 100dvh; overflow: hidden; position: relative; }
 
-    /* ====== HERO SLIDESHOW ====== */
-    .slideshow-section {
-      padding:64px 32px 32px;
-      background:radial-gradient(ellipse at 50% 0%, rgba(99,102,241,.2) 0%, transparent 70%);
+    .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 199; backdrop-filter: blur(3px); }
+    .overlay.show { display: block; }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      padding: 14px 11px; flex-shrink: 0;
+      overflow-y: auto; z-index: 200; position: relative;
+    }
+    @media (max-width: 768px) {
+      .sidebar {
+        position: fixed; top: 0; left: 0; bottom: 0;
+        transform: translateX(-100%);
+        transition: transform .28s cubic-bezier(.4,0,.2,1);
+        box-shadow: 8px 0 40px rgba(0,0,0,.6);
+      }
+      .sidebar.open { transform: translateX(0); }
     }
 
-    .section-label {
-      display:inline-flex; align-items:center; gap:6px;
-      background:rgba(99,102,241,.15); border:1px solid rgba(99,102,241,.3);
-      color:#a5b4fc; font-size:11px; font-weight:700; text-transform:uppercase;
-      letter-spacing:.08em; padding:4px 12px; border-radius:99px; margin-bottom:16px;
+    .logo { display: flex; align-items: center; gap: 10px; padding: 4px 4px 18px; }
+    .logo-badge {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, var(--primary), #4f46e5);
+      border-radius: 11px; display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 15px; color: white;
+      box-shadow: 0 0 24px rgba(124,111,255,.4); flex-shrink: 0;
     }
+    .logo-name { font-size: 16px; font-weight: 700; }
+    .logo-sub { font-size: 10px; color: var(--accent); font-weight: 600; font-family: var(--mono); }
 
-    .section-title { font-size:36px; font-weight:800; line-height:1.2; margin-bottom:8px; }
-    .section-sub { font-size:16px; color:var(--text-sub); margin-bottom:40px; }
+    .sidebar-x {
+      position: absolute; top: 13px; right: 11px;
+      width: 28px; height: 28px; border-radius: 7px;
+      background: var(--surface2); border: 1px solid var(--border2);
+      display: none; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--text2); font-size: 14px;
+    }
+    .sidebar-x:hover { background: var(--surface3); color: var(--text); }
+    @media (max-width: 768px) { .sidebar-x { display: flex; } }
 
-    .slideshow {
-      position:relative; overflow:hidden; border-radius:20px;
-      border:1px solid var(--border); background:var(--surface);
-      box-shadow:0 32px 80px rgba(0,0,0,.5);
+    .nav-section { margin-bottom: 18px; }
+    .nav-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--text3); padding: 0 10px 7px; font-family: var(--mono); }
+    .nav-item {
+      display: flex; align-items: center; gap: 9px;
+      padding: 9px 10px; border-radius: 9px;
+      font-size: 13.5px; font-weight: 500; color: var(--text2);
+      cursor: pointer; transition: all .15s; margin-bottom: 2px;
+      border: none; background: none; width: 100%; text-align: left; font-family: var(--sans);
+      text-decoration: none;
     }
+    .nav-item:hover { background: var(--surface2); color: var(--text); }
+    .nav-item.active { background: var(--primary-glow); color: var(--primary2); font-weight: 600; border: 1px solid rgba(124,111,255,.22); }
+    .nav-icon { font-size: 16px; flex-shrink: 0; width: 20px; text-align: center; }
+    .nav-badge { margin-left: auto; font-size: 9px; font-weight: 700; background: rgba(52,211,153,.12); color: var(--accent); padding: 2px 7px; border-radius: 99px; border: 1px solid rgba(52,211,153,.22); font-family: var(--mono); }
 
-    .slides { display:flex; transition:transform .5s cubic-bezier(.25,.46,.45,.94); }
+    .sidebar-footer { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--border); }
+    .info-box { background: rgba(52,211,153,.07); border: 1px solid rgba(52,211,153,.18); border-radius: 10px; padding: 11px 13px; font-size: 12.5px; line-height: 1.6; color: #6ee7b7; }
+    .info-box strong { color: var(--accent); }
+    .dot-live { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); display: inline-block; margin-right: 4px; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
 
-    .slide {
-      min-width:100%; padding:48px 56px;
-      display:flex; flex-direction:column; align-items:flex-start; gap:20px;
-    }
+    /* MAIN */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
 
-    .slide-number {
-      font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.1em;
-      color:var(--primary); background:rgba(99,102,241,.15); padding:4px 10px; border-radius:99px;
-    }
-    .slide-title { font-size:28px; font-weight:800; line-height:1.2; }
-    .slide-body { font-size:15px; line-height:1.75; color:var(--text-sub); max-width:640px; }
-    .slide-body strong { color:var(--text); }
+    /* TOPBAR */
+    .topbar { height: 54px; min-height: 54px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; padding: 0 13px; flex-shrink: 0; }
+    .hamburger { width: 36px; height: 36px; border-radius: 9px; background: transparent; border: 1px solid var(--border2); cursor: pointer; display: none; align-items: center; justify-content: center; color: var(--text2); font-size: 18px; transition: .15s; flex-shrink: 0; }
+    .hamburger:hover { background: var(--surface2); color: var(--text); }
+    @media (max-width: 768px) { .hamburger { display: flex; } }
+    .topbar-title { font-size: 15px; font-weight: 600; flex: 1; }
 
-    .code-block {
-      background:#0d0d17; border:1px solid var(--border); border-radius:12px;
-      padding:20px 24px; font-family:'Courier New',monospace; font-size:13px;
-      line-height:1.65; color:#a5f3fc; overflow-x:auto; width:100%; max-width:680px;
-    }
-    .code-block .kw { color:#818cf8; }
-    .code-block .str { color:#86efac; }
-    .code-block .cm { color:#475569; }
-    .code-block .fn { color:#f9a8d4; }
+    .btn { display: inline-flex; align-items: center; gap: 5px; padding: 7px 13px; border-radius: 9px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; transition: all .15s; font-family: var(--sans); }
+    .btn-ghost { background: transparent; color: var(--text2); border: 1px solid var(--border2); }
+    .btn-ghost:hover { background: var(--surface2); color: var(--text); }
+    .btn-primary { background: var(--primary); color: white; box-shadow: 0 0 20px rgba(124,111,255,.3); }
+    .btn-primary:hover { background: #6c5fff; }
+    .btn-outline { background: transparent; border: 1px solid var(--border2); color: var(--text2); }
+    .btn-outline:hover { border-color: var(--primary); color: var(--primary2); }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
 
-    .feature-list { display:flex; flex-direction:column; gap:10px; }
-    .feature-item {
-      display:flex; align-items:flex-start; gap:12px;
-      background:var(--surface2); border:1px solid var(--border);
-      border-radius:10px; padding:14px 16px;
-    }
-    .feature-icon { color:var(--accent); flex-shrink:0; margin-top:2px; }
-    .feature-text { font-size:14px; line-height:1.5; color:var(--text-sub); }
-    .feature-text strong { color:var(--text); display:block; margin-bottom:2px; }
+    /* PANELS */
+    .panel { display: none; flex: 1; overflow: hidden; flex-direction: column; }
+    .panel.active { display: flex; }
 
-    .model-pills { display:flex; flex-wrap:wrap; gap:8px; }
-    .pill {
-      background:var(--surface2); border:1px solid var(--border);
-      padding:6px 14px; border-radius:99px; font-size:12px; font-weight:500;
-      color:var(--text);
-    }
-    .pill.green { background:rgba(16,185,129,.15); border-color:rgba(16,185,129,.3); color:#6ee7b7; }
+    /* MESSAGES */
+    #messages-area { flex: 1; overflow-y: auto; padding: 14px 13px; display: flex; flex-direction: column; gap: 12px; scroll-behavior: smooth; }
+    .msg { display: flex; gap: 9px; max-width: 90%; animation: msgIn .2s ease; }
+    @keyframes msgIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
+    .msg.user { align-self: flex-end; flex-direction: row-reverse; }
+    .msg.ai { align-self: flex-start; }
+    .avatar { width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; border: 1px solid var(--border2); background: var(--surface2); }
+    .msg.user .avatar { background: var(--primary); border: none; }
+    
+    .bubble { padding: 10px 15px; border-radius: 16px; font-size: 14px; line-height: 1.7; background: var(--surface); border: 1px solid var(--border); word-break: break-word; max-width: 100%; color: var(--text); }
+    .msg.user .bubble { background: var(--primary); color: white; border-color: transparent; border-radius: 16px 4px 16px 16px; white-space: pre-wrap; }
+    .msg.ai .bubble { border-radius: 4px 16px 16px 16px; }
 
-    /* slide controls */
-    .slide-controls {
-      display:flex; align-items:center; justify-content:space-between;
-      padding:20px 32px; border-top:1px solid var(--border);
-    }
-    .slide-dots { display:flex; gap:8px; }
-    .dot-btn {
-      width:8px; height:8px; border-radius:50%; background:var(--surface2);
-      border:none; cursor:pointer; transition:.2s;
-    }
-    .dot-btn.active { background:var(--primary); width:24px; border-radius:4px; }
-    .arrow-btn {
-      background:var(--surface2); border:1px solid var(--border);
-      color:var(--text); border-radius:8px; padding:8px 16px; cursor:pointer;
-      font-size:13px; font-weight:500; transition:.15s; display:flex; align-items:center; gap:6px;
-    }
-    .arrow-btn:hover { background:var(--surface); border-color:var(--primary); }
-    .arrow-btn:disabled { opacity:.3; cursor:not-allowed; }
+    /* Markdown Styling */
+    .bubble h1, .bubble h2, .bubble h3 { margin: 10px 0 6px; font-weight: 700; color: white; }
+    .bubble h1 { font-size: 1.4em; }
+    .bubble h2 { font-size: 1.25em; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+    .bubble h3 { font-size: 1.1em; }
+    .bubble p { margin-bottom: 8px; }
+    .bubble ul, .bubble ol { margin: 8px 0 12px 20px; }
+    .bubble li { margin-bottom: 4px; }
+    .bubble blockquote { border-left: 3px solid var(--primary); padding: 4px 12px; color: var(--text2); background: var(--surface2); margin: 8px 0; border-radius: 0 6px 6px 0; }
+    .bubble code { font-family: var(--mono); background: var(--surface2); padding: 2px 4px; border-radius: 4px; font-size: 0.9em; color: var(--primary2); }
+    .bubble pre { margin: 10px 0; position: relative; }
+    .bubble pre code { display: block; padding: 12px; overflow-x: auto; background: #0d0d0d; color: #e6edf3; border-radius: 8px; border: 1px solid var(--border2); line-height: 1.5; }
+    
+    /* Tables */
+    .bubble table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
+    .bubble th, .bubble td { border: 1px solid var(--border2); padding: 8px 10px; text-align: left; }
+    .bubble th { background: var(--surface2); color: white; font-weight: 600; }
+    .bubble tr:nth-child(even) { background: rgba(255,255,255,0.02); }
 
-    /* ====== DOC SECTIONS ====== */
-    .docs-body { max-width:900px; margin:0 auto; padding:64px 32px; }
-    .doc-section { margin-bottom:64px; }
-    .doc-section-title {
-      font-size:22px; font-weight:700; margin-bottom:24px;
-      display:flex; align-items:center; gap:10px;
-    }
-    .endpoint-card {
-      background:var(--surface); border:1px solid var(--border);
-      border-radius:12px; margin-bottom:16px; overflow:hidden;
-    }
-    .endpoint-header {
-      display:flex; align-items:center; gap:12px; padding:16px 20px;
-      border-bottom:1px solid var(--border);
-    }
-    .method {
-      font-size:11px; font-weight:800; padding:3px 8px; border-radius:6px;
-      font-family:monospace;
-    }
-    .method.post { background:rgba(99,102,241,.2); color:#a5b4fc; }
-    .method.get  { background:rgba(16,185,129,.2); color:#6ee7b7; }
-    .method.del  { background:rgba(239,68,68,.2);  color:#fca5a5; }
-    .endpoint-path { font-family:monospace; font-size:14px; font-weight:600; }
-    .endpoint-desc { color:var(--text-sub); font-size:13px; margin-left:auto; }
-    .endpoint-body { padding:16px 20px; }
-    .param-table { width:100%; border-collapse:collapse; font-size:13px; }
-    .param-table th { text-align:left; color:var(--text-sub); font-size:11px; text-transform:uppercase; letter-spacing:.05em; padding:6px 8px; border-bottom:1px solid var(--border); }
-    .param-table td { padding:8px; vertical-align:top; color:var(--text-sub); }
-    .param-table td:first-child { font-family:monospace; color:var(--text); font-size:12px; }
-    .param-badge { font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px; background:rgba(239,68,68,.2); color:#fca5a5; }
-    .param-badge.opt { background:rgba(99,102,241,.2); color:#a5b4fc; }
+    .copy-btn { position: absolute; top: 8px; right: 8px; padding: 4px 8px; font-size: 10px; background: var(--surface3); border: 1px solid var(--border2); color: var(--text2); border-radius: 4px; cursor: pointer; }
+    .copy-btn:hover { background: var(--primary); color: white; }
 
-    /* ====== EMBED SECTION ====== */
-    .embed-box {
-      background:#0d0d17; border:1px solid var(--border); border-radius:12px;
-      padding:24px; font-family:monospace; font-size:13px; line-height:1.7;
-      color:#a5f3fc; overflow-x:auto;
-    }
-    .embed-box .kw { color:#818cf8; }
-    .embed-box .str { color:#86efac; }
-    .embed-box .cm { color:#475569; }
+    .bubble .chat-img-preview { max-width: 100%; max-height: 300px; border-radius: 9px; display: block; margin-bottom: 10px; object-fit: contain; border: 1px solid rgba(255,255,255,.2); }
+    
+    .typing { display: flex; gap: 4px; align-items: center; padding: 4px 0; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--primary2); animation: bop .9s infinite; }
+    .dot:nth-child(2){animation-delay:.15s} .dot:nth-child(3){animation-delay:.3s}
+    @keyframes bop { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-5px)} }
 
-    /* ====== FOOTER ====== */
-    footer {
-      text-align:center; padding:32px; border-top:1px solid var(--border);
-      color:var(--text-sub); font-size:13px;
-    }
+    /* CHAT BAR */
+    .chat-bar { background: var(--surface); border-top: 1px solid var(--border); padding: 9px 11px 11px; display: flex; flex-direction: column; gap: 7px; flex-shrink: 0; }
+    .model-select { width: 100%; background: var(--surface2); border: 1px solid var(--border2); border-radius: 9px; padding: 7px 10px; font-size: 13px; color: var(--text); outline: none; cursor: pointer; font-family: var(--sans); transition: border-color .2s; }
+    .model-select:focus { border-color: var(--primary); }
+    .model-select option { background: var(--surface2); }
+    .chat-input-row { display: flex; gap: 7px; align-items: flex-end; }
+    .input-area { flex: 1; background: var(--surface2); border: 1.5px solid var(--border2); border-radius: 14px; transition: border-color .2s; display: flex; flex-direction: column; padding: 9px 12px; min-height: 46px; }
+    .input-area:focus-within { border-color: var(--primary); }
+    #chat-img-chips { display: none; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; }
+    .img-chip { position: relative; width: 46px; height: 46px; border-radius: 8px; overflow: hidden; flex-shrink: 0; border: 1px solid var(--border2); }
+    .img-chip img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .img-chip .rm { position: absolute; top: 1px; right: 1px; width: 15px; height: 15px; border-radius: 50%; background: rgba(0,0,0,.75); color: white; display: flex; align-items: center; justify-content: center; font-size: 9px; cursor: pointer; border: none; }
+    #chat-input { width: 100%; background: transparent; border: none; outline: none; font-family: var(--sans); font-size: 14px; resize: none; max-height: 120px; line-height: 1.55; color: var(--text); min-height: 22px; }
+    #chat-input::placeholder { color: var(--text3); }
+    .attach-btn { width: 38px; height: 38px; border-radius: 10px; background: transparent; border: 1px solid var(--border2); color: var(--text2); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 17px; transition: .15s; flex-shrink: 0; }
+    .attach-btn:hover { background: var(--surface3); color: var(--primary2); border-color: var(--primary); }
+    #attach-input { display: none; }
+    .send-btn { width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0; background: var(--primary); color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: .15s; box-shadow: 0 0 18px rgba(124,111,255,.35); align-self: flex-end; }
+    .send-btn:hover { background: #6c5fff; }
+    .send-btn:disabled { opacity: .45; cursor: not-allowed; }
 
-    ::-webkit-scrollbar { width:6px; }
-    ::-webkit-scrollbar-thumb { background:#334155; border-radius:99px; }
+    /* PANEL CONTENT */
+    .panel-content { padding: 13px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 13px; }
+    .panel-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 15px; }
+    .panel-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 13px; }
+    .form-group { margin-bottom: 11px; }
+    .form-label { font-size: 10.5px; font-weight: 700; color: var(--text3); margin-bottom: 5px; display: block; text-transform: uppercase; letter-spacing: .07em; font-family: var(--mono); }
+    .form-input, .form-textarea, .form-select { width: 100%; padding: 9px 11px; border: 1.5px solid var(--border2); border-radius: 9px; font-family: var(--sans); font-size: 14px; color: var(--text); background: var(--surface2); outline: none; transition: border-color .2s; }
+    .form-input:focus, .form-textarea:focus, .form-select:focus { border-color: var(--primary); }
+    .form-textarea { resize: vertical; min-height: 74px; }
+    .form-select option { background: var(--surface2); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+    .img-output { width: 100%; min-height: 140px; border: 2px dashed var(--border2); border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-top: 13px; background: var(--surface2); }
+    .img-output img { max-width: 100%; border-radius: 10px; display: block; }
+    .img-ph { color: var(--text3); font-size: 13px; text-align: center; padding: 24px; }
+    .upload-zone { border: 2px dashed var(--border2); border-radius: 12px; padding: 22px 14px; text-align: center; cursor: pointer; transition: all .2s; background: var(--surface2); display: block; }
+    .upload-zone:hover { border-color: var(--primary); background: var(--primary-glow); }
+    .upload-zone input { display: none; }
+    .model-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(115px,1fr)); gap: 7px; }
+    .model-card { border: 1.5px solid var(--border2); border-radius: 10px; padding: 11px; cursor: pointer; transition: all .15s; background: var(--surface2); }
+    .model-card:hover { border-color: var(--primary); background: var(--primary-glow); }
+    .model-card.active { border-color: var(--primary); background: var(--primary-glow); }
+    .model-card-name { font-size: 12px; font-weight: 600; margin-bottom: 2px; }
+    .model-card-provider { font-size: 10.5px; color: var(--text3); font-family: var(--mono); }
+    .model-card-badge { display: inline-block; margin-top: 5px; font-size: 9px; font-weight: 700; background: rgba(52,211,153,.12); color: var(--accent); padding: 2px 6px; border-radius: 99px; border: 1px solid rgba(52,211,153,.22); font-family: var(--mono); }
+    .analyze-result-box { background: var(--primary-glow); border: 1px solid rgba(124,111,255,.22); border-radius: 12px; padding: 13px; }
+    .analyze-result-title { font-size: 10px; font-weight: 700; color: var(--primary2); margin-bottom: 7px; text-transform: uppercase; letter-spacing: .08em; font-family: var(--mono); }
+    #analyze-text { font-size: 14px; line-height: 1.75; }
+    .toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); z-index: 9999; background: var(--surface3); color: var(--text); border: 1px solid var(--border2); padding: 10px 18px; border-radius: 10px; font-size: 13px; box-shadow: 0 8px 32px rgba(0,0,0,.5); display: none; white-space: nowrap; }
+
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 99px; }
   </style>
 </head>
 <body>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+<div class="layout">
 
-<!-- NAV -->
-<nav>
-  <div class="nav-logo">
-    <div class="nav-badge">AI</div>
-    AIVERSE Docs
-  </div>
-  <div class="nav-links">
-    <a href="#guide" class="nav-link">Guide</a>
-    <a href="#api" class="nav-link">API</a>
-    <a href="#embed" class="nav-link">Intégration</a>
-    <a href="#models" class="nav-link">Modèles</a>
-  </div>
-  <a href="/" class="back-btn">
-    <i data-lucide="arrow-left" style="width:14px;height:14px"></i>
-    Retour à l'app
-  </a>
-</nav>
-
-<!-- SLIDESHOW SECTION -->
-<div class="slideshow-section" id="guide">
-  <div class="section-label">
-    <i data-lucide="book-open" style="width:12px;height:12px"></i>
-    Guide Démarrage Rapide
-  </div>
-  <h1 class="section-title">AIVERSE en 5 minutes</h1>
-  <p class="section-sub">Tout ce qu'il faut savoir pour utiliser et intégrer AIVERSE</p>
-
-  <div class="slideshow">
-    <div class="slides" id="slides-track">
-
-      <!-- Slide 1 -->
-      <div class="slide">
-        <span class="slide-number">1 / 6 — Introduction</span>
-        <h2 class="slide-title">Qu'est-ce que AIVERSE ?</h2>
-        <p class="slide-body">
-          AIVERSE est un assistant IA multimodal <strong>entièrement gratuit</strong> qui ne nécessite
-          <strong>aucune clé API</strong>. Il permet de chatter avec de nombreux modèles IA,
-          de générer des images, d'analyser des photos et de les modifier — le tout depuis
-          votre navigateur ou intégré dans votre propre site web.
-        </p>
-        <div class="feature-list">
-          <div class="feature-item">
-            <i data-lucide="zap" class="feature-icon" style="width:16px;height:16px"></i>
-            <div class="feature-text"><strong>Aucune inscription requise</strong>Ouvrez l'app et commencez immédiatement.</div>
-          </div>
-          <div class="feature-item">
-            <i data-lucide="shield-check" class="feature-icon" style="width:16px;height:16px"></i>
-            <div class="feature-text"><strong>100% gratuit</strong>Pas de limite d'utilisation, pas de carte bancaire.</div>
-          </div>
-          <div class="feature-item">
-            <i data-lucide="code" class="feature-icon" style="width:16px;height:16px"></i>
-            <div class="feature_text"><strong>API REST intégrée</strong>Intégrez AIVERSE dans n'importe quel site web ou application.</div>
-          </div>
-        </div>
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <button class="sidebar-x" onclick="closeSidebar()">✕</button>
+    <div class="logo">
+      <div class="logo-badge">AI</div>
+      <div>
+        <div class="logo-name">AIVERSE</div>
+        <div class="logo-sub"><span class="dot-live"></span>100% GRATUIT</div>
       </div>
-
-      <!-- Slide 2 -->
-      <div class="slide">
-        <span class="slide-number">2 / 6 — Installation</span>
-        <h2 class="slide-title">Démarrer en 3 commandes</h2>
-        <p class="slide-body">Clonez ou téléchargez le projet, installez les dépendances et lancez :</p>
-        <div class="code-block">
-<span class="cm"># 1. Téléchargez le projet</span>
-git clone https://github.com/votre-repo/aiverse.git
-cd aiverse
-
-<span class="cm"># 2. Installez les dépendances</span>
-npm install
-
-<span class="cm"># 3. Démarrez le serveur</span>
-npm start
-
-<span class="cm"># L'app est accessible sur :</span>
-<span class="str">http://localhost:5000</span>
-        </div>
-        <div class="feature-item">
-          <i data-lucide="info" class="feature-icon" style="width:16px;height:16px"></i>
-          <div class="feature-text"><strong>Node.js 18+ requis.</strong>Aucun fichier .env n'est nécessaire — l'app fonctionne sans configuration.</div>
-        </div>
-      </div>
-
-      <!-- Slide 3 -->
-      <div class="slide">
-        <span class="slide-number">3 / 6 — Chat IA</span>
-        <h2 class="slide-title">Utiliser le Chat</h2>
-        <p class="slide-body">
-          Sélectionnez un modèle dans le menu déroulant, tapez votre message et appuyez sur
-          <strong>Entrée</strong>. L'historique de conversation est conservé en mémoire.
-          Cliquez sur <strong>"Nouveau chat"</strong> pour recommencer.
-        </p>
-        <div class="model-pills">
-          <span class="pill green">Mistral Large</span>
-          <span class="pill green">GPT-4o</span>
-          <span class="pill green">Gemini 2.0</span>
-          <span class="pill green">Claude</span>
-          <span class="pill green">Llama 3.3 70B</span>
-          <span class="pill green">DeepSeek-V3</span>
-          <span class="pill green">DeepSeek-R1</span>
-          <span class="pill green">Qwen-Max</span>
-          <span class="pill green">Phi-4</span>
-          <span class="pill green">SearchGPT 🌐</span>
-        </div>
-        <p class="slide-body">Tous les modèles ci-dessus sont <strong>gratuits et sans clé API</strong>.</p>
-      </div>
-
-      <!-- Slide 4 -->
-      <div class="slide">
-        <span class="slide-number">4 / 6 — Génération d'images</span>
-        <h2 class="slide-title">Créer des Images par IA</h2>
-        <p class="slide-body">
-          Allez dans <strong>Générer Image</strong>, décrivez l'image souhaitée en français ou en
-          anglais, sélectionnez le modèle et la taille, puis cliquez sur
-          <strong>"Générer l'Image"</strong>. Vous pouvez télécharger le résultat.
-        </p>
-        <div class="code-block">
-<span class="cm"># Exemples de prompts efficaces :</span>
-<span class="str">"Un chat astronaute sur la lune, style photoréaliste"</span>
-<span class="str">"Paysage de montagne au coucher de soleil, peinture à l'huile"</span>
-<span class="str">"Logo minimaliste pour une startup tech, fond blanc"</span>
-<span class="str">"Portrait d'une femme afro-futuriste, cyberpunk, 8K"</span>
-        </div>
-      </div>
-
-      <!-- Slide 5 -->
-      <div class="slide">
-        <span class="slide-number">5 / 6 — Analyse d'images</span>
-        <h2 class="slide-title">Analyser & Éditer des Photos</h2>
-        <p class="slide-body">
-          <strong>Analyser :</strong> Importez une image, posez une question optionnelle, et l'IA Vision décrit
-          ce qu'elle voit en français.<br><br>
-          <strong>Éditer :</strong> Importez une image, décrivez la modification voulue. L'IA analyse d'abord votre image,
-          puis génère une nouvelle version modifiée selon vos instructions.
-        </p>
-        <div class="feature-list">
-          <div class="feature-item">
-            <i data-lucide="eye" class="feature-icon" style="width:16px;height:16px"></i>
-            <div class="feature-text"><strong>Analyse Vision</strong>Powered by GPT-4 Vision — gratuit.</div>
-          </div>
-          <div class="feature-item">
-            <i data-lucide="wand-2" class="feature-icon" style="width:16px;height:16px"></i>
-            <div class="feature-text"><strong>Édition par description</strong>L'IA comprend votre image et génère une version modifiée.</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Slide 6 -->
-      <div class="slide">
-        <span class="slide-number">6 / 6 — Intégration</span>
-        <h2 class="slide-title">Intégrer dans votre Site</h2>
-        <p class="slide-body">
-          AIVERSE expose une API REST complète. Intégrez le chat IA dans n'importe quel site
-          ou application en quelques lignes de JavaScript, sans clé API.
-        </p>
-        <div class="code-block">
-<span class="cm">// Chat depuis n'importe quel site web</span>
-<span class="kw">const</span> response = <span class="kw">await</span> fetch(<span class="str">'http://votre-serveur/api/chat'</span>, {
-  method: <span class="str">'POST'</span>,
-  headers: { <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span> },
-  body: JSON.stringify({
-    message: <span class="str">'Bonjour, comment vas-tu ?'</span>,
-    model: <span class="str">'mistral'</span>
-  })
-});
-<span class="kw">const</span> data = <span class="kw">await</span> response.json();
-console.log(data.message); <span class="cm">// Réponse de l'IA</span>
-        </div>
-      </div>
-
-    </div><!-- /slides -->
-
-    <div class="slide-controls">
-      <button class="arrow-btn" id="prev-btn" onclick="prevSlide()" disabled>
-        <i data-lucide="arrow-left" style="width:14px;height:14px"></i> Précédent
-      </button>
-      <div class="slide-dots" id="slide-dots"></div>
-      <button class="arrow-btn" id="next-btn" onclick="nextSlide()">
-        Suivant <i data-lucide="arrow-right" style="width:14px;height:14px"></i>
-      </button>
     </div>
-  </div>
+    <div class="nav-section">
+      <div class="nav-label">Outils IA</div>
+      <button class="nav-item active" onclick="showPanel('chat',this)"><span class="nav-icon">💬</span>Chat IA<span class="nav-badge">FREE</span></button>
+      <button class="nav-item" onclick="showPanel('generate',this)"><span class="nav-icon">🎨</span>Générer Image<span class="nav-badge">FREE</span></button>
+      <button class="nav-item" onclick="showPanel('analyze',this)"><span class="nav-icon">👁️</span>Analyser Image<span class="nav-badge">FREE</span></button>
+      <button class="nav-item" onclick="showPanel('edit',this)"><span class="nav-icon">✏️</span>Éditer Image<span class="nav-badge">FREE</span></button>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Configuration</div>
+      <button class="nav-item" onclick="showPanel('models',this)"><span class="nav-icon">🤖</span>Modèles IA</button>
+      <a href="/docs" class="nav-item" target="_blank"><span class="nav-icon">📄</span>API & Docs</a>
+    </div>
+    <div class="sidebar-footer">
+      <div class="info-box"><strong>✅ Sécurité & Confidentialité</strong><br>Vos conversations sont privées et isolées par votre identifiant unique.</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <button class="hamburger" onclick="openSidebar()">☰</button>
+      <span class="topbar-title" id="panel-title">💬 Chat IA</span>
+      <button class="btn btn-ghost" id="new-chat-btn" onclick="newChat()">+ Nouveau</button>
+    </div>
+
+    <!-- CHAT -->
+    <div id="chat-panel" class="panel active">
+      <div id="messages-area">
+        <div class="msg ai">
+          <div class="avatar">🤖</div>
+          <div class="bubble" id="welcome-msg"></div>
+        </div>
+      </div>
+      <div class="chat-bar">
+        <select class="model-select" id="chat-model-select">
+          <option value="mistral">⚡ Mistral Large</option>
+          <option value="llama">🦙 Llama 3.3 70B</option>
+          <option value="deepseek">🔍 DeepSeek-V3</option>
+          <option value="deepseek-r1">🧠 DeepSeek-R1</option>
+          <option value="gpt-4o">✨ GPT-4o</option>
+          <option value="gemini">🌟 Gemini 2.0</option>
+          <option value="claude">🤖 Claude</option>
+          <option value="qwen">🏮 Qwen-Max</option>
+          <option value="phi">🔷 Phi-4</option>
+          <option value="search">🌐 SearchGPT</option>
+        </select>
+        <div class="chat-input-row">
+          <div class="input-area">
+            <div id="chat-img-chips"></div>
+            <textarea id="chat-input" placeholder="Écrivez votre message... (Entrée pour envoyer)" rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+          </div>
+          <input type="file" id="attach-input" accept="image/*" multiple onchange="handleAttach(event)">
+          <button class="attach-btn" onclick="document.getElementById('attach-input').click()" title="Joindre image">📎</button>
+          <button class="send-btn" id="send-btn" onclick="sendChat()">➤</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- GENERATE -->
+    <div id="generate-panel" class="panel">
+      <div class="panel-content">
+        <div class="panel-card">
+          <h3>🎨 Générer une Image par IA</h3>
+          <div class="form-group">
+            <label class="form-label">Description (prompt)</label>
+            <textarea class="form-textarea" id="gen-prompt" placeholder="Ex: Un coucher de soleil sur la mer, style photoréaliste, 4K..."></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Modèle</label>
+              <select class="form-select" id="gen-model">
+                <option value="flux">Flux Schnell ⚡</option>
+                <option value="flux-pro">Flux Pro 🌟</option>
+                <option value="turbo">SDXL Turbo</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Taille</label>
+              <select class="form-select" id="gen-size">
+                <option value="512x512">512 × 512</option>
+                <option value="768x768">768 × 768</option>
+                <option value="1024x1024" selected>1024 × 1024</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-primary" id="gen-btn" onclick="generateImage()" style="width:100%;justify-content:center;padding:12px;font-size:14px">✨ Générer l'Image</button>
+          <div class="img-output" id="gen-output"><div class="img-ph">🎨<br><br>L'image apparaîtra ici</div></div>
+          <div id="gen-dl" style="display:none;margin-top:12px;text-align:center">
+            <a id="gen-dl-link" class="btn btn-outline" download="aiverse.jpg">⬇️ Télécharger</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANALYZE -->
+    <div id="analyze-panel" class="panel">
+      <div class="panel-content">
+        <div class="panel-card">
+          <h3>👁️ Analyser une Image par Vision IA</h3>
+          <div class="form-group">
+            <label class="form-label">Question sur l'Image (optionnel)</label>
+            <input class="form-input" id="analyze-q" placeholder="Ex: Qu'est-ce que tu vois ? Quelle est l'émotion ?">
+          </div>
+          <label class="upload-zone" for="analyze-file">
+            <input type="file" id="analyze-file" accept="image/*" onchange="analyzeImage(event)">
+            <div style="font-size:30px;margin-bottom:8px">⬆️</div>
+            <strong>Toucher pour choisir une image</strong><br>
+            <span style="font-size:12px;color:var(--text3)">PNG, JPG, WEBP · Max 10MB</span>
+          </label>
+          <div id="analyze-prev-wrap" style="display:none;margin-top:13px;text-align:center">
+            <img id="analyze-img" style="max-width:100%;max-height:220px;border-radius:11px;border:1px solid var(--border2)">
+          </div>
+          <div id="analyze-result" style="display:none;margin-top:13px">
+            <div class="analyze-result-box">
+              <div class="analyze-result-title">🤖 Analyse IA</div>
+              <div id="analyze-text"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EDIT -->
+    <div id="edit-panel" class="panel">
+      <div class="panel-content">
+        <div class="panel-card">
+          <h3>✏️ Édition d'Image par IA</h3>
+          <p style="font-size:13px;color:var(--text2);margin-bottom:13px">L'IA analyse votre image puis génère une nouvelle version modifiée selon vos instructions.</p>
+          <label class="upload-zone" for="edit-file" style="margin-bottom:13px">
+            <input type="file" id="edit-file" accept="image/*" onchange="previewEdit(event)">
+            <div style="font-size:28px;margin-bottom:6px">🖼️</div>
+            <strong>Choisir l'image à modifier</strong>
+          </label>
+          <div id="edit-orig-wrap" style="display:none;margin-bottom:13px">
+            <div class="form-label">Image originale</div>
+            <img id="edit-orig" style="max-width:100%;max-height:180px;border-radius:10px;display:block;border:1px solid var(--border2)">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Instructions de modification</label>
+            <textarea class="form-textarea" id="edit-prompt" placeholder="Ex: Rends le ciel violet, ajoute des étoiles..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Modèle</label>
+            <select class="form-select" id="edit-model">
+              <option value="flux">Flux Schnell ⚡</option>
+              <option value="flux-pro">Flux Pro 🌟</option>
+              <option value="turbo">SDXL Turbo</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" id="edit-btn" onclick="editImage()" style="width:100%;justify-content:center;padding:12px;font-size:14px">🪄 Appliquer la Modification</button>
+          <div class="img-output" id="edit-output" style="display:none;margin-top:13px"><img id="edit-result" style="max-width:100%;border-radius:10px"></div>
+          <div id="edit-dl" style="display:none;margin-top:12px;text-align:center">
+            <a id="edit-dl-link" class="btn btn-outline" download="aiverse-edit.jpg">⬇️ Télécharger</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODELS -->
+    <div id="models-panel" class="panel">
+      <div class="panel-content">
+        <div class="panel-card">
+          <h3>💬 Modèles de Texte</h3>
+          <div class="model-grid" id="text-model-grid"></div>
+        </div>
+        <div class="panel-card">
+          <h3>🎨 Modèles d'Image</h3>
+          <div class="model-grid" id="image-model-grid"></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
 </div>
-
-<!-- API DOCS -->
-<div class="docs-body">
-
-  <div class="doc-section" id="api">
-    <h2 class="doc-section-title">
-      <i data-lucide="terminal" style="width:20px;height:20px;color:#6366f1"></i>
-      Référence API
-    </h2>
-
-    <!-- Chat -->
-    <div class="endpoint-card">
-      <div class="endpoint-header">
-        <span class="method post">POST</span>
-        <span class="endpoint-path">/api/chat</span>
-        <span class="endpoint-desc">Chat avec l'IA</span>
-      </div>
-      <div class="endpoint-body">
-        <table class="param-table">
-          <tr><th>Paramètre</th><th>Type</th><th>Requis</th><th>Description</th></tr>
-          <tr><td>message</td><td>string</td><td><span class="param-badge">requis</span></td><td>Message de l'utilisateur</td></tr>
-          <tr><td>model</td><td>string</td><td><span class="param-badge opt">optionnel</span></td><td>ID du modèle (défaut: mistral)</td></tr>
-          <tr><td>conversationId</td><td>string</td><td><span class="param-badge opt">optionnel</span></td><td>ID de conversation pour historique</td></tr>
-          <tr><td>systemPrompt</td><td>string</td><td><span class="param-badge opt">optionnel</span></td><td>Instruction système personnalisée</td></tr>
-        </table>
-      </div>
-    </div>
-
-    <!-- Generate Image -->
-    <div class="endpoint-card">
-      <div class="endpoint-header">
-        <span class="method post">POST</span>
-        <span class="endpoint-path">/api/generate-image</span>
-        <span class="endpoint-desc">Génère une image (retourne image/jpeg)</span>
-      </div>
-      <div class="endpoint-body">
-        <table class="param-table">
-          <tr><th>Paramètre</th><th>Type</th><th>Requis</th><th>Description</th></tr>
-          <tr><td>prompt</td><td>string</td><td><span class="param-badge">requis</span></td><td>Description de l'image</td></tr>
-          <tr><td>model</td><td>string</td><td><span class="param-badge opt">optionnel</span></td><td>flux | flux-pro | turbo</td></tr>
-          <tr><td>width</td><td>number</td><td><span class="param-badge opt">optionnel</span></td><td>Largeur en px (défaut: 1024)</td></tr>
-          <tr><td>height</td><td>number</td><td><span class="param-badge opt">optionnel</span></td><td>Hauteur en px (défaut: 1024)</td></tr>
-        </table>
-      </div>
-    </div>
-
-    <!-- Analyze -->
-    <div class="endpoint-card">
-      <div class="endpoint-header">
-        <span class="method post">POST</span>
-        <span class="endpoint-path">/api/analyze-image</span>
-        <span class="endpoint-desc">Analyse une image par Vision IA (multipart/form-data)</span>
-      </div>
-      <div class="endpoint-body">
-        <table class="param-table">
-          <tr><th>Paramètre</th><th>Type</th><th>Requis</th><th>Description</th></tr>
-          <tr><td>image</td><td>file</td><td><span class="param-badge">requis</span></td><td>Fichier image (PNG/JPG/WEBP)</td></tr>
-          <tr><td>question</td><td>string</td><td><span class="param-badge opt">optionnel</span></td><td>Question à poser sur l'image</td></tr>
-        </table>
-      </div>
-    </div>
-
-    <!-- Edit -->
-    <div class="endpoint-card">
-      <div class="endpoint-header">
-        <span class="method post">POST</span>
-        <span class="endpoint-path">/api/edit-image</span>
-        <span class="endpoint-desc">Modifie une image par IA (multipart/form-data)</span>
-      </div>
-      <div class="endpoint-body">
-        <table class="param-table">
-          <tr><th>Paramètre</th><th>Type</th><th>Requis</th><th>Description</th></tr>
-          <tr><td>image</td><td>file</td><td><span class="param-badge">requis</span></td><td>Image originale à modifier</td></tr>
-          <tr><td>prompt</td><td>string</td><td><span class="param-badge">requis</span></td><td>Instructions de modification</td></tr>
-          <tr><td>model</td><td>string</td><td><span class="param-badge opt">optionnel</span></td><td>flux | flux-pro | turbo</td></tr>
-        </table>
-      </div>
-    </div>
-
-    <!-- Health / Models / Conversation -->
-    <div class="endpoint-card">
-      <div class="endpoint-header">
-        <span class="method get">GET</span>
-        <span class="endpoint-path">/api/health</span>
-        <span class="endpoint-desc">Santé du serveur</span>
-      </div>
-    </div>
-    <div class="endpoint-card">
-      <div class="endpoint-header">
-        <span class="method get">GET</span>
-        <span class="endpoint-path">/api/models</span>
-        <span class="endpoint-desc">Liste des modèles disponibles</span>
-      </div>
-    </div>
-    <div class="endpoint-card">
-      <div class="endpoint-header">
-        <span class="method get">GET</span>
-        <span class="endpoint-path">/api/conversation/:id</span>
-        <span class="endpoint-desc">Historique d'une conversation</span>
-      </div>
-    </div>
-    <div class="endpoint-card">
-      <div class="endpoint-header">
-        <span class="method del">DELETE</span>
-        <span class="endpoint-path">/api/conversation/:id</span>
-        <span class="endpoint-desc">Supprimer une conversation</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- EMBED SECTION -->
-  <div class="doc-section" id="embed">
-    <h2 class="doc-section-title">
-      <i data-lucide="globe" style="width:20px;height:20px;color:#10b981"></i>
-      Intégration dans votre site web
-    </h2>
-
-    <p style="color:var(--text-sub);font-size:14px;line-height:1.7;margin-bottom:24px;">
-      Intégrez AIVERSE dans n'importe quel site via <code style="background:rgba(255,255,255,.08);padding:2px 6px;border-radius:4px">iframe</code> 
-      ou directement via l'API REST avec fetch. Aucune clé API n'est requise.
-    </p>
-
-    <div style="margin-bottom:20px">
-      <div style="font-size:13px;font-weight:600;color:var(--text-sub);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">Option 1 — Intégrer via iframe</div>
-      <div class="embed-box">
-&lt;<span class="kw">iframe</span>
-  src=<span class="str">"http://votre-serveur:5000"</span>
-  width=<span class="str">"100%"</span>
-  height=<span class="str">"600"</span>
-  frameborder=<span class="str">"0"</span>
-  style=<span class="str">"border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,.1);"</span>
-&gt;&lt;/<span class="kw">iframe</span>&gt;
-      </div>
-    </div>
-
-    <div style="margin-bottom:20px">
-      <div style="font-size:13px;font-weight:600;color:var(--text-sub);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">Option 2 — API Fetch (JavaScript)</div>
-      <div class="embed-box">
-<span class="cm">// Chat IA — sans clé API</span>
-<span class="kw">async function</span> <span class="fn">chatWithAI</span>(message, model = <span class="str">'mistral'</span>) {
-  <span class="kw">const</span> res = <span class="kw">await</span> fetch(<span class="str">'http://votre-serveur/api/chat'</span>, {
-    method: <span class="str">'POST'</span>,
-    headers: { <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span> },
-    body: JSON.stringify({ message, model })
-  });
-  <span class="kw">const</span> data = <span class="kw">await</span> res.json();
-  <span class="kw">return</span> data.message;
-}
-
-<span class="cm">// Génération d'image</span>
-<span class="kw">async function</span> <span class="fn">generateImage</span>(prompt) {
-  <span class="kw">const</span> res = <span class="kw">await</span> fetch(<span class="str">'http://votre-serveur/api/generate-image'</span>, {
-    method: <span class="str">'POST'</span>,
-    headers: { <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span> },
-    body: JSON.stringify({ prompt, model: <span class="str">'flux'</span> })
-  });
-  <span class="kw">const</span> blob = <span class="kw">await</span> res.blob();
-  <span class="kw">return</span> URL.createObjectURL(blob); <span class="cm">// URL de l'image</span>
-}
-      </div>
-    </div>
-
-    <div>
-      <div style="font-size:13px;font-weight:600;color:var(--text-sub);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">Option 3 — Deploy sur Render/Railway (CORS déjà activé)</div>
-      <div class="embed-box">
-<span class="cm"># Sur Render.com — déploiement gratuit</span>
-Build Command:  <span class="str">npm install</span>
-Start Command:  <span class="str">npm start</span>
-Environment:    Node
-
-<span class="cm"># L'API sera accessible depuis :</span>
-<span class="str">https://votre-app.onrender.com/api/chat</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODELS SECTION -->
-  <div class="doc-section" id="models">
-    <h2 class="doc-section-title">
-      <i data-lucide="cpu" style="width:20px;height:20px;color:#f59e0b"></i>
-      Modèles disponibles
-    </h2>
-    <div style="overflow-x:auto">
-      <table class="param-table" style="margin-bottom:24px">
-        <tr><th>ID Modèle</th><th>Nom</th><th>Fournisseur</th><th>Type</th><th>Gratuit</th></tr>
-        <tr><td>mistral</td><td>Mistral Large</td><td>Mistral AI</td><td>Texte</td><td>✅</td></tr>
-        <tr><td>llama</td><td>Llama 3.3 70B</td><td>Meta</td><td>Texte</td><td>✅</td></tr>
-        <tr><td>deepseek</td><td>DeepSeek-V3</td><td>DeepSeek</td><td>Texte</td><td>✅</td></tr>
-        <tr><td>deepseek-r1</td><td>DeepSeek-R1</td><td>DeepSeek</td><td>Raisonnement</td><td>✅</td></tr>
-        <tr><td>gpt-4o</td><td>GPT-4o</td><td>OpenAI</td><td>Texte + Vision</td><td>✅</td></tr>
-        <tr><td>gemini</td><td>Gemini 2.0 Flash</td><td>Google</td><td>Texte</td><td>✅</td></tr>
-        <tr><td>claude</td><td>Claude Sonnet</td><td>Anthropic</td><td>Texte</td><td>✅</td></tr>
-        <tr><td>qwen</td><td>Qwen-Max</td><td>Alibaba</td><td>Texte</td><td>✅</td></tr>
-        <tr><td>phi</td><td>Phi-4</td><td>Microsoft</td><td>Texte</td><td>✅</td></tr>
-        <tr><td>search</td><td>SearchGPT</td><td>OpenAI</td><td>Web Search</td><td>✅</td></tr>
-        <tr><td>flux</td><td>Flux.1 Schnell</td><td>Black Forest Labs</td><td>Image</td><td>✅</td></tr>
-        <tr><td>flux-pro</td><td>Flux.1 Pro</td><td>Black Forest Labs</td><td>Image HD</td><td>✅</td></tr>
-        <tr><td>turbo</td><td>SDXL Turbo</td><td>Stability AI</td><td>Image rapide</td><td>✅</td></tr>
-      </table>
-    </div>
-    <div style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:12px;padding:20px;color:#6ee7b7;font-size:14px;line-height:1.7">
-      <strong>🌐 Propulsé par l'IA Libre</strong><br>
-      Tous ces modèles sont accessibles gratuitement, un hub IA qui agrège les modèles les plus populaires sans nécessiter de clé API.
-      Aucune donnée personnelle n'est stockée.
-    </div>
-  </div>
-
-</div>
-
-<footer>
-  AIVERSE — 100% gratuit · Pas de clé API requise
-</footer>
+<div class="toast" id="toast"></div>
 
 <script>
-  lucide.createIcons();
+const API = window.location.origin + '/api';
+let convId = null;
+let userId = localStorage.getItem('aiverse_user_id');
+if (!userId) {
+  userId = 'u_' + Math.random().toString(36).substr(2, 9);
+  localStorage.setItem('aiverse_user_id', userId);
+}
 
-  // ====== SLIDESHOW ======
-  const TOTAL = 6;
-  let current = 0;
+let attachedImages = [];
 
-  const track = document.getElementById('slides-track');
-  const dots  = document.getElementById('slide-dots');
-  const prevBtn = document.getElementById('prev-btn');
-  const nextBtn = document.getElementById('next-btn');
+// Configure Marked
+marked.setOptions({
+  highlight: function(code, lang) {
+    const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+    return hljs.highlight(code, { language }).value;
+  },
+  breaks: true,
+  gfm: true
+});
 
-  // Create dots
-  for(let i=0;i<TOTAL;i++){
-    const d = document.createElement('button');
-    d.className = 'dot-btn' + (i===0?' active':'');
-    d.onclick = () => goTo(i);
-    dots.appendChild(d);
-  }
+const TEXT_MODELS = [
+  {id:'mistral',name:'Mistral Large',provider:'Mistral AI'},
+  {id:'llama',name:'Llama 3.3 70B',provider:'Meta AI'},
+  {id:'deepseek',name:'DeepSeek-V3',provider:'DeepSeek'},
+  {id:'deepseek-r1',name:'DeepSeek-R1',provider:'DeepSeek'},
+  {id:'gpt-4o',name:'GPT-4o',provider:'OpenAI'},
+  {id:'gemini',name:'Gemini 2.0',provider:'Google'},
+  {id:'claude',name:'Claude Sonnet',provider:'Anthropic'},
+  {id:'qwen',name:'Qwen-Max',provider:'Alibaba'},
+  {id:'phi',name:'Phi-4',provider:'Microsoft'},
+  {id:'search',name:'SearchGPT',provider:'OpenAI + Web'},
+];
+const IMAGE_MODELS = [
+  {id:'flux',name:'Flux.1 Schnell',provider:'Black Forest'},
+  {id:'flux-pro',name:'Flux.1 Pro',provider:'Black Forest'},
+  {id:'turbo',name:'SDXL Turbo',provider:'Stability AI'},
+];
+let selText = 'mistral', selImg = 'flux';
 
-  function goTo(n) {
-    current = Math.max(0, Math.min(TOTAL-1, n));
-    track.style.transform = `translateX(-${current * 100}%)`;
-    document.querySelectorAll('.dot-btn').forEach((d,i)=>d.classList.toggle('active', i===current));
-    prevBtn.disabled = current === 0;
-    nextBtn.disabled = current === TOTAL-1;
-  }
+const welcomeMarkdown = `Nous sommes le **4 avril 2026**.
 
-  function prevSlide() { goTo(current - 1); }
-  function nextSlide() { goTo(current + 1); }
+👋 Bonjour ! Je suis **AIVERSE**, votre assistant IA ultra-rapide.
 
-  // Auto-advance
-  let autoTimer = setInterval(() => { if(current < TOTAL-1) nextSlide(); }, 6000);
-  track.addEventListener('click', () => { clearInterval(autoTimer); });
+### Ce que je peux faire :
+*   **Répondre** à vos questions complexes
+*   **Analyser** vos images avec précision
+*   **Générer** des visuels magnifiques
+*   **Coder** et créer des tableaux
 
-  // Keyboard
-  document.addEventListener('keydown', e => {
-    if(e.key === 'ArrowLeft') prevSlide();
-    if(e.key === 'ArrowRight') nextSlide();
+> *Note : Chaque session est privée. Votre ID est : \`${userId}\`*`;
+
+window.onload = () => {
+  renderGrids();
+  document.getElementById('welcome-msg').innerHTML = marked.parse(welcomeMarkdown);
+};
+
+function openSidebar() { document.getElementById('sidebar').classList.add('open'); document.getElementById('overlay').classList.add('show'); }
+function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('show'); }
+
+function showPanel(id, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(id+'-panel').classList.add('active');
+  if(el) el.classList.add('active');
+  const titles = {chat:'💬 Chat IA',generate:'🎨 Générer Image',analyze:'👁️ Analyser Image',edit:'✏️ Éditer Image',models:'🤖 Modèles IA'};
+  document.getElementById('panel-title').textContent = titles[id]||id;
+  document.getElementById('new-chat-btn').style.display = id==='chat'?'':'none';
+  closeSidebar();
+}
+
+function renderGrids() {
+  document.getElementById('text-model-grid').innerHTML = TEXT_MODELS.map(m=>`
+    <div class="model-card ${m.id===selText?'active':''}" onclick="pickText('${m.id}')">
+      <div class="model-card-name">${m.name}</div>
+      <div class="model-card-provider">${m.provider}</div>
+      <span class="model-card-badge">GRATUIT</span>
+    </div>`).join('');
+  document.getElementById('image-model-grid').innerHTML = IMAGE_MODELS.map(m=>`
+    <div class="model-card ${m.id===selImg?'active':''}" onclick="pickImg('${m.id}')">
+      <div class="model-card-name">${m.name}</div>
+      <div class="model-card-provider">${m.provider}</div>
+      <span class="model-card-badge">GRATUIT</span>
+    </div>`).join('');
+}
+function pickText(id){ selText=id; document.getElementById('chat-model-select').value=id; renderGrids(); }
+function pickImg(id){ selImg=id; renderGrids(); }
+
+function handleKey(e){ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();} }
+function autoResize(el){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; }
+
+function handleAttach(e) {
+  Array.from(e.target.files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = ev => { attachedImages.push({file, dataUrl:ev.target.result}); renderChips(); };
+    reader.readAsDataURL(file);
   });
+  e.target.value='';
+}
+function renderChips() {
+  const chips = document.getElementById('chat-img-chips');
+  if(!attachedImages.length){ chips.style.display='none'; chips.innerHTML=''; return; }
+  chips.style.display='flex';
+  chips.innerHTML = attachedImages.map((img,i)=>`
+    <div class="img-chip">
+      <img src="${img.dataUrl}">
+      <button class="rm" onclick="removeChip(${i})">✕</button>
+    </div>`).join('');
+}
+function removeChip(i){ attachedImages.splice(i,1); renderChips(); }
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if(!msg && !attachedImages.length) return;
+  const model = document.getElementById('chat-model-select').value;
+  const imgsCopy = [...attachedImages];
+
+  // User UI
+  let userHtml = imgsCopy.map(i=>`<img class="chat-img-preview" src="${i.dataUrl}">`).join('');
+  if(msg) userHtml += `<div>${escapeHtml(msg)}</div>`;
+  appendMsgHtml('user', userHtml);
+
+  input.value=''; input.style.height='auto';
+  attachedImages=[]; renderChips();
+
+  const aiDiv = appendMsg('ai','<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>');
+  const bubble = aiDiv.querySelector('.bubble');
+  document.getElementById('send-btn').disabled=true;
+
+  try {
+    if(imgsCopy.length > 0) {
+      let results = [];
+      for(const imgObj of imgsCopy) {
+        const fd = new FormData();
+        fd.append('image', imgObj.file);
+        fd.append('question', msg || 'Décris cette image.');
+        const r = await fetch(`${API}/analyze-image`,{method:'POST',body:fd});
+        if(r.ok){ const d=await r.json(); results.push(d.description); }
+        else results.push('Erreur d\'analyse.');
+      }
+      const finalResponse = results.join('\n\n');
+      bubble.innerHTML = marked.parse(finalResponse);
+    } else {
+      const r = await fetch(`${API}/chat`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,conversationId:convId,userId:userId,model})});
+      if(!r.ok) throw new Error(`Erreur ${r.status}`);
+      const data = await r.json();
+      convId = data.conversationId;
+      bubble.innerHTML = marked.parse(data.message);
+    }
+    addCopyButtons(bubble);
+  } catch(e){ bubble.innerHTML = `❌ ${e.message}`; }
+  finally { 
+    document.getElementById('send-btn').disabled=false; 
+    document.getElementById('messages-area').scrollTop = document.getElementById('messages-area').scrollHeight;
+  }
+}
+
+function addCopyButtons(container) {
+  container.querySelectorAll('pre').forEach(pre => {
+    if (pre.querySelector('.copy-btn')) return;
+    const btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = 'Copier';
+    btn.onclick = () => {
+      navigator.clipboard.writeText(pre.querySelector('code').innerText);
+      btn.textContent = 'Copié !';
+      setTimeout(() => btn.textContent = 'Copier', 2000);
+    };
+    pre.appendChild(btn);
+  });
+}
+
+function escapeHtml(t){ const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+function appendMsg(role,html){ return appendMsgHtml(role,html); }
+function appendMsgHtml(role,html){
+  const area=document.getElementById('messages-area');
+  const div=document.createElement('div');
+  div.className=`msg ${role}`;
+  div.innerHTML=`<div class="avatar">${role==='user'?'👤':'🤖'}</div><div class="bubble">${html}</div>`;
+  area.appendChild(div); area.scrollTop=area.scrollHeight; return div;
+}
+
+function newChat(){ 
+  document.getElementById('messages-area').innerHTML=''; 
+  convId=null; attachedImages=[]; renderChips(); 
+  const aiDiv = appendMsg('ai','');
+  aiDiv.querySelector('.bubble').innerHTML = marked.parse(welcomeMarkdown);
+}
+
+async function generateImage(){
+  const prompt=document.getElementById('gen-prompt').value.trim();
+  if(!prompt){toast('Entrez une description.');return;}
+  const [width,height]=document.getElementById('gen-size').value.split('x').map(Number);
+  const btn=document.getElementById('gen-btn'),out=document.getElementById('gen-output');
+  btn.disabled=true; btn.textContent='⏳ Génération...';
+  out.innerHTML='<div class="img-ph"><div class="typing" style="justify-content:center"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><br>Génération en cours...</div>';
+  document.getElementById('gen-dl').style.display='none';
+  try {
+    const r=await fetch(`${API}/generate-image`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt,model:document.getElementById('gen-model').value,width,height})});
+    if(!r.ok)throw new Error(`Erreur ${r.status}`);
+    const blob=await r.blob(),url=URL.createObjectURL(blob);
+    out.innerHTML=`<img src="${url}" alt="Generated">`;
+    document.getElementById('gen-dl-link').href=url;
+    document.getElementById('gen-dl').style.display='block';
+  }catch(e){out.innerHTML=`<div class="img-ph" style="color:var(--red)">❌ ${e.message}</div>`;}
+  finally{btn.disabled=false;btn.textContent='✨ Générer l\'Image';}
+}
+
+async function analyzeImage(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{document.getElementById('analyze-img').src=ev.target.result;document.getElementById('analyze-prev-wrap').style.display='block';};
+  reader.readAsDataURL(file);
+  const q=document.getElementById('analyze-q').value.trim()||'Décris cette image.';
+  document.getElementById('analyze-result').style.display='block';
+  document.getElementById('analyze-text').innerHTML='⏳ Analyse en cours...';
+  const fd=new FormData();fd.append('image',file);fd.append('question',q);
+  try{
+    const r=await fetch(`${API}/analyze-image`,{method:'POST',body:fd});
+    if(!r.ok)throw new Error(`Erreur ${r.status}`);
+    const data=await r.json();
+    document.getElementById('analyze-text').innerHTML = marked.parse(data.description);
+  }catch(e){document.getElementById('analyze-text').textContent='❌ '+e.message;}
+}
+
+function previewEdit(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{document.getElementById('edit-orig').src=ev.target.result;document.getElementById('edit-orig-wrap').style.display='block';};
+  reader.readAsDataURL(file);
+}
+async function editImage(){
+  const file=document.getElementById('edit-file').files[0];
+  const prompt=document.getElementById('edit-prompt').value.trim();
+  if(!file){toast('Choisissez une image.');return;}if(!prompt){toast('Entrez des instructions.');return;}
+  const btn=document.getElementById('edit-btn');
+  btn.disabled=true;btn.textContent='⏳ En cours...';
+  const fd=new FormData();fd.append('image',file);fd.append('prompt',prompt);fd.append('model',document.getElementById('edit-model').value);
+  try{
+    const r=await fetch(`${API}/edit-image`,{method:'POST',body:fd});
+    if(!r.ok)throw new Error(`Erreur ${r.status}`);
+    const blob=await r.blob(),url=URL.createObjectURL(blob);
+    document.getElementById('edit-result').src=url;
+    document.getElementById('edit-output').style.display='flex';
+    document.getElementById('edit-dl-link').href=url;
+    document.getElementById('edit-dl').style.display='block';
+  }catch(e){toast('Erreur: '+e.message);}
+  finally{btn.disabled=false;btn.textContent='🪄 Appliquer la Modification';}
+}
+
+function toast(msg,ms=3000){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.style.display='block';
+  clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',ms);
+}
 </script>
 </body>
 </html>
