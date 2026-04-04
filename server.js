@@ -36,13 +36,9 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 }
 });
 
-// ==================== POLLINATIONS API (100% Free, No Key) ====================
+// ==================== AI API CONFIGURATION (100% Free, No Key) ====================
 
-/**
- * Maps frontend model IDs to Pollinations model names
- * All models are free, no API key required
- */
-const POLLINATIONS_TEXT_MODELS = {
+const TEXT_MODELS_MAP = {
   'mistral':    'mistral',
   'llama':      'llama',
   'llama-3':    'llama',
@@ -59,7 +55,7 @@ const POLLINATIONS_TEXT_MODELS = {
   'phi':        'phi',
 };
 
-const POLLINATIONS_IMAGE_MODELS = {
+const IMAGE_MODELS_MAP = {
   'flux':       'flux',
   'flux-schnell': 'flux',
   'turbo':      'turbo',
@@ -67,14 +63,17 @@ const POLLINATIONS_IMAGE_MODELS = {
   'flux-pro':   'flux-pro',
 };
 
+const TEXT_API_URL = process.env.TEXT_API_URL || 'https://text.pollinations.ai/openai';
+const IMAGE_API_URL = process.env.IMAGE_API_URL || 'https://image.pollinations.ai/prompt';
+
 /**
- * Query Pollinations Text API — totally free, no key
+ * Query Text API — totally free
  */
-async function queryPollinationsText(messages, modelId = 'mistral', systemPrompt = '') {
-  const pollinationsModel = POLLINATIONS_TEXT_MODELS[modelId] || 'mistral';
+async function queryTextAPI(messages, modelId = 'mistral', systemPrompt = '') {
+  const selectedModel = TEXT_MODELS_MAP[modelId] || 'mistral';
   
   const payload = {
-    model: pollinationsModel,
+    model: selectedModel,
     messages: [
       ...(systemPrompt ? [{ role: 'system', content: systemPrompt }] : []),
       ...messages
@@ -83,7 +82,7 @@ async function queryPollinationsText(messages, modelId = 'mistral', systemPrompt
     stream: false
   };
 
-  const response = await fetch('https://text.pollinations.ai/openai', {
+  const response = await fetch(TEXT_API_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
@@ -92,10 +91,10 @@ async function queryPollinationsText(messages, modelId = 'mistral', systemPrompt
 
   if (!response.ok) {
     const text = await response.text();
-    throw new Error(`Pollinations API error ${response.status}: ${text.slice(0, 200)}`);
+    throw new Error(`API error ${response.status}: ${text.slice(0, 200)}`);
   }
 
-  // Pollinations returns plain text or JSON depending on endpoint
+  // returns plain text or JSON depending on endpoint
   const contentType = response.headers.get('content-type') || '';
   if (contentType.includes('application/json')) {
     const data = await response.json();
@@ -106,9 +105,9 @@ async function queryPollinationsText(messages, modelId = 'mistral', systemPrompt
 }
 
 /**
- * Query Pollinations Image API — totally free, no key
+ * Query Image API — totally free
  */
-async function queryPollinationsImage(prompt, options = {}) {
+async function queryImageAPI(prompt, options = {}) {
   const {
     width = 1024,
     height = 1024,
@@ -116,8 +115,8 @@ async function queryPollinationsImage(prompt, options = {}) {
     model = 'flux'
   } = options;
 
-  const pollinationsModel = POLLINATIONS_IMAGE_MODELS[model] || 'flux';
-  const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${width}&height=${height}&seed=${seed}&model=${pollinationsModel}&nologo=true&enhance=false`;
+  const selectedModel = IMAGE_MODELS_MAP[model] || 'flux';
+  const url = `${IMAGE_API_URL}/${encodeURIComponent(prompt)}?width=${width}&height=${height}&seed=${seed}&model=${selectedModel}&nologo=true&enhance=false`;
 
   const response = await fetch(url, { timeout: 90000 });
 
@@ -129,9 +128,9 @@ async function queryPollinationsImage(prompt, options = {}) {
 }
 
 /**
- * Analyze image using Pollinations Vision (LLaVA via openai compatible endpoint)
+ * Analyze image using Vision (LLaVA via openai compatible endpoint)
  */
-async function analyzeImageWithPollinations(base64Image, mimeType = 'image/jpeg', question = 'Describe this image in detail in French.') {
+async function analyzeImageWithVision(base64Image, mimeType = 'image/jpeg', question = 'Describe this image in detail in French.') {
   const payload = {
     model: 'openai',
     messages: [{
@@ -144,7 +143,7 @@ async function analyzeImageWithPollinations(base64Image, mimeType = 'image/jpeg'
     stream: false
   };
 
-  const response = await fetch('https://text.pollinations.ai/openai', {
+  const response = await fetch(TEXT_API_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
@@ -165,18 +164,27 @@ async function analyzeImageWithPollinations(base64Image, mimeType = 'image/jpeg'
 }
 
 // ==================== CONVERSATION STORE ====================
-const conversations = new Map();
+// Map structure: userId -> (Map: conversationId -> conversationData)
+const userConversations = new Map();
 
-function getConversation(conversationId) {
-  if (!conversations.has(conversationId)) {
-    conversations.set(conversationId, {
+function getUserStore(userId) {
+  if (!userConversations.has(userId)) {
+    userConversations.set(userId, new Map());
+  }
+  return userConversations.get(userId);
+}
+
+function getConversation(userId, conversationId) {
+  const userStore = getUserStore(userId);
+  if (!userStore.has(conversationId)) {
+    userStore.set(conversationId, {
       id: conversationId,
       messages: [],
       createdAt: Date.now(),
       updatedAt: Date.now()
     });
   }
-  return conversations.get(conversationId);
+  return userStore.get(conversationId);
 }
 
 // ==================== API ENDPOINTS ====================
@@ -193,7 +201,7 @@ app.get('/api/health', (req, res) => {
 
 app.get('/api/models', (req, res) => {
   res.json({
-    note: 'All models are 100% free via Pollinations.ai — no API key required',
+    note: 'All models are 100% free — no API key required',
     textModels: [
       { id: 'mistral',      name: 'Mistral Large',        provider: 'Mistral AI',  free: true },
       { id: 'llama',        name: 'Llama 3.3 70B',        provider: 'Meta',        free: true },
@@ -219,14 +227,14 @@ app.get('/api/models', (req, res) => {
  */
 app.post('/api/chat', async (req, res) => {
   try {
-    const { message, conversationId, model = 'mistral', systemPrompt } = req.body;
+    const { message, conversationId, userId = 'default_user', model = 'mistral', systemPrompt } = req.body;
 
     if (!message) {
       return res.status(400).json({ error: 'Le message est requis.' });
     }
 
     const convoId = conversationId || `conv_${Date.now()}`;
-    const conversation = getConversation(convoId);
+    const conversation = getConversation(userId, convoId);
 
     // Add user message
     conversation.messages.push({ role: 'user', content: message });
@@ -238,7 +246,7 @@ app.post('/api/chat', async (req, res) => {
 
     const sysPrompt = systemPrompt || `Tu es AIVERSE, un assistant IA intelligent, créatif et serviable. Tu peux discuter, analyser, rédiger, et aider avec des images. Réponds toujours en français de manière claire et utile.`;
 
-    const assistantMessage = await queryPollinationsText(
+    const assistantMessage = await queryTextAPI(
       conversation.messages,
       model,
       sysPrompt
@@ -275,7 +283,7 @@ app.post('/api/generate-image', async (req, res) => {
       return res.status(400).json({ error: 'Le prompt est requis.' });
     }
 
-    const buffer = await queryPollinationsImage(prompt, { width, height, model });
+    const buffer = await queryImageAPI(prompt, { width, height, model });
 
     res.set('Content-Type', 'image/jpeg');
     res.send(Buffer.from(buffer));
@@ -300,7 +308,7 @@ app.post('/api/analyze-image', upload.single('image'), async (req, res) => {
     const base64Image = imageBuffer.toString('base64');
     const mimeType = req.file.mimetype || 'image/jpeg';
 
-    const description = await analyzeImageWithPollinations(base64Image, mimeType, question);
+    const description = await analyzeImageWithVision(base64Image, mimeType, question);
 
     fs.unlinkSync(req.file.path);
 
@@ -335,7 +343,7 @@ app.post('/api/edit-image', upload.single('image'), async (req, res) => {
     fs.unlinkSync(req.file.path);
 
     // Describe the original image
-    const originalDescription = await analyzeImageWithPollinations(
+    const originalDescription = await analyzeImageWithVision(
       base64Image,
       mimeType,
       'Describe this image very concisely in English in 2-3 sentences for an image generation prompt.'
@@ -343,7 +351,7 @@ app.post('/api/edit-image', upload.single('image'), async (req, res) => {
 
     // Generate new image combining original description + edit instructions
     const combinedPrompt = `${originalDescription}. Modification: ${prompt}`;
-    const buffer = await queryPollinationsImage(combinedPrompt, { width: 1024, height: 1024, model });
+    const buffer = await queryImageAPI(combinedPrompt, { width: 1024, height: 1024, model });
 
     res.set('Content-Type', 'image/jpeg');
     res.send(Buffer.from(buffer));
@@ -359,7 +367,9 @@ app.post('/api/edit-image', upload.single('image'), async (req, res) => {
  * Get conversation history
  */
 app.get('/api/conversation/:id', (req, res) => {
-  const conversation = conversations.get(req.params.id);
+  const userId = req.query.userId || 'default_user';
+  const userStore = getUserStore(userId);
+  const conversation = userStore.get(req.params.id);
   if (!conversation) return res.status(404).json({ error: 'Conversation introuvable.' });
   res.json(conversation);
 });
@@ -368,7 +378,9 @@ app.get('/api/conversation/:id', (req, res) => {
  * Clear conversation
  */
 app.delete('/api/conversation/:id', (req, res) => {
-  const deleted = conversations.delete(req.params.id);
+  const userId = req.query.userId || 'default_user';
+  const userStore = getUserStore(userId);
+  const deleted = userStore.delete(req.params.id);
   res.json({ deleted, message: deleted ? 'Conversation supprimée.' : 'Introuvable.' });
 });
 
@@ -383,7 +395,7 @@ app.listen(PORT, () => {
   console.log(`
 ╔══════════════════════════════════════════════╗
 ║   🤖 AIVERSE — Démarré sans clé API !       ║
-║   ✅ 100% Gratuit via Pollinations.ai        ║
+║   ✅ 100% Gratuit                            ║
 ╚══════════════════════════════════════════════╝
 
 📍 Serveur   : http://localhost:${PORT}
