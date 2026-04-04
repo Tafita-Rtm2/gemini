@@ -1,955 +1,808 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AIVERSE - Assistant IA de Luxe</title>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AIVERSE — Assistant IA Gratuit</title>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
-        :root {
-            --bg-page: #f8fafc;
-            --bg-card: #ffffff;
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --text-main: #0f172a;
-            --text-sub: #64748b;
-            --border: #e2e8f0;
-            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            --sidebar-bg: #ffffff;
-            --sidebar-active: #eff6ff;
-            --bubble-user: #2563eb;
-            --bubble-ai: #f1f5f9;
-        }
+    :root {
+      --bg: #f0f2f5;
+      --surface: #ffffff;
+      --surface2: #f8fafc;
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --primary-light: #eef2ff;
+      --accent: #10b981;
+      --text: #0f172a;
+      --text-sub: #64748b;
+      --border: #e2e8f0;
+      --shadow: 0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.06);
+      --shadow-lg: 0 8px 32px rgba(0,0,0,.12);
+      --radius: 12px;
+      --sidebar-w: 260px;
+    }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-page);
-            color: var(--text-main);
-            height: 100vh;
-            overflow: hidden;
-        }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); height:100vh; overflow:hidden; }
 
-        .app-layout {
-            display: flex;
-            height: 100vh;
-        }
+    /* ====== LAYOUT ====== */
+    .layout { display:flex; height:100vh; }
 
-        /* --- Sidebar --- */
-        .sidebar {
-            width: 280px;
-            background: var(--sidebar-bg);
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            padding: 24px;
-            transition: all 0.3s ease;
-        }
+    /* ====== SIDEBAR ====== */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 20px 16px;
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
 
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 40px;
-        }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 4px 24px;
+    }
+    .logo-badge {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      border-radius: 10px;
+      display: flex; align-items:center; justify-content:center;
+      color: white; font-weight: 800; font-size: 16px;
+    }
+    .logo-name { font-size:17px; font-weight:700; letter-spacing:-.5px; }
+    .logo-sub  { font-size:10px; color:var(--accent); font-weight:600; letter-spacing:.05em; margin-top:1px; }
 
-        .logo-icon {
-            color: var(--primary);
-        }
+    .nav-section { margin-bottom: 24px; }
+    .nav-label {
+      font-size:10px; font-weight:700; text-transform:uppercase;
+      letter-spacing:.08em; color:var(--text-sub); padding:0 8px 8px;
+    }
 
-        .logo-text {
-            font-weight: 700;
-            font-size: 20px;
-            letter-spacing: -0.5px;
-            color: var(--text-main);
-        }
+    .nav-item {
+      display:flex; align-items:center; gap:10px;
+      padding:9px 10px; border-radius:9px;
+      font-size:13.5px; font-weight:500; color:var(--text);
+      cursor:pointer; transition:all .15s; margin-bottom:2px;
+      border:none; background:none; width:100%; text-align:left;
+    }
+    .nav-item:hover { background:#f1f5f9; }
+    .nav-item.active { background:var(--primary-light); color:var(--primary); font-weight:600; }
+    .nav-item .nav-icon { width:16px; height:16px; flex-shrink:0; }
 
-        .nav-group {
-            margin-bottom: 32px;
-        }
+    .nav-badge {
+      margin-left:auto; font-size:10px; font-weight:700;
+      background:#dcfce7; color:#16a34a; padding:2px 6px; border-radius:99px;
+    }
 
-        .nav-label {
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: var(--text-sub);
-            letter-spacing: 0.05em;
-            margin-bottom: 12px;
-            padding-left: 12px;
-        }
+    .sidebar-footer { margin-top:auto; padding-top:16px; border-top:1px solid var(--border); }
 
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 12px;
-            border-radius: 8px;
-            color: var(--text-main);
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-bottom: 4px;
-        }
+    .docs-btn {
+      display:flex; align-items:center; gap:8px;
+      width:100%; padding:10px 12px; border-radius:9px;
+      background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+      color:white; font-size:13px; font-weight:600;
+      cursor:pointer; border:none; transition:opacity .2s;
+      text-decoration:none; justify-content:center;
+    }
+    .docs-btn:hover { opacity:.9; }
 
-        .nav-item:hover {
-            background: #f1f5f9;
-        }
+    /* ====== MAIN ====== */
+    .main { flex:1; display:flex; flex-direction:column; overflow:hidden; background:var(--bg); }
 
-        .nav-item.active {
-            background: var(--sidebar-active);
-            color: var(--primary);
-        }
+    .topbar {
+      height:58px; background:var(--surface); border-bottom:1px solid var(--border);
+      display:flex; align-items:center; justify-content:space-between;
+      padding:0 24px; flex-shrink:0;
+    }
+    .topbar-title { font-size:15px; font-weight:600; }
+    .topbar-actions { display:flex; gap:8px; }
 
-        /* --- Main Content --- */
-        .main-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: #fcfcfc;
-            position: relative;
-        }
+    .btn {
+      display:inline-flex; align-items:center; gap:6px;
+      padding:7px 14px; border-radius:8px; font-size:13px; font-weight:500;
+      cursor:pointer; border:none; transition:all .15s;
+    }
+    .btn-ghost { background:transparent; color:var(--text-sub); }
+    .btn-ghost:hover { background:#f1f5f9; color:var(--text); }
+    .btn-primary { background:var(--primary); color:white; }
+    .btn-primary:hover { background:var(--primary-dark); }
+    .btn-outline { background:transparent; border:1px solid var(--border); color:var(--text); }
+    .btn-outline:hover { background:#f8fafc; }
+    .btn:disabled { opacity:.5; cursor:not-allowed; }
 
-        .header {
-            height: 64px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 32px;
-            background: white;
-        }
+    /* ====== PANELS ====== */
+    .panel { display:none; flex:1; overflow:hidden; }
+    .panel.active { display:flex; flex-direction:column; }
 
-        .header-title {
-            font-weight: 600;
-            font-size: 16px;
-        }
+    /* ====== CHAT PANEL ====== */
+    #messages-area {
+      flex:1; overflow-y:auto; padding:28px;
+      display:flex; flex-direction:column; gap:20px;
+    }
+    .msg { display:flex; gap:12px; max-width:80%; animation:fadeUp .25s ease; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .msg.user { align-self:flex-end; flex-direction:row-reverse; }
+    .msg.ai   { align-self:flex-start; }
+    .avatar {
+      width:34px; height:34px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center; flex-shrink:0;
+      background:var(--primary-light); color:var(--primary);
+      border:1px solid var(--border);
+    }
+    .msg.user .avatar { background:var(--primary); color:white; border:none; }
+    .bubble {
+      padding:12px 16px; border-radius:14px; font-size:14px; line-height:1.65;
+      background:var(--surface); border:1px solid var(--border); box-shadow:var(--shadow);
+      white-space:pre-wrap; word-break:break-word;
+    }
+    .msg.user .bubble { background:var(--primary); color:white; border-color:var(--primary); }
 
-        /* --- Panels --- */
-        .panel {
-            display: none;
-            flex: 1;
-            flex-direction: column;
-            overflow: hidden;
-            padding: 0;
-            position: relative;
-        }
+    .typing { display:flex; gap:4px; padding:4px 0; }
+    .dot { width:7px; height:7px; border-radius:50%; background:var(--text-sub); animation:bounce .9s infinite; }
+    .dot:nth-child(2){animation-delay:.15s}
+    .dot:nth-child(3){animation-delay:.3s}
+    @keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-6px)} }
 
-        .panel.active {
-            display: flex;
-        }
+    .chat-bar {
+      background:var(--surface); border-top:1px solid var(--border);
+      padding:16px 24px; display:flex; gap:10px; align-items:flex-end;
+    }
+    .chat-input-wrap {
+      flex:1; background:var(--surface2); border:1px solid var(--border);
+      border-radius:12px; display:flex; align-items:flex-end; gap:8px; padding:10px 14px;
+      transition:border-color .2s;
+    }
+    .chat-input-wrap:focus-within { border-color:var(--primary); }
+    #chat-input {
+      flex:1; background:transparent; border:none; outline:none;
+      font-family:inherit; font-size:14px; resize:none;
+      max-height:120px; line-height:1.5;
+    }
+    .chat-input-actions { display:flex; gap:4px; flex-shrink:0; }
+    .icon-btn {
+      width:32px; height:32px; border-radius:8px; background:transparent;
+      border:none; cursor:pointer; display:flex; align-items:center; justify-content:center;
+      color:var(--text-sub); transition:all .15s;
+    }
+    .icon-btn:hover { background:#f1f5f9; color:var(--text); }
 
-        /* --- Chat Panel --- */
-        #messages-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 32px;
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-        }
+    /* ====== MODEL SELECTOR (in chat bar) ====== */
+    .model-select {
+      background:var(--surface2); border:1px solid var(--border); border-radius:8px;
+      padding:6px 10px; font-size:12px; font-weight:500; color:var(--text);
+      cursor:pointer; outline:none;
+    }
 
-        .message {
-            display: flex;
-            gap: 16px;
-            max-width: 80%;
-            animation: fadeIn 0.3s ease;
-        }
+    /* ====== IMAGE PANELS ====== */
+    .panel-content { padding:28px; overflow-y:auto; flex:1; }
+    .panel-card {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:var(--radius); padding:24px; margin-bottom:20px;
+      box-shadow:var(--shadow);
+    }
+    .panel-card h3 { font-size:15px; font-weight:600; margin-bottom:16px; }
+    .form-group { margin-bottom:14px; }
+    .form-label { font-size:12px; font-weight:600; color:var(--text-sub); margin-bottom:6px; display:block; }
+    .form-input, .form-textarea, .form-select {
+      width:100%; padding:9px 12px; border:1px solid var(--border);
+      border-radius:8px; font-family:inherit; font-size:14px; color:var(--text);
+      background:var(--surface2); outline:none; transition:border-color .2s;
+    }
+    .form-input:focus, .form-textarea:focus, .form-select:focus { border-color:var(--primary); }
+    .form-textarea { resize:vertical; min-height:80px; }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+    .img-output {
+      width:100%; min-height:200px; border:2px dashed var(--border);
+      border-radius:12px; display:flex; align-items:center; justify-content:center;
+      overflow:hidden; margin-top:16px; background:var(--surface2);
+    }
+    .img-output img { max-width:100%; border-radius:10px; }
+    .img-placeholder { color:var(--text-sub); font-size:13px; text-align:center; padding:32px; }
 
-        .message.user {
-            align-self: flex-end;
-            flex-direction: row-reverse;
-        }
+    /* ====== ANALYZE PANEL ====== */
+    .upload-zone {
+      border:2px dashed var(--border); border-radius:12px;
+      padding:40px; text-align:center; cursor:pointer;
+      transition:all .2s; background:var(--surface2);
+    }
+    .upload-zone:hover { border-color:var(--primary); background:var(--primary-light); }
+    .upload-zone input { display:none; }
 
-        .message.ai {
-            align-self: flex-start;
-        }
+    /* ====== MODELS PANEL ====== */
+    .model-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px; }
+    .model-card {
+      border:2px solid var(--border); border-radius:10px;
+      padding:14px; cursor:pointer; transition:all .15s; background:var(--surface);
+    }
+    .model-card:hover { border-color:var(--primary); background:var(--primary-light); }
+    .model-card.active { border-color:var(--primary); background:var(--primary-light); }
+    .model-card-name { font-size:13px; font-weight:600; margin-bottom:4px; }
+    .model-card-provider { font-size:11px; color:var(--text-sub); }
+    .model-card-badge { display:inline-block; margin-top:6px; font-size:10px; font-weight:700; background:#dcfce7; color:#16a34a; padding:2px 6px; border-radius:99px; }
 
-        .avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            background: white;
-            border: 1px solid var(--border);
-        }
+    /* ====== SLIDESHOW (docs page) ====== */
+    /* This is in docs.html */
 
-        .message.user .avatar {
-            background: var(--primary);
-            color: white;
-            border: none;
-        }
+    /* ====== SCROLLBAR ====== */
+    ::-webkit-scrollbar { width:6px; }
+    ::-webkit-scrollbar-track { background:transparent; }
+    ::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:99px; }
 
-        .bubble {
-            padding: 12px 18px;
-            border-radius: 18px;
-            font-size: 14px;
-            line-height: 1.5;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        }
+    /* ====== RESPONSIVE ====== */
+    @media(max-width:640px) {
+      .sidebar { width:220px; }
+      #messages-area { padding:16px; }
+    }
 
-        .message.user .bubble {
-            background: var(--bubble-user);
-            color: white;
-            border-top-right-radius: 4px;
-        }
-
-        .message.ai .bubble {
-            background: var(--bubble-ai);
-            color: var(--text-main);
-            border-top-left-radius: 4px;
-        }
-
-        /* --- Input Area --- */
-        .input-box-container {
-            padding: 24px 32px;
-            background: linear-gradient(transparent, #fcfcfc 20%);
-        }
-
-        .input-box {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 8px 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05);
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-
-        .input-box:focus-within {
-            border-color: var(--primary);
-            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.1);
-        }
-
-        .input-box textarea {
-            flex: 1;
-            border: none;
-            outline: none;
-            padding: 12px 0;
-            font-family: inherit;
-            font-size: 14px;
-            resize: none;
-            max-height: 200px;
-        }
-
-        .action-btn {
-            background: none;
-            border: none;
-            color: var(--text-sub);
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 8px;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .action-btn:hover {
-            background: #f1f5f9;
-            color: var(--text-main);
-        }
-
-        .send-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 8px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .send-btn:hover {
-            background: var(--primary-hover);
-        }
-
-        .send-btn:disabled {
-            background: #cbd5e1;
-            cursor: not-allowed;
-        }
-
-        /* --- Tools Styling --- */
-        .tool-panel-content {
-            padding: 40px;
-            max-width: 900px;
-            margin: 0 auto;
-            width: 100%;
-            overflow-y: auto;
-        }
-
-        .card {
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 24px;
-            box-shadow: var(--shadow);
-        }
-
-        .card-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--text-main);
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-family: inherit;
-            font-size: 14px;
-            margin-bottom: 20px;
-            transition: border-color 0.2s;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s;
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-hover);
-        }
-
-        .image-preview {
-            width: 100%;
-            min-height: 300px;
-            background: #f8fafc;
-            border: 2px dashed var(--border);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-top: 20px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .image-preview img {
-            max-width: 100%;
-            max-height: 500px;
-            border-radius: 8px;
-        }
-
-        .model-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 16px;
-            margin-top: 20px;
-        }
-
-        .model-card {
-            border: 1px solid var(--border);
-            padding: 16px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .model-card:hover {
-            border-color: var(--primary);
-            background: var(--sidebar-active);
-        }
-
-        .model-card.active {
-            border-color: var(--primary);
-            background: var(--sidebar-active);
-            box-shadow: 0 0 0 1px var(--primary);
-        }
-
-        .model-name {
-            font-weight: 600;
-            font-size: 14px;
-            margin-bottom: 4px;
-        }
-
-        .model-provider {
-            font-size: 12px;
-            color: var(--text-sub);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .sidebar {
-                display: none;
-            }
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #e2e8f0;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #cbd5e1;
-        }
-
-        /* Typing Indicator */
-        .typing {
-            display: flex;
-            gap: 4px;
-        }
-        .dot {
-            width: 6px;
-            height: 6px;
-            background: #cbd5e1;
-            border-radius: 50%;
-            animation: bounce 1.4s infinite;
-        }
-        .dot:nth-child(2) { animation-delay: 0.2s; }
-        .dot:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes bounce {
-            0%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-6px); }
-        }
-
-    </style>
+    /* ====== NOTIFICATION ====== */
+    .toast {
+      position:fixed; bottom:24px; right:24px; z-index:999;
+      background:var(--text); color:white; padding:12px 18px; border-radius:10px;
+      font-size:13px; font-weight:500; box-shadow:var(--shadow-lg);
+      animation:slideIn .25s ease; display:none;
+    }
+    @keyframes slideIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+  </style>
 </head>
 <body>
-    <div class="app-layout">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="logo">
-                <i data-lucide="sparkles" class="logo-icon"></i>
-                <span class="logo-text">AIVERSE</span>
-            </div>
 
-            <nav class="nav-group">
-                <div class="nav-label">CONVERSATION</div>
-                <div class="nav-item active" onclick="showPanel('chat', this)">
-                    <i data-lucide="message-square" size="18"></i>
-                    <span>Assistant IA</span>
-                </div>
-            </nav>
+<div class="layout">
 
-            <nav class="nav-group">
-                <div class="nav-label">CRÉATION</div>
-                <div class="nav-item" onclick="showPanel('generate', this)">
-                    <i data-lucide="image" size="18"></i>
-                    <span>Générer Image</span>
-                </div>
-                <div class="nav-item" onclick="showPanel('edit', this)">
-                    <i data-lucide="edit-3" size="18"></i>
-                    <span>Éditer Image</span>
-                </div>
-            </nav>
-
-            <nav class="nav-group">
-                <div class="nav-label">VISION</div>
-                <div class="nav-item" onclick="showPanel('analyze', this)">
-                    <i data-lucide="search" size="18"></i>
-                    <span>Analyser Image</span>
-                </div>
-            </nav>
-
-            <div style="margin-top: auto;">
-                <div class="nav-item" onclick="showPanel('models', this)">
-                    <i data-lucide="layers" size="18"></i>
-                    <span>Modèles</span>
-                </div>
-                <div class="nav-item" onclick="showPanel('settings', this)">
-                    <i data-lucide="settings" size="18"></i>
-                    <span>Paramètres</span>
-                </div>
-            </div>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="main-container">
-            <header class="header">
-                <div class="header-title" id="panel-title">Assistant IA</div>
-                <div style="display: flex; gap: 12px;">
-                    <button class="action-btn" title="Nouvelle conversation" onclick="newChat()">
-                        <i data-lucide="plus"></i>
-                    </button>
-                    <div class="avatar" style="border: none; background: #eee;">
-                        <i data-lucide="user" size="18"></i>
-                    </div>
-                </div>
-            </header>
-
-            <!-- Chat Panel -->
-            <div id="chat-panel" class="panel active">
-                <div id="messages-container">
-                    <div class="message ai">
-                        <div class="avatar"><i data-lucide="bot" size="20"></i></div>
-                        <div class="bubble">Bonjour ! Je suis votre assistant AIVERSE. Comment puis-je vous aider aujourd'hui ?</div>
-                    </div>
-                </div>
-
-                <div class="input-box-container">
-                    <div class="input-box">
-                        <button class="action-btn" onclick="document.getElementById('chat-file').click()">
-                            <i data-lucide="paperclip" size="20"></i>
-                        </button>
-                        <input type="file" id="chat-file" hidden onchange="handleChatFileUpload(event)">
-                        
-                        <textarea id="chat-input" placeholder="Écrivez votre message..." rows="1" onkeydown="handleChatKeyDown(event)"></textarea>
-                        
-                        <button class="send-btn" id="send-btn" onclick="sendChatMessage()">
-                            <i data-lucide="send" size="18"></i>
-                        </button>
-                    </div>
-                    <p style="text-align: center; font-size: 11px; color: #94a3b8; margin-top: 12px;">
-                        AIVERSE peut faire des erreurs. Envisagez de vérifier les informations importantes.
-                    </p>
-                </div>
-            </div>
-
-            <!-- Generate Panel -->
-            <div id="generate-panel" class="panel">
-                <div class="tool-panel-content">
-                    <div class="card">
-                        <h2 class="card-title"><i data-lucide="image"></i> Générateur d'Image</h2>
-                        <div class="form-group">
-                            <label class="form-label">Description (Prompt)</label>
-                            <textarea id="gen-prompt" class="form-control" rows="4" placeholder="Ex: Un paysage futuriste avec des voitures volantes, style cyberpunk, 8k..."></textarea>
-                        </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                            <div>
-                                <label class="form-label">Taille</label>
-                                <select id="gen-size" class="form-control">
-                                    <option value="512x512">Carré (512x512)</option>
-                                    <option value="1024x1024">HD Carré (1024x1024)</option>
-                                    <option value="512x768">Portrait (512x768)</option>
-                                    <option value="768x512">Paysage (768x512)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="form-label">Style</label>
-                                <select id="gen-style" class="form-control">
-                                    <option value="">Par défaut</option>
-                                    <option value="cinematic">Cinématique</option>
-                                    <option value="anime">Anime</option>
-                                    <option value="digital-art">Art Digital</option>
-                                    <option value="photographic">Photographique</option>
-                                </select>
-                            </div>
-                        </div>
-                        <button class="btn-primary" id="gen-btn" onclick="generateImage()">
-                            Générer l'Image
-                        </button>
-                    </div>
-
-                    <div class="image-preview" id="gen-output">
-                        <div style="text-align: center; color: var(--text-sub);">
-                            <i data-lucide="palette" size="48" style="margin-bottom: 12px; opacity: 0.2;"></i>
-                            <p>Votre création apparaîtra ici</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Edit Panel -->
-            <div id="edit-panel" class="panel">
-                <div class="tool-panel-content">
-                    <div class="card">
-                        <h2 class="card-title"><i data-lucide="edit-3"></i> Modifier une Image</h2>
-                        <div class="form-group">
-                            <label class="form-label">Télécharger l'Image</label>
-                            <input type="file" id="edit-upload-input" class="form-control" accept="image/*" onchange="previewEditImage(event)">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Instructions de modification</label>
-                            <textarea id="edit-prompt" class="form-control" rows="3" placeholder="Ex: Change la couleur du ciel en orange, ajoute des lunettes..."></textarea>
-                        </div>
-                        <button class="btn-primary" id="edit-btn" onclick="editImage()">
-                            Appliquer les modifications
-                        </button>
-                    </div>
-
-                    <div class="image-preview" id="edit-preview">
-                        <div style="text-align: center; color: var(--text-sub);">
-                            <i data-lucide="image-plus" size="48" style="margin-bottom: 12px; opacity: 0.2;"></i>
-                            <p>Image originale ou modifiée</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Analyze Panel -->
-            <div id="analyze-panel" class="panel">
-                <div class="tool-panel-content">
-                    <div class="card">
-                        <h2 class="card-title"><i data-lucide="search"></i> Analyser une Image</h2>
-                        <div class="form-group">
-                            <label class="form-label">Télécharger l'Image</label>
-                            <input type="file" id="analyze-upload-input" class="form-control" accept="image/*" onchange="analyzeImage(event)">
-                        </div>
-                    </div>
-
-                    <div id="analyze-results"></div>
-                </div>
-            </div>
-
-            <!-- Models Panel -->
-            <div id="models-panel" class="panel">
-                <div class="tool-panel-content">
-                    <h2 style="margin-bottom: 24px;">Sélection du Modèle</h2>
-                    <div class="nav-label">TEXTE (LLM)</div>
-                    <div class="model-grid" id="text-models-grid">
-                        <!-- Filled by JS -->
-                    </div>
-
-                    <div class="nav-label" style="margin-top: 32px;">IMAGE</div>
-                    <div class="model-grid" id="image-models-grid">
-                        <!-- Filled by JS -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Settings Panel -->
-            <div id="settings-panel" class="panel">
-                <div class="tool-panel-content">
-                    <div class="card">
-                        <h2 class="card-title"><i data-lucide="settings"></i> Paramètres Généraux</h2>
-                        <div class="form-group">
-                            <label class="form-label">Nom d'utilisateur</label>
-                            <input type="text" class="form-control" value="Invité">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Langue</label>
-                            <select class="form-control">
-                                <option>Français</option>
-                                <option>English</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Thème</label>
-                            <select class="form-control">
-                                <option>Clair (Défaut)</option>
-                                <option disabled>Sombre (Bientôt)</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
+  <!-- ====== SIDEBAR ====== -->
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-badge">AI</div>
+      <div>
+        <div class="logo-name">AIVERSE</div>
+        <div class="logo-sub">100% GRATUIT · SANS CLÉ API</div>
+      </div>
     </div>
 
-    <script>
-        const API_URL = window.location.origin + '/api';
-        let currentConversationId = null;
-        let selectedTextModel = 'mistral';
-        let selectedImageModel = 'flux';
+    <div class="nav-section">
+      <div class="nav-label">Outils IA</div>
+      <button class="nav-item active" onclick="showPanel('chat', this)">
+        <i data-lucide="message-square" class="nav-icon"></i>
+        Chat IA
+        <span class="nav-badge">FREE</span>
+      </button>
+      <button class="nav-item" onclick="showPanel('generate', this)">
+        <i data-lucide="image" class="nav-icon"></i>
+        Générer Image
+        <span class="nav-badge">FREE</span>
+      </button>
+      <button class="nav-item" onclick="showPanel('analyze', this)">
+        <i data-lucide="eye" class="nav-icon"></i>
+        Analyser Image
+        <span class="nav-badge">FREE</span>
+      </button>
+      <button class="nav-item" onclick="showPanel('edit', this)">
+        <i data-lucide="pencil" class="nav-icon"></i>
+        Éditer Image
+        <span class="nav-badge">FREE</span>
+      </button>
+    </div>
 
-        const textModels = [
-            { id: 'gpt-4o', name: 'ChatGPT-4o', provider: 'OpenAI (Free)', icon: 'zap' },
-            { id: 'claude-3-5', name: 'Claude 3.5 Sonnet', provider: 'Anthropic (Free)', icon: 'brain' },
-            { id: 'gemini-1.5', name: 'Gemini 1.5 Pro', provider: 'Google (Free)', icon: 'star' },
-            { id: 'mistral', name: 'Mistral Large', provider: 'Mistral (Unlimited)', icon: 'wind' },
-            { id: 'llama-3', name: 'Llama 3.1 405B', provider: 'Meta (Unlimited)', icon: 'cpu' },
-            { id: 'deepseek', name: 'DeepSeek-V3', provider: 'DeepSeek (Fast)', icon: 'search' },
-            { id: 'search', name: 'AI Search', provider: 'SearchGPT (Web)', icon: 'globe' }
-        ];
+    <div class="nav-section">
+      <div class="nav-label">Configuration</div>
+      <button class="nav-item" onclick="showPanel('models', this)">
+        <i data-lucide="cpu" class="nav-icon"></i>
+        Modèles IA
+      </button>
+    </div>
 
-        const imageModels = [
-            { id: 'flux', name: 'Flux.1 Schnell', provider: 'Black Forest (Unlimited)' },
-            { id: 'sdxl', name: 'Stable Diffusion XL', provider: 'Stability (Fast)' },
-            { id: 'dalle-3', name: 'DALL-E 3', provider: 'OpenAI (Premium)' }
-        ];
+    <div class="sidebar-footer">
+      <a href="/docs" target="_blank" class="docs-btn">
+        <i data-lucide="book-open" style="width:15px;height:15px"></i>
+        Documentation & Guide
+      </a>
+    </div>
+  </aside>
 
-        function init() {
-            lucide.createIcons();
-            renderModels();
-            autoResizeTextarea();
-        }
+  <!-- ====== MAIN ====== -->
+  <main class="main">
+    <div class="topbar">
+      <span class="topbar-title" id="panel-title">Chat IA</span>
+      <div class="topbar-actions">
+        <button class="btn btn-ghost" id="new-chat-btn" onclick="newChat()">
+          <i data-lucide="plus" style="width:14px;height:14px"></i>
+          Nouveau chat
+        </button>
+      </div>
+    </div>
 
-        function showPanel(panelId, element) {
-            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-            document.getElementById(panelId + '-panel').classList.add('active');
-            
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            element.classList.add('active');
+    <!-- ====== CHAT PANEL ====== -->
+    <div id="chat-panel" class="panel active">
+      <div id="messages-area">
+        <div class="msg ai">
+          <div class="avatar"><i data-lucide="bot" style="width:16px;height:16px"></i></div>
+          <div class="bubble">
+            👋 Bonjour ! Je suis <strong>AIVERSE</strong>, votre assistant IA multimodal gratuit.<br><br>
+            Je peux :<br>
+            • 💬 Discuter et répondre à vos questions<br>
+            • 🎨 Générer des images depuis un texte<br>
+            • 👁️ Analyser et décrire vos photos<br>
+            • ✏️ Modifier vos images avec du texte<br><br>
+            <em>Aucune clé API requise — 100% gratuit via Pollinations.ai</em>
+          </div>
+        </div>
+      </div>
 
-            const titles = {
-                'chat': 'Assistant IA',
-                'generate': 'Générateur d\'Image',
-                'edit': 'Éditeur d\'Image',
-                'analyze': 'Analyseur Visuel',
-                'models': 'Configuration des Modèles',
-                'settings': 'Paramètres'
-            };
-            document.getElementById('panel-title').innerText = titles[panelId];
-        }
+      <div class="chat-bar">
+        <div class="chat-input-wrap">
+          <textarea id="chat-input" placeholder="Écrivez votre message..." rows="1"
+            onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+          <div class="chat-input-actions">
+            <select class="model-select" id="chat-model-select">
+              <option value="mistral">Mistral</option>
+              <option value="llama">Llama 3.3</option>
+              <option value="deepseek">DeepSeek-V3</option>
+              <option value="deepseek-r1">DeepSeek-R1</option>
+              <option value="gpt-4o">GPT-4o</option>
+              <option value="gemini">Gemini 2.0</option>
+              <option value="claude">Claude</option>
+              <option value="qwen">Qwen-Max</option>
+              <option value="phi">Phi-4</option>
+              <option value="search">SearchGPT 🌐</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="sendChat()" id="send-btn">
+          <i data-lucide="send" style="width:14px;height:14px"></i>
+        </button>
+      </div>
+    </div>
 
-        function renderModels() {
-            const textGrid = document.getElementById('text-models-grid');
-            textGrid.innerHTML = textModels.map(m => `
-                <div class="model-card ${m.id === selectedTextModel ? 'active' : ''}" onclick="selectModel('text', '${m.id}')">
-                    <div class="model-name">${m.name}</div>
-                    <div class="model-provider">${m.provider}</div>
-                </div>
-            `).join('');
+    <!-- ====== GENERATE IMAGE PANEL ====== -->
+    <div id="generate-panel" class="panel">
+      <div class="panel-content">
+        <div class="panel-card">
+          <h3>🎨 Génération d'Image par IA</h3>
+          <div class="form-group">
+            <label class="form-label">Description de l'image (prompt)</label>
+            <textarea class="form-textarea" id="gen-prompt"
+              placeholder="Ex: Un coucher de soleil sur l'océan avec des couleurs violettes et orangées, style photoréaliste..."></textarea>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;">
+            <div class="form-group">
+              <label class="form-label">Modèle</label>
+              <select class="form-select" id="gen-model">
+                <option value="flux">Flux.1 Schnell ⚡</option>
+                <option value="flux-pro">Flux.1 Pro 🌟</option>
+                <option value="turbo">SDXL Turbo</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Largeur</label>
+              <select class="form-select" id="gen-width">
+                <option value="512">512px</option>
+                <option value="768">768px</option>
+                <option value="1024" selected>1024px</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Hauteur</label>
+              <select class="form-select" id="gen-height">
+                <option value="512">512px</option>
+                <option value="768">768px</option>
+                <option value="1024" selected>1024px</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-primary" id="gen-btn" onclick="generateImage()" style="width:100%; justify-content:center;">
+            <i data-lucide="sparkles" style="width:14px;height:14px"></i>
+            Générer l'Image
+          </button>
+          <div class="img-output" id="gen-output">
+            <div class="img-placeholder">
+              <i data-lucide="image" style="width:40px;height:40px;color:#cbd5e1;display:block;margin:0 auto 8px"></i>
+              L'image générée apparaîtra ici
+            </div>
+          </div>
+          <div id="gen-download" style="display:none; margin-top:12px; text-align:center;">
+            <a id="gen-download-link" class="btn btn-outline" download="aiverse-image.jpg">
+              <i data-lucide="download" style="width:14px;height:14px"></i>
+              Télécharger
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
 
-            const imageGrid = document.getElementById('image-models-grid');
-            imageGrid.innerHTML = imageModels.map(m => `
-                <div class="model-card ${m.id === selectedImageModel ? 'active' : ''}" onclick="selectModel('image', '${m.id}')">
-                    <div class="model-name">${m.name}</div>
-                    <div class="model-provider">${m.provider}</div>
-                </div>
-            `).join('');
-        }
+    <!-- ====== ANALYZE IMAGE PANEL ====== -->
+    <div id="analyze-panel" class="panel">
+      <div class="panel-content">
+        <div class="panel-card">
+          <h3>👁️ Analyse d'Image par Vision IA</h3>
+          <div class="form-group">
+            <label class="form-label">Question sur l'image (optionnel)</label>
+            <input class="form-input" id="analyze-question" type="text"
+              placeholder="Ex: Qu'est-ce que tu vois ? Quelle est l'émotion de cette personne ?" />
+          </div>
+          <label class="upload-zone" for="analyze-file">
+            <input type="file" id="analyze-file" accept="image/*" onchange="analyzeImage(event)">
+            <i data-lucide="upload" style="width:40px;height:40px;color:#94a3b8;display:block;margin:0 auto 12px"></i>
+            <strong>Cliquez ou glissez une image ici</strong><br>
+            <span style="font-size:12px; color:var(--text-sub)">PNG, JPG, WEBP · Max 10MB</span>
+          </label>
+          <div id="analyze-preview" style="margin-top:16px;display:none">
+            <img id="analyze-img-preview" style="max-width:100%;max-height:300px;border-radius:10px;display:block;margin:0 auto">
+          </div>
+          <div id="analyze-result" style="margin-top:16px;display:none">
+            <div class="panel-card" style="background:var(--primary-light); border-color:#c7d2fe;">
+              <h3 style="color:var(--primary)">🤖 Analyse IA</h3>
+              <p id="analyze-text" style="font-size:14px;line-height:1.7;margin-top:8px;white-space:pre-wrap"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-        function selectModel(type, id) {
-            if(type === 'text') selectedTextModel = id;
-            else selectedImageModel = id;
-            renderModels();
-        }
+    <!-- ====== EDIT IMAGE PANEL ====== -->
+    <div id="edit-panel" class="panel">
+      <div class="panel-content">
+        <div class="panel-card">
+          <h3>✏️ Édition d'Image par IA</h3>
+          <p style="font-size:13px;color:var(--text-sub);margin-bottom:16px;">
+            Téléchargez une image, décrivez la modification souhaitée. L'IA analyse votre image puis génère une nouvelle version modifiée.
+          </p>
+          <label class="upload-zone" for="edit-file" style="margin-bottom:16px;display:block">
+            <input type="file" id="edit-file" accept="image/*" onchange="previewEdit(event)">
+            <i data-lucide="image-plus" style="width:36px;height:36px;color:#94a3b8;display:block;margin:0 auto 10px"></i>
+            <strong>Choisir l'image à modifier</strong>
+          </label>
+          <div id="edit-before-after" style="display:none; gap:16px; margin-bottom:16px; display:none">
+            <div>
+              <div class="form-label">Image originale</div>
+              <img id="edit-original" style="max-width:100%;max-height:250px;border-radius:10px;display:block">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Instructions de modification</label>
+            <textarea class="form-textarea" id="edit-prompt"
+              placeholder="Ex: Ajoute un ciel étoilé, change la couleur du ciel en violet, rends le plus artistique..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Modèle</label>
+            <select class="form-select" id="edit-model">
+              <option value="flux">Flux.1 Schnell</option>
+              <option value="flux-pro">Flux.1 Pro</option>
+              <option value="turbo">SDXL Turbo</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" id="edit-btn" onclick="editImage()" style="width:100%;justify-content:center;">
+            <i data-lucide="wand-2" style="width:14px;height:14px"></i>
+            Appliquer la Modification
+          </button>
+          <div class="img-output" id="edit-output" style="margin-top:16px;display:none">
+            <img id="edit-result-img" style="max-width:100%;border-radius:10px">
+          </div>
+          <div id="edit-download" style="display:none; margin-top:12px; text-align:center;">
+            <a id="edit-download-link" class="btn btn-outline" download="aiverse-edit.jpg">
+              <i data-lucide="download" style="width:14px;height:14px"></i>
+              Télécharger
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
 
-        function autoResizeTextarea() {
-            const tx = document.getElementById('chat-input');
-            tx.addEventListener('input', function() {
-                this.style.height = 'auto';
-                this.style.height = (this.scrollHeight) + 'px';
-            });
-        }
+    <!-- ====== MODELS PANEL ====== -->
+    <div id="models-panel" class="panel">
+      <div class="panel-content">
+        <div class="panel-card">
+          <h3>💬 Modèles de texte — 100% gratuits</h3>
+          <p style="font-size:13px;color:var(--text-sub);margin-bottom:16px;">Tous les modèles fonctionnent sans clé API via Pollinations.ai</p>
+          <div class="model-grid" id="text-model-grid"></div>
+        </div>
+        <div class="panel-card">
+          <h3>🎨 Modèles de génération d'image</h3>
+          <div class="model-grid" id="image-model-grid"></div>
+        </div>
+        <div class="panel-card" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7); border-color:#86efac;">
+          <h3 style="color:#16a34a">✅ Comment ça marche ?</h3>
+          <p style="font-size:13px;line-height:1.7;margin-top:8px;color:#15803d">
+            AIVERSE utilise <strong>Pollinations.ai</strong>, un service tiers qui donne accès gratuitement 
+            à des dizaines de modèles IA sans nécessiter de clé API. Aucun compte, aucune inscription, 
+            aucune carte bancaire. Idéal pour intégrer dans vos sites web ou applications.
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
 
-        function handleChatKeyDown(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendChatMessage();
-            }
-        }
+<div class="toast" id="toast"></div>
 
-        async function sendChatMessage() {
-            const input = document.getElementById('chat-input');
-            const msg = input.value.trim();
-            if (!msg) return;
+<script>
+  // ====== STATE ======
+  const API = window.location.origin + '/api';
+  let convId = null;
 
-            addMessage('user', msg);
-            input.value = '';
-            input.style.height = 'auto';
+  const TEXT_MODELS = [
+    { id:'mistral',     name:'Mistral Large',         provider:'Mistral AI' },
+    { id:'llama',       name:'Llama 3.3 70B',         provider:'Meta AI' },
+    { id:'deepseek',    name:'DeepSeek-V3',           provider:'DeepSeek' },
+    { id:'deepseek-r1', name:'DeepSeek-R1',           provider:'DeepSeek (Raisonnement)' },
+    { id:'gpt-4o',      name:'GPT-4o',                provider:'OpenAI' },
+    { id:'gemini',      name:'Gemini 2.0 Flash',      provider:'Google' },
+    { id:'claude',      name:'Claude Sonnet',         provider:'Anthropic' },
+    { id:'qwen',        name:'Qwen-Max',              provider:'Alibaba' },
+    { id:'phi',         name:'Phi-4',                 provider:'Microsoft' },
+    { id:'search',      name:'SearchGPT (Web)',       provider:'OpenAI + Web' },
+  ];
 
-            const aiMsgDiv = addMessage('ai', '<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>');
+  const IMAGE_MODELS = [
+    { id:'flux',      name:'Flux.1 Schnell', provider:'Black Forest Labs (Rapide)' },
+    { id:'flux-pro',  name:'Flux.1 Pro',     provider:'Black Forest Labs (Qualité)' },
+    { id:'turbo',     name:'SDXL Turbo',     provider:'Stability AI' },
+  ];
 
-            try {
-                const response = await fetch(`${API_URL}/chat`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        message: msg,
-                        model: selectedTextModel,
-                        conversationId: currentConversationId
-                    })
-                });
-                const data = await response.json();
-                
-                if (data.error) throw new Error(data.error);
-                
-                currentConversationId = data.conversationId;
-                updateAIMessage(aiMsgDiv, data.message);
-            } catch (err) {
-                updateAIMessage(aiMsgDiv, "Désolé, une erreur est survenue : " + err.message);
-            }
-        }
+  let selectedTextModel = 'mistral';
+  let selectedImageModel = 'flux';
 
-        function addMessage(role, content) {
-            const container = document.getElementById('messages-container');
-            const div = document.createElement('div');
-            div.className = `message ${role}`;
-            
-            const icon = role === 'user' ? 'user' : 'bot';
-            div.innerHTML = `
-                <div class="avatar"><i data-lucide="${icon}" size="20"></i></div>
-                <div class="bubble">${content}</div>
-            `;
-            container.appendChild(div);
-            lucide.createIcons();
-            container.scrollTop = container.scrollHeight;
-            return div;
-        }
+  // ====== INIT ======
+  window.onload = () => {
+    lucide.createIcons();
+    renderModelGrids();
+  };
 
-        function updateAIMessage(div, content) {
-            div.querySelector('.bubble').innerHTML = content;
-            const container = document.getElementById('messages-container');
-            container.scrollTop = container.scrollHeight;
-        }
+  // ====== NAVIGATION ======
+  function showPanel(id, el) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById(id + '-panel').classList.add('active');
+    if(el) el.classList.add('active');
 
-        function newChat() {
-            document.getElementById('messages-container').innerHTML = `
-                <div class="message ai">
-                    <div class="avatar"><i data-lucide="bot" size="20"></i></div>
-                    <div class="bubble">Nouvelle conversation commencée. Comment puis-je vous aider ?</div>
-                </div>
-            `;
-            currentConversationId = null;
-            lucide.createIcons();
-        }
+    const titles = {
+      chat:'Chat IA', generate:'Générer Image',
+      analyze:'Analyser Image', edit:'Éditer Image', models:'Modèles IA'
+    };
+    document.getElementById('panel-title').textContent = titles[id] || id;
+    document.getElementById('new-chat-btn').style.display = id === 'chat' ? '' : 'none';
 
-        // Image Generation
-        async function generateImage() {
-            const prompt = document.getElementById('gen-prompt').value;
-            if(!prompt) return;
+    lucide.createIcons();
+  }
 
-            const btn = document.getElementById('gen-btn');
-            const output = document.getElementById('gen-output');
-            
-            btn.disabled = true;
-            btn.innerText = "Génération...";
-            output.innerHTML = '<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+  // ====== MODELS GRID ======
+  function renderModelGrids() {
+    const tg = document.getElementById('text-model-grid');
+    tg.innerHTML = TEXT_MODELS.map(m => `
+      <div class="model-card ${m.id===selectedTextModel?'active':''}" onclick="selectTextModel('${m.id}')">
+        <div class="model-card-name">${m.name}</div>
+        <div class="model-card-provider">${m.provider}</div>
+        <span class="model-card-badge">GRATUIT</span>
+      </div>`).join('');
 
-            try {
-                const response = await fetch(`${API_URL}/generate-image`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        prompt, 
-                        model: selectedImageModel,
-                        size: document.getElementById('gen-size').value,
-                        style: document.getElementById('gen-style').value
-                    })
-                });
+    const ig = document.getElementById('image-model-grid');
+    ig.innerHTML = IMAGE_MODELS.map(m => `
+      <div class="model-card ${m.id===selectedImageModel?'active':''}" onclick="selectImageModel('${m.id}')">
+        <div class="model-card-name">${m.name}</div>
+        <div class="model-card-provider">${m.provider}</div>
+        <span class="model-card-badge">GRATUIT</span>
+      </div>`).join('');
+  }
 
-                if (response.ok) {
-                    const blob = await response.blob();
-                    const url = URL.createObjectURL(blob);
-                    output.innerHTML = `<img src="${url}" alt="Generated">`;
-                } else {
-                    const err = await response.json();
-                    throw new Error(err.error);
-                }
-            } catch (e) {
-                output.innerHTML = `<p style="color: red;">Erreur: ${e.message}</p>`;
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "Générer l'Image";
-            }
-        }
+  function selectTextModel(id) {
+    selectedTextModel = id;
+    document.getElementById('chat-model-select').value = id;
+    renderModelGrids();
+  }
+  function selectImageModel(id) {
+    selectedImageModel = id;
+    renderModelGrids();
+  }
 
-        // Image Analysis
-        async function analyzeImage(e) {
-            const file = e.target.files[0];
-            if(!file) return;
+  // ====== CHAT ======
+  function handleKey(e) {
+    if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
+  }
 
-            const resultsDiv = document.getElementById('analyze-results');
-            resultsDiv.innerHTML = '<div class="card"><div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>';
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  }
 
-            const formData = new FormData();
-            formData.append('image', file);
+  async function sendChat() {
+    const input = document.getElementById('chat-input');
+    const msg = input.value.trim();
+    if(!msg) return;
 
-            try {
-                const response = await fetch(`${API_URL}/analyze-image`, {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await response.json();
+    const model = document.getElementById('chat-model-select').value;
+    selectedTextModel = model;
 
-                let html = '<div class="card"><h3>Résultats d\'Analyse</h3><ul style="margin-top:12px; list-style:none;">';
-                data.classifications.forEach(c => {
-                    html += `<li style="padding: 8px 0; border-bottom:1px solid #eee; display:flex; justify-content:space-between;">
-                        <span>${c.label}</span>
-                        <span style="font-weight:600; color:var(--primary);">${(c.score * 100).toFixed(1)}%</span>
-                    </li>`;
-                });
-                html += '</ul></div>';
-                resultsDiv.innerHTML = html;
-            } catch (e) {
-                resultsDiv.innerHTML = `<div class="card" style="color:red;">Erreur: ${e.message}</div>`;
-            }
-        }
+    appendMsg('user', msg);
+    input.value = '';
+    input.style.height = 'auto';
 
-        function previewEditImage(e) {
-            const file = e.target.files[0];
-            if(file) {
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    document.getElementById('edit-preview').innerHTML = `<img src="${ev.target.result}">`;
-                };
-                reader.readAsDataURL(file);
-            }
-        }
+    const aiDiv = appendMsg('ai', `<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`);
+    document.getElementById('send-btn').disabled = true;
 
-        async function editImage() {
-            const file = document.getElementById('edit-upload-input').files[0];
-            const prompt = document.getElementById('edit-prompt').value;
-            if(!file || !prompt) return;
+    try {
+      const r = await fetch(`${API}/chat`, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ message:msg, conversationId:convId, model })
+      });
 
-            const btn = document.getElementById('edit-btn');
-            btn.disabled = true;
-            btn.innerText = "Modification...";
+      if(!r.ok) {
+        const err = await r.json().catch(() => ({error:'Erreur réseau'}));
+        throw new Error(err.error || 'Erreur serveur');
+      }
 
-            const formData = new FormData();
-            formData.append('image', file);
-            formData.append('prompt', prompt);
+      const data = await r.json();
+      if(data.error) throw new Error(data.error);
 
-            try {
-                const response = await fetch(`${API_URL}/edit-image`, {
-                    method: 'POST',
-                    body: formData
-                });
-                if(response.ok) {
-                    const blob = await response.blob();
-                    const url = URL.createObjectURL(blob);
-                    document.getElementById('edit-preview').innerHTML = `<img src="${url}">`;
-                } else {
-                    const err = await response.json();
-                    throw new Error(err.error);
-                }
-            } catch(e) {
-                alert("Erreur: " + e.message);
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "Appliquer les modifications";
-            }
-        }
+      convId = data.conversationId;
+      setBubble(aiDiv, data.message);
+    } catch(e) {
+      setBubble(aiDiv, `❌ Erreur : ${e.message}`);
+    } finally {
+      document.getElementById('send-btn').disabled = false;
+    }
+  }
 
-        window.onload = init;
-    </script>
+  function appendMsg(role, html) {
+    const area = document.getElementById('messages-area');
+    const div = document.createElement('div');
+    div.className = `msg ${role}`;
+    const icon = role === 'user' ? 'user' : 'bot';
+    div.innerHTML = `
+      <div class="avatar"><i data-lucide="${icon}" style="width:16px;height:16px"></i></div>
+      <div class="bubble">${html}</div>`;
+    area.appendChild(div);
+    lucide.createIcons();
+    area.scrollTop = area.scrollHeight;
+    return div;
+  }
+
+  function setBubble(div, text) {
+    div.querySelector('.bubble').textContent = text;
+    document.getElementById('messages-area').scrollTop = 99999;
+  }
+
+  function newChat() {
+    document.getElementById('messages-area').innerHTML = '';
+    convId = null;
+    appendMsg('ai', 'Nouvelle conversation. Comment puis-je vous aider ?');
+  }
+
+  // ====== GENERATE IMAGE ======
+  async function generateImage() {
+    const prompt = document.getElementById('gen-prompt').value.trim();
+    if(!prompt) { toast('Entrez une description d\'image.'); return; }
+
+    const btn = document.getElementById('gen-btn');
+    const out  = document.getElementById('gen-output');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="typing" style="display:inline-flex;gap:4px"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
+    out.innerHTML = '<div class="img-placeholder"><div class="typing" style="justify-content:center"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><br>Génération en cours...</div>';
+    document.getElementById('gen-download').style.display = 'none';
+
+    try {
+      const r = await fetch(`${API}/generate-image`, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          prompt,
+          model: document.getElementById('gen-model').value,
+          width: +document.getElementById('gen-width').value,
+          height: +document.getElementById('gen-height').value,
+        })
+      });
+
+      if(!r.ok) throw new Error(`Erreur ${r.status}`);
+
+      const blob = await r.blob();
+      const url  = URL.createObjectURL(blob);
+      out.innerHTML = `<img src="${url}" alt="Generated" style="max-width:100%;border-radius:10px">`;
+      const dl = document.getElementById('gen-download-link');
+      dl.href = url;
+      document.getElementById('gen-download').style.display = 'block';
+
+    } catch(e) {
+      out.innerHTML = `<div class="img-placeholder" style="color:#ef4444">❌ ${e.message}</div>`;
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i data-lucide="sparkles" style="width:14px;height:14px"></i> Générer l\'Image';
+      lucide.createIcons();
+    }
+  }
+
+  // ====== ANALYZE IMAGE ======
+  async function analyzeImage(e) {
+    const file = e.target.files[0];
+    if(!file) return;
+
+    // Show preview
+    const reader = new FileReader();
+    reader.onload = ev => {
+      document.getElementById('analyze-img-preview').src = ev.target.result;
+      document.getElementById('analyze-preview').style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+
+    const question = document.getElementById('analyze-question').value.trim()
+      || 'Décris cette image en détail en français.';
+
+    document.getElementById('analyze-result').style.display = 'block';
+    document.getElementById('analyze-text').textContent = '⏳ Analyse en cours...';
+
+    const fd = new FormData();
+    fd.append('image', file);
+    fd.append('question', question);
+
+    try {
+      const r = await fetch(`${API}/analyze-image`, { method:'POST', body:fd });
+      if(!r.ok) throw new Error(`Erreur ${r.status}`);
+      const data = await r.json();
+      if(data.error) throw new Error(data.error);
+      document.getElementById('analyze-text').textContent = data.description;
+    } catch(e) {
+      document.getElementById('analyze-text').textContent = `❌ Erreur : ${e.message}`;
+    }
+  }
+
+  // ====== EDIT IMAGE ======
+  function previewEdit(e) {
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      document.getElementById('edit-original').src = ev.target.result;
+      document.getElementById('edit-before-after').style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  async function editImage() {
+    const file = document.getElementById('edit-file').files[0];
+    const prompt = document.getElementById('edit-prompt').value.trim();
+    if(!file) { toast('Choisissez une image.'); return; }
+    if(!prompt) { toast('Entrez des instructions de modification.'); return; }
+
+    const btn = document.getElementById('edit-btn');
+    btn.disabled = true;
+    btn.textContent = '⏳ Modification en cours...';
+
+    const fd = new FormData();
+    fd.append('image', file);
+    fd.append('prompt', prompt);
+    fd.append('model', document.getElementById('edit-model').value);
+
+    try {
+      const r = await fetch(`${API}/edit-image`, { method:'POST', body:fd });
+      if(!r.ok) throw new Error(`Erreur ${r.status}`);
+      const blob = await r.blob();
+      const url  = URL.createObjectURL(blob);
+      document.getElementById('edit-result-img').src = url;
+      document.getElementById('edit-output').style.display = 'flex';
+      const dl = document.getElementById('edit-download-link');
+      dl.href = url;
+      document.getElementById('edit-download').style.display = 'block';
+    } catch(e) {
+      toast('Erreur : ' + e.message);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<i data-lucide="wand-2" style="width:14px;height:14px"></i> Appliquer la Modification';
+      lucide.createIcons();
+    }
+  }
+
+  // ====== TOAST ======
+  function toast(msg, duration = 3000) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.display = 'block';
+    setTimeout(() => t.style.display = 'none', duration);
+  }
+</script>
 </body>
 </html>
