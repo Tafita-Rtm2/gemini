@@ -6,7 +6,6 @@ import multer from 'multer';
 import fetch from 'node-fetch';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import sharp from 'sharp';
 import fs from 'fs';
 
 dotenv.config();
@@ -23,106 +22,151 @@ app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Root route to serve index.html
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.get('/docs', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'docs.html'));
 });
 
 // Configure multer for file uploads
 const upload = multer({
   dest: 'uploads/',
-  limits: { fileSize: parseInt(process.env.MAX_IMAGE_SIZE) || 10485760 }
+  limits: { fileSize: 10 * 1024 * 1024 }
 });
 
-// ==================== CONSTANTS ====================
-const HF_API_KEY = process.env.HUGGINGFACE_API_KEY;
-const HF_API_URL = process.env.HUGGINGFACE_API_URL || 'https://api-inference.huggingface.co/models';
-const TEXT_MODEL = process.env.DEFAULT_LLM_MODEL || 'mistralai/Mistral-7B-Instruct-v0.3';
-const IMAGE_GEN_MODEL = process.env.DEFAULT_IMAGE_MODEL || 'stabilityai/stable-diffusion-3.5-large';
-const IMAGE_EDIT_MODEL = process.env.DEFAULT_EDIT_MODEL || 'Qwen/Qwen-Image-Edit-2511';
-
-// Store conversations in memory (use database in production)
-const conversations = new Map();
-
-// ==================== UTILITY FUNCTIONS ====================
+// ==================== POLLINATIONS API (100% Free, No Key) ====================
 
 /**
- * Query Pollinations API for Free AI
+ * Maps frontend model IDs to Pollinations model names
+ * All models are free, no API key required
  */
-async function queryPollinationsText(prompt, model = 'mistral') {
-  const models = {
-    'mistral': 'mistral',
-    'llama-3': 'llama',
-    'gpt-4o': 'openai',
-    'claude-3-5': 'anthropic',
-    'gemini-1.5': 'google',
-    'search': 'searchgpt',
-    'deepseek': 'deepseek'
+const POLLINATIONS_TEXT_MODELS = {
+  'mistral':    'mistral',
+  'llama':      'llama',
+  'llama-3':    'llama',
+  'deepseek':   'deepseek',
+  'deepseek-r1':'deepseek-r1',
+  'gpt-4o':     'openai',
+  'gpt4o':      'openai',
+  'gemini':     'gemini',
+  'gemini-1.5': 'gemini',
+  'claude':     'claude',
+  'claude-3-5': 'claude',
+  'qwen':       'qwen',
+  'search':     'searchgpt',
+  'phi':        'phi',
+};
+
+const POLLINATIONS_IMAGE_MODELS = {
+  'flux':       'flux',
+  'flux-schnell': 'flux',
+  'turbo':      'turbo',
+  'sdxl':       'turbo',
+  'flux-pro':   'flux-pro',
+};
+
+/**
+ * Query Pollinations Text API — totally free, no key
+ */
+async function queryPollinationsText(messages, modelId = 'mistral', systemPrompt = '') {
+  const pollinationsModel = POLLINATIONS_TEXT_MODELS[modelId] || 'mistral';
+  
+  const payload = {
+    model: pollinationsModel,
+    messages: [
+      ...(systemPrompt ? [{ role: 'system', content: systemPrompt }] : []),
+      ...messages
+    ],
+    seed: Math.floor(Math.random() * 999999),
+    stream: false
   };
-  
-  const selectedModel = models[model] || 'mistral';
-  const url = `https://text.pollinations.ai/${encodeURIComponent(prompt)}?model=${selectedModel}`;
-  
-  const response = await fetch(url);
-  if (!response.ok) throw new Error('Pollinations API Error');
-  return await response.text();
-}
 
-async function queryPollinationsImage(prompt, options = {}) {
-  const { width = 512, height = 512, seed = Math.floor(Math.random() * 1000000), model = 'flux' } = options;
-  const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${width}&height=${height}&seed=${seed}&model=${model}&nologo=true`;
-  
-  const response = await fetch(url);
-  if (!response.ok) throw new Error('Pollinations Image API Error');
-  return await response.arrayBuffer();
-}
+  const response = await fetch('https://text.pollinations.ai/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+    timeout: 60000
+  });
 
-/**
- * Query Hugging Face API
- */
-async function queryHuggingFace(modelId, inputs, options = {}) {
-  const maxRetries = 3;
-  let retries = 0;
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`Pollinations API error ${response.status}: ${text.slice(0, 200)}`);
+  }
 
-  while (retries < maxRetries) {
-    try {
-      const response = await fetch(`${HF_API_URL}/${modelId}`, {
-        headers: { Authorization: `Bearer ${HF_API_KEY}` },
-        method: 'POST',
-        body: JSON.stringify(inputs),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        
-        // Check if model is loading
-        if (error.error && error.error.includes('currently loading')) {
-          console.log(`Model ${modelId} loading... retrying in 10s`);
-          await new Promise(resolve => setTimeout(resolve, 10000));
-          retries++;
-          continue;
-        }
-        
-        throw new Error(`HF API Error: ${error.error || response.statusText}`);
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error(`Error querying ${modelId}:`, error.message);
-      retries++;
-      
-      if (retries >= maxRetries) {
-        throw error;
-      }
-      
-      await new Promise(resolve => setTimeout(resolve, 5000));
-    }
+  // Pollinations returns plain text or JSON depending on endpoint
+  const contentType = response.headers.get('content-type') || '';
+  if (contentType.includes('application/json')) {
+    const data = await response.json();
+    return data?.choices?.[0]?.message?.content || data?.text || JSON.stringify(data);
+  } else {
+    return await response.text();
   }
 }
 
 /**
- * Get or create conversation
+ * Query Pollinations Image API — totally free, no key
  */
+async function queryPollinationsImage(prompt, options = {}) {
+  const {
+    width = 1024,
+    height = 1024,
+    seed = Math.floor(Math.random() * 1000000),
+    model = 'flux'
+  } = options;
+
+  const pollinationsModel = POLLINATIONS_IMAGE_MODELS[model] || 'flux';
+  const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${width}&height=${height}&seed=${seed}&model=${pollinationsModel}&nologo=true&enhance=false`;
+
+  const response = await fetch(url, { timeout: 90000 });
+
+  if (!response.ok) {
+    throw new Error(`Image generation failed: ${response.status}`);
+  }
+
+  return await response.arrayBuffer();
+}
+
+/**
+ * Analyze image using Pollinations Vision (LLaVA via openai compatible endpoint)
+ */
+async function analyzeImageWithPollinations(base64Image, mimeType = 'image/jpeg', question = 'Describe this image in detail in French.') {
+  const payload = {
+    model: 'openai',
+    messages: [{
+      role: 'user',
+      content: [
+        { type: 'image_url', image_url: { url: `data:${mimeType};base64,${base64Image}` } },
+        { type: 'text', text: question }
+      ]
+    }],
+    stream: false
+  };
+
+  const response = await fetch('https://text.pollinations.ai/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+    timeout: 60000
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`Vision API error: ${text.slice(0, 200)}`);
+  }
+
+  const contentType = response.headers.get('content-type') || '';
+  if (contentType.includes('application/json')) {
+    const data = await response.json();
+    return data?.choices?.[0]?.message?.content || data?.text || 'Analyse non disponible.';
+  }
+  return await response.text();
+}
+
+// ==================== CONVERSATION STORE ====================
+const conversations = new Map();
+
 function getConversation(conversationId) {
   if (!conversations.has(conversationId)) {
     conversations.set(conversationId, {
@@ -135,106 +179,79 @@ function getConversation(conversationId) {
   return conversations.get(conversationId);
 }
 
-/**
- * Format messages for LLM
- */
-function formatMessagesForLLM(messages) {
-  return messages
-    .map(msg => `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`)
-    .join('\n');
-}
-
 // ==================== API ENDPOINTS ====================
 
-/**
- * Health Check
- */
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'OK',
+    freeMode: true,
+    apiKeyRequired: false,
     timestamp: new Date().toISOString(),
     uptime: process.uptime()
   });
 });
 
+app.get('/api/models', (req, res) => {
+  res.json({
+    note: 'All models are 100% free via Pollinations.ai — no API key required',
+    textModels: [
+      { id: 'mistral',      name: 'Mistral Large',        provider: 'Mistral AI',  free: true },
+      { id: 'llama',        name: 'Llama 3.3 70B',        provider: 'Meta',        free: true },
+      { id: 'deepseek',     name: 'DeepSeek-V3',          provider: 'DeepSeek',    free: true },
+      { id: 'deepseek-r1',  name: 'DeepSeek-R1 (raisonnement)', provider: 'DeepSeek', free: true },
+      { id: 'gpt-4o',       name: 'GPT-4o',               provider: 'OpenAI',      free: true },
+      { id: 'gemini',       name: 'Gemini 2.0 Flash',     provider: 'Google',      free: true },
+      { id: 'claude',       name: 'Claude Sonnet',        provider: 'Anthropic',   free: true },
+      { id: 'qwen',         name: 'Qwen-Max',             provider: 'Alibaba',     free: true },
+      { id: 'search',       name: 'SearchGPT (Web)',      provider: 'OpenAI',      free: true },
+      { id: 'phi',          name: 'Phi-4',                provider: 'Microsoft',   free: true },
+    ],
+    imageModels: [
+      { id: 'flux',         name: 'Flux.1 Schnell',       provider: 'Black Forest Labs', free: true },
+      { id: 'flux-pro',     name: 'Flux.1 Pro',           provider: 'Black Forest Labs', free: true },
+      { id: 'turbo',        name: 'SDXL Turbo',           provider: 'Stability AI',      free: true },
+    ]
+  });
+});
+
 /**
- * Chat Endpoint - Text Generation
+ * Chat — text generation, 100% free
  */
 app.post('/api/chat', async (req, res) => {
   try {
-    const { message, conversationId, systemPrompt } = req.body;
+    const { message, conversationId, model = 'mistral', systemPrompt } = req.body;
 
     if (!message) {
-      return res.status(400).json({ error: 'Message is required' });
+      return res.status(400).json({ error: 'Le message est requis.' });
     }
 
     const convoId = conversationId || `conv_${Date.now()}`;
     const conversation = getConversation(convoId);
 
     // Add user message
-    conversation.messages.push({
-      role: 'user',
-      content: message,
-      timestamp: Date.now()
-    });
+    conversation.messages.push({ role: 'user', content: message });
 
-    // Limit conversation history
-    const maxLen = parseInt(process.env.MAX_CONVERSATION_LENGTH) || 50;
-    if (conversation.messages.length > maxLen) {
-      conversation.messages = conversation.messages.slice(-maxLen);
+    // Keep last 20 messages
+    if (conversation.messages.length > 20) {
+      conversation.messages = conversation.messages.slice(-20);
     }
 
-    // Prepare prompt
-    const systemMsg = systemPrompt || `Tu es un assistant IA intelligent et serviable nommé AIVERSE. Tu aides les utilisateurs avec leurs questions, la rédaction de textes, la génération d'images et l'analyse visuelle. Réponds en français de manière élégante et concise.`;
+    const sysPrompt = systemPrompt || `Tu es AIVERSE, un assistant IA intelligent, créatif et serviable. Tu peux discuter, analyser, rédiger, et aider avec des images. Réponds toujours en français de manière claire et utile.`;
 
-    const chatHistory = formatMessagesForLLM(conversation.messages);
-    const fullPrompt = `${systemMsg}\n\nConversation:\n${chatHistory}\nAssistant:`;
-
-    // Try Pollinations first (Unlimited & Free)
-    let assistantMessage = '';
-    try {
-      assistantMessage = await queryPollinationsText(fullPrompt, req.body.model);
-    } catch (e) {
-      console.log('Pollinations failed, falling back to HF');
-      // Query LLM via Hugging Face if Pollinations fails
-      const result = await queryHuggingFace(TEXT_MODEL, {
-        inputs: fullPrompt,
-        parameters: {
-          max_new_tokens: 500,
-          temperature: 0.7,
-          top_p: 0.9,
-          do_sample: true
-        }
-      });
-
-      if (Array.isArray(result)) {
-        assistantMessage = result[0]?.generated_text || 'No response generated';
-      } else if (result.generated_text) {
-        assistantMessage = result.generated_text;
-      } else {
-        throw new Error('Unexpected API response format');
-      }
-
-      // Extract only the new response (remove prompt from output)
-      const lastUserMsg = 'Assistant:';
-      const responseStart = assistantMessage.lastIndexOf(lastUserMsg);
-      if (responseStart !== -1) {
-        assistantMessage = assistantMessage.substring(responseStart + lastUserMsg.length).trim();
-      }
-    }
+    const assistantMessage = await queryPollinationsText(
+      conversation.messages,
+      model,
+      sysPrompt
+    );
 
     // Add assistant response
-    conversation.messages.push({
-      role: 'assistant',
-      content: assistantMessage,
-      timestamp: Date.now()
-    });
-
+    conversation.messages.push({ role: 'assistant', content: assistantMessage });
     conversation.updatedAt = Date.now();
 
     res.json({
       conversationId: convoId,
       message: assistantMessage,
+      model: model,
       messageCount: conversation.messages.length,
       timestamp: new Date().toISOString()
     });
@@ -242,252 +259,148 @@ app.post('/api/chat', async (req, res) => {
   } catch (error) {
     console.error('Chat error:', error);
     res.status(500).json({
-      error: error.message || 'Failed to process chat',
-      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      error: error.message || 'Erreur lors du traitement du chat.'
     });
   }
 });
 
 /**
- * Generate Image Endpoint
+ * Generate Image — free via Pollinations
  */
 app.post('/api/generate-image', async (req, res) => {
   try {
-    const { prompt, height = 512, width = 512, numSteps = 20, guidanceScale = 7.5 } = req.body;
+    const { prompt, width = 1024, height = 1024, model = 'flux' } = req.body;
 
     if (!prompt) {
-      return res.status(400).json({ error: 'Prompt is required' });
+      return res.status(400).json({ error: 'Le prompt est requis.' });
     }
 
-    // Use Pollinations for free unlimited image generation
-    try {
-      const buffer = await queryPollinationsImage(prompt, { 
-        width, 
-        height, 
-        model: req.body.model === 'flux' ? 'flux' : 'turbo' 
-      });
-      res.set('Content-Type', 'image/png');
-      res.send(Buffer.from(buffer));
-    } catch (e) {
-      console.log('Pollinations image failed, falling back to HF');
-      // For Stable Diffusion via HF fallback
-      const result = await queryHuggingFace(IMAGE_GEN_MODEL, {
-        inputs: prompt,
-        parameters: { height, width }
-      });
+    const buffer = await queryPollinationsImage(prompt, { width, height, model });
 
-      if (Buffer.isBuffer(result)) {
-        res.set('Content-Type', 'image/png');
-        res.send(result);
-      } else {
-        res.json(result);
-      }
-    }
+    res.set('Content-Type', 'image/jpeg');
+    res.send(Buffer.from(buffer));
 
   } catch (error) {
     console.error('Image generation error:', error);
-    res.status(500).json({
-      error: error.message || 'Failed to generate image',
-      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
-    });
+    res.status(500).json({ error: error.message || 'Erreur de génération d\'image.' });
   }
 });
 
 /**
- * Edit Image Endpoint
- */
-app.post('/api/edit-image', upload.single('image'), async (req, res) => {
-  try {
-    const { prompt, strength = 0.75, guidanceScale = 7.5 } = req.body;
-
-    if (!req.file) {
-      return res.status(400).json({ error: 'Image file is required' });
-    }
-
-    if (!prompt) {
-      return res.status(400).json({ error: 'Edit prompt is required' });
-    }
-
-    // Read image file
-    const imageBuffer = fs.readFileSync(req.file.path);
-    const base64Image = imageBuffer.toString('base64');
-
-    // Query editing model
-    const result = await queryHuggingFace(IMAGE_EDIT_MODEL, {
-      inputs: {
-        image: base64Image,
-        prompt: prompt
-      },
-      parameters: {
-        strength,
-        guidance_scale: guidanceScale
-      }
-    });
-
-    // Clean up uploaded file
-    fs.unlinkSync(req.file.path);
-
-    if (Buffer.isBuffer(result)) {
-      res.set('Content-Type', 'image/png');
-      res.send(result);
-    } else {
-      res.json(result);
-    }
-
-  } catch (error) {
-    console.error('Image editing error:', error);
-    
-    // Clean up on error
-    if (req.file) {
-      try { fs.unlinkSync(req.file.path); } catch (e) {}
-    }
-
-    res.status(500).json({
-      error: error.message || 'Failed to edit image',
-      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
-    });
-  }
-});
-
-/**
- * Analyze Image Endpoint
+ * Analyze Image — free via Pollinations Vision
  */
 app.post('/api/analyze-image', upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ error: 'Image file is required' });
+      return res.status(400).json({ error: 'Image requise.' });
     }
 
+    const question = req.body.question || 'Décris cette image en détail en français.';
     const imageBuffer = fs.readFileSync(req.file.path);
     const base64Image = imageBuffer.toString('base64');
+    const mimeType = req.file.mimetype || 'image/jpeg';
 
-    // Use image classification model
-    const result = await queryHuggingFace('google/vit-base-patch16-224', {
-      inputs: base64Image
-    });
+    const description = await analyzeImageWithPollinations(base64Image, mimeType, question);
 
     fs.unlinkSync(req.file.path);
 
     res.json({
-      classifications: result,
+      description,
       imageSize: req.file.size,
-      uploadedAt: new Date().toISOString()
+      analyzedAt: new Date().toISOString()
     });
 
   } catch (error) {
     console.error('Image analysis error:', error);
-    
-    if (req.file) {
-      try { fs.unlinkSync(req.file.path); } catch (e) {}
-    }
-
-    res.status(500).json({
-      error: error.message || 'Failed to analyze image',
-      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
-    });
+    if (req.file) { try { fs.unlinkSync(req.file.path); } catch (e) {} }
+    res.status(500).json({ error: error.message || 'Erreur d\'analyse d\'image.' });
   }
 });
 
 /**
- * Get Conversation History
+ * Edit Image — regenerate with modified prompt (Pollinations doesn't support true inpainting)
+ */
+app.post('/api/edit-image', upload.single('image'), async (req, res) => {
+  try {
+    const { prompt, model = 'flux' } = req.body;
+
+    if (!req.file) return res.status(400).json({ error: 'Image requise.' });
+    if (!prompt) return res.status(400).json({ error: 'Prompt de modification requis.' });
+
+    // First: analyze the image, then regenerate with the edit prompt
+    const imageBuffer = fs.readFileSync(req.file.path);
+    const base64Image = imageBuffer.toString('base64');
+    const mimeType = req.file.mimetype || 'image/jpeg';
+
+    fs.unlinkSync(req.file.path);
+
+    // Describe the original image
+    const originalDescription = await analyzeImageWithPollinations(
+      base64Image,
+      mimeType,
+      'Describe this image very concisely in English in 2-3 sentences for an image generation prompt.'
+    );
+
+    // Generate new image combining original description + edit instructions
+    const combinedPrompt = `${originalDescription}. Modification: ${prompt}`;
+    const buffer = await queryPollinationsImage(combinedPrompt, { width: 1024, height: 1024, model });
+
+    res.set('Content-Type', 'image/jpeg');
+    res.send(Buffer.from(buffer));
+
+  } catch (error) {
+    console.error('Image editing error:', error);
+    if (req.file) { try { fs.unlinkSync(req.file.path); } catch (e) {} }
+    res.status(500).json({ error: error.message || 'Erreur de modification d\'image.' });
+  }
+});
+
+/**
+ * Get conversation history
  */
 app.get('/api/conversation/:id', (req, res) => {
-  try {
-    const conversation = conversations.get(req.params.id);
-
-    if (!conversation) {
-      return res.status(404).json({ error: 'Conversation not found' });
-    }
-
-    res.json(conversation);
-
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to retrieve conversation' });
-  }
+  const conversation = conversations.get(req.params.id);
+  if (!conversation) return res.status(404).json({ error: 'Conversation introuvable.' });
+  res.json(conversation);
 });
 
 /**
- * Clear Conversation
+ * Clear conversation
  */
 app.delete('/api/conversation/:id', (req, res) => {
-  try {
-    const deleted = conversations.delete(req.params.id);
-
-    res.json({
-      deleted,
-      message: deleted ? 'Conversation deleted' : 'Conversation not found'
-    });
-
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to delete conversation' });
-  }
+  const deleted = conversations.delete(req.params.id);
+  res.json({ deleted, message: deleted ? 'Conversation supprimée.' : 'Introuvable.' });
 });
 
-/**
- * List Models (Available Models)
- */
-app.get('/api/models', (req, res) => {
-  res.json({
-    textGeneration: {
-      default: TEXT_MODEL,
-      available: [
-        'mistralai/Mistral-7B-Instruct-v0.3',
-        'meta-llama/Llama-2-7b-chat-hf',
-        'google/flan-t5-large'
-      ]
-    },
-    imageGeneration: {
-      default: IMAGE_GEN_MODEL,
-      available: [
-        'stabilityai/stable-diffusion-3.5-large',
-        'black-forest-labs/FLUX.1-schnell',
-        'Qwen/Qwen-Image'
-      ]
-    },
-    imageEditing: {
-      default: IMAGE_EDIT_MODEL,
-      available: [
-        'Qwen/Qwen-Image-Edit-2511',
-        'stabilityai/stable-diffusion-inpainting'
-      ]
-    }
-  });
-});
-
-/**
- * Error handling middleware
- */
+// Error handler
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', err);
-  res.status(500).json({
-    error: 'Internal server error',
-    message: err.message
-  });
+  res.status(500).json({ error: 'Erreur interne du serveur.', message: err.message });
 });
 
-// ==================== START SERVER ====================
+// ==================== START ====================
 app.listen(PORT, () => {
   console.log(`
-╔════════════════════════════════════════╗
-║   🤖 AIVERSE CHATBOT SERVER STARTED    ║
-╚════════════════════════════════════════╝
-  
-📍 Server: http://localhost:${PORT}
-🌐 API Docs: http://localhost:${PORT}/docs
-💬 Chat: http://localhost:${PORT}
+╔══════════════════════════════════════════════╗
+║   🤖 AIVERSE — Démarré sans clé API !       ║
+║   ✅ 100% Gratuit via Pollinations.ai        ║
+╚══════════════════════════════════════════════╝
 
-📌 Available Endpoints:
-  ✓ POST   /api/chat              - Chat with AI
-  ✓ POST   /api/generate-image    - Generate images
-  ✓ POST   /api/edit-image        - Edit images
-  ✓ POST   /api/analyze-image     - Analyze images
-  ✓ GET    /api/conversation/:id  - Get chat history
-  ✓ DELETE /api/conversation/:id  - Clear conversation
-  ✓ GET    /api/models            - List available models
-  ✓ GET    /api/health            - Health check
+📍 Serveur   : http://localhost:${PORT}
+📄 Docs      : http://localhost:${PORT}/docs
+💬 Chat      : http://localhost:${PORT}
 
-⚠️  Make sure to set HUGGINGFACE_API_KEY in .env
+📌 Endpoints disponibles:
+  ✓ POST   /api/chat              — Chat IA (texte)
+  ✓ POST   /api/generate-image    — Génération d'image
+  ✓ POST   /api/edit-image        — Édition d'image
+  ✓ POST   /api/analyze-image     — Analyse visuelle
+  ✓ GET    /api/models            — Liste des modèles
+  ✓ GET    /api/health            — Santé du serveur
+  ✓ GET    /api/conversation/:id  — Historique
+  ✓ DELETE /api/conversation/:id  — Supprimer conv.
 
+⚡ Aucune clé API requise !
   `);
 });
 
