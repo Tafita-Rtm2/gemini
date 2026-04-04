@@ -4,8 +4,16 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>AIVERSE — IA Gratuit</title>
+
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Scripts for Markdown & Highlighting -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -86,6 +94,7 @@
       font-size: 13.5px; font-weight: 500; color: var(--text2);
       cursor: pointer; transition: all .15s; margin-bottom: 2px;
       border: none; background: none; width: 100%; text-align: left; font-family: var(--sans);
+      text-decoration: none;
     }
     .nav-item:hover { background: var(--surface2); color: var(--text); }
     .nav-item.active { background: var(--primary-glow); color: var(--primary2); font-weight: 600; border: 1px solid rgba(124,111,255,.22); }
@@ -129,10 +138,35 @@
     .msg.ai { align-self: flex-start; }
     .avatar { width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; border: 1px solid var(--border2); background: var(--surface2); }
     .msg.user .avatar { background: var(--primary); border: none; }
-    .bubble { padding: 10px 13px; border-radius: 16px; font-size: 14px; line-height: 1.7; background: var(--surface); border: 1px solid var(--border); white-space: pre-wrap; word-break: break-word; max-width: 100%; }
-    .msg.user .bubble { background: var(--primary); color: white; border-color: transparent; border-radius: 16px 4px 16px 16px; }
+
+    .bubble { padding: 10px 15px; border-radius: 16px; font-size: 14px; line-height: 1.7; background: var(--surface); border: 1px solid var(--border); word-break: break-word; max-width: 100%; color: var(--text); }
+    .msg.user .bubble { background: var(--primary); color: white; border-color: transparent; border-radius: 16px 4px 16px 16px; white-space: pre-wrap; }
     .msg.ai .bubble { border-radius: 4px 16px 16px 16px; }
-    .bubble .chat-img-preview { max-width: 200px; max-height: 150px; border-radius: 9px; display: block; margin-bottom: 7px; object-fit: cover; border: 1px solid rgba(255,255,255,.2); }
+
+    /* Markdown Styling */
+    .bubble h1, .bubble h2, .bubble h3 { margin: 10px 0 6px; font-weight: 700; color: white; }
+    .bubble h1 { font-size: 1.4em; }
+    .bubble h2 { font-size: 1.25em; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+    .bubble h3 { font-size: 1.1em; }
+    .bubble p { margin-bottom: 8px; }
+    .bubble ul, .bubble ol { margin: 8px 0 12px 20px; }
+    .bubble li { margin-bottom: 4px; }
+    .bubble blockquote { border-left: 3px solid var(--primary); padding: 4px 12px; color: var(--text2); background: var(--surface2); margin: 8px 0; border-radius: 0 6px 6px 0; }
+    .bubble code { font-family: var(--mono); background: var(--surface2); padding: 2px 4px; border-radius: 4px; font-size: 0.9em; color: var(--primary2); }
+    .bubble pre { margin: 10px 0; position: relative; }
+    .bubble pre code { display: block; padding: 12px; overflow-x: auto; background: #0d0d0d; color: #e6edf3; border-radius: 8px; border: 1px solid var(--border2); line-height: 1.5; }
+
+    /* Tables */
+    .bubble table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
+    .bubble th, .bubble td { border: 1px solid var(--border2); padding: 8px 10px; text-align: left; }
+    .bubble th { background: var(--surface2); color: white; font-weight: 600; }
+    .bubble tr:nth-child(even) { background: rgba(255,255,255,0.02); }
+
+    .copy-btn { position: absolute; top: 8px; right: 8px; padding: 4px 8px; font-size: 10px; background: var(--surface3); border: 1px solid var(--border2); color: var(--text2); border-radius: 4px; cursor: pointer; }
+    .copy-btn:hover { background: var(--primary); color: white; }
+
+    .bubble .chat-img-preview { max-width: 100%; max-height: 300px; border-radius: 9px; display: block; margin-bottom: 10px; object-fit: contain; border: 1px solid rgba(255,255,255,.2); }
+
     .typing { display: flex; gap: 4px; align-items: center; padding: 4px 0; }
     .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--primary2); animation: bop .9s infinite; }
     .dot:nth-child(2){animation-delay:.15s} .dot:nth-child(3){animation-delay:.3s}
@@ -185,10 +219,10 @@
     .model-card-badge { display: inline-block; margin-top: 5px; font-size: 9px; font-weight: 700; background: rgba(52,211,153,.12); color: var(--accent); padding: 2px 6px; border-radius: 99px; border: 1px solid rgba(52,211,153,.22); font-family: var(--mono); }
     .analyze-result-box { background: var(--primary-glow); border: 1px solid rgba(124,111,255,.22); border-radius: 12px; padding: 13px; }
     .analyze-result-title { font-size: 10px; font-weight: 700; color: var(--primary2); margin-bottom: 7px; text-transform: uppercase; letter-spacing: .08em; font-family: var(--mono); }
-    #analyze-text { font-size: 14px; line-height: 1.75; white-space: pre-wrap; }
+    #analyze-text { font-size: 14px; line-height: 1.75; }
     .toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); z-index: 9999; background: var(--surface3); color: var(--text); border: 1px solid var(--border2); padding: 10px 18px; border-radius: 10px; font-size: 13px; box-shadow: 0 8px 32px rgba(0,0,0,.5); display: none; white-space: nowrap; }
 
-    ::-webkit-scrollbar { width: 3px; height: 3px; }
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 99px; }
   </style>
 </head>
@@ -216,9 +250,10 @@
     <div class="nav-section">
       <div class="nav-label">Configuration</div>
       <button class="nav-item" onclick="showPanel('models',this)"><span class="nav-icon">🤖</span>Modèles IA</button>
+      <a href="/docs" class="nav-item" target="_blank"><span class="nav-icon">📄</span>API & Docs</a>
     </div>
     <div class="sidebar-footer">
-      <div class="info-box"><strong>✅ 100% Gratuit</strong><br>Via Pollinations.ai — aucune clé API, illimité.</div>
+      <div class="info-box"><strong>✅ Sécurité & Confidentialité</strong><br>Vos conversations sont privées et isolées par votre identifiant unique.</div>
     </div>
   </aside>
 
@@ -235,17 +270,7 @@
       <div id="messages-area">
         <div class="msg ai">
           <div class="avatar">🤖</div>
-          <div class="bubble">👋 Bonjour ! Je suis <strong>AIVERSE</strong>.
-
-Je peux vous aider à :
-• 💬 Répondre à toutes vos questions
-• 📎 Analyser vos images directement ici
-• 🎨 Générer des images (menu gauche)
-• ✏️ Modifier des images (menu gauche)
-
-<strong>Joignez des images avec le bouton 📎 !</strong>
-
-100% gratuit — sans clé API requise</div>
+          <div class="bubble" id="welcome-msg"></div>
         </div>
       </div>
       <div class="chat-bar">
@@ -330,7 +355,7 @@ Je peux vous aider à :
           <div id="analyze-result" style="display:none;margin-top:13px">
             <div class="analyze-result-box">
               <div class="analyze-result-title">🤖 Analyse IA</div>
-              <p id="analyze-text"></p>
+              <div id="analyze-text"></div>
             </div>
           </div>
         </div>
@@ -342,7 +367,7 @@ Je peux vous aider à :
       <div class="panel-content">
         <div class="panel-card">
           <h3>✏️ Édition d'Image par IA</h3>
-          <p style="font-size:13px;color:var(--text2);margin-bottom:13px">Téléchargez une image, décrivez la modification souhaitée. L'IA analyse votre image puis génère une nouvelle version modifiée.</p>
+          <p style="font-size:13px;color:var(--text2);margin-bottom:13px">L'IA analyse votre image puis génère une nouvelle version modifiée selon vos instructions.</p>
           <label class="upload-zone" for="edit-file" style="margin-bottom:13px">
             <input type="file" id="edit-file" accept="image/*" onchange="previewEdit(event)">
             <div style="font-size:28px;margin-bottom:6px">🖼️</div>
@@ -384,7 +409,6 @@ Je peux vous aider à :
           <h3>🎨 Modèles d'Image</h3>
           <div class="model-grid" id="image-model-grid"></div>
         </div>
-        <div class="info-box"><strong>✅ Comment ça marche ?</strong><br>Tous les modèles fonctionnent via <strong>Pollinations.ai</strong> — gratuit, sans compte, sans clé API. Illimité.</div>
       </div>
     </div>
 
@@ -395,7 +419,23 @@ Je peux vous aider à :
 <script>
 const API = window.location.origin + '/api';
 let convId = null;
+let userId = localStorage.getItem('aiverse_user_id');
+if (!userId) {
+  userId = 'u_' + Math.random().toString(36).substr(2, 9);
+  localStorage.setItem('aiverse_user_id', userId);
+}
+
 let attachedImages = [];
+
+// Configure Marked
+marked.setOptions({
+  highlight: function(code, lang) {
+    const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+    return hljs.highlight(code, { language }).value;
+  },
+  breaks: true,
+  gfm: true
+});
 
 const TEXT_MODELS = [
   {id:'mistral',name:'Mistral Large',provider:'Mistral AI'},
@@ -416,7 +456,22 @@ const IMAGE_MODELS = [
 ];
 let selText = 'mistral', selImg = 'flux';
 
-window.onload = () => renderGrids();
+const welcomeMarkdown = `Nous sommes le **4 avril 2026**.
+
+👋 Bonjour ! Je suis **AIVERSE**, votre assistant IA ultra-rapide.
+
+### Ce que je peux faire :
+*   **Répondre** à vos questions complexes
+*   **Analyser** vos images avec précision
+*   **Générer** des visuels magnifiques
+*   **Coder** et créer des tableaux
+
+> *Note : Chaque session est privée. Votre ID est : \`${userId}\`*`;
+
+window.onload = () => {
+  renderGrids();
+  document.getElementById('welcome-msg').innerHTML = marked.parse(welcomeMarkdown);
+};
 
 function openSidebar() { document.getElementById('sidebar').classList.add('open'); document.getElementById('overlay').classList.add('show'); }
 function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('show'); }
@@ -479,41 +534,59 @@ async function sendChat() {
   const model = document.getElementById('chat-model-select').value;
   const imgsCopy = [...attachedImages];
 
-  // Display user message with images
+  // User UI
   let userHtml = imgsCopy.map(i=>`<img class="chat-img-preview" src="${i.dataUrl}">`).join('');
-  if(msg) userHtml += escapeHtml(msg);
+  if(msg) userHtml += `<div>${escapeHtml(msg)}</div>`;
   appendMsgHtml('user', userHtml);
 
   input.value=''; input.style.height='auto';
   attachedImages=[]; renderChips();
 
   const aiDiv = appendMsg('ai','<div class="typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>');
+  const bubble = aiDiv.querySelector('.bubble');
   document.getElementById('send-btn').disabled=true;
 
   try {
     if(imgsCopy.length > 0) {
-      // Analyze each image via backend
       let results = [];
       for(const imgObj of imgsCopy) {
         const fd = new FormData();
         fd.append('image', imgObj.file);
-        fd.append('question', msg || 'Décris cette image en détail en français.');
+        fd.append('question', msg || 'Décris cette image.');
         const r = await fetch(`${API}/analyze-image`,{method:'POST',body:fd});
-        if(r.ok){ const d=await r.json(); results.push(d.description||'Analyse indisponible.'); }
-        else results.push('Erreur d\'analyse image.');
+        if(r.ok){ const d=await r.json(); results.push(d.description); }
+        else results.push('Erreur d\'analyse.');
       }
-      const response = results.length===1 ? results[0] : results.map((t,i)=>`📸 Image ${i+1}:\n${t}`).join('\n\n');
-      setBubble(aiDiv, response);
+      const finalResponse = results.join('\n\n');
+      bubble.innerHTML = marked.parse(finalResponse);
     } else {
-      const r = await fetch(`${API}/chat`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,conversationId:convId,model})});
-      if(!r.ok){const e=await r.json().catch(()=>({error:'Erreur réseau'}));throw new Error(e.error||`Erreur ${r.status}`);}
+      const r = await fetch(`${API}/chat`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,conversationId:convId,userId:userId,model})});
+      if(!r.ok) throw new Error(`Erreur ${r.status}`);
       const data = await r.json();
-      if(data.error) throw new Error(data.error);
       convId = data.conversationId;
-      setBubble(aiDiv, data.message);
+      bubble.innerHTML = marked.parse(data.message);
     }
-  } catch(e){ setBubble(aiDiv,'❌ '+e.message); }
-  finally { document.getElementById('send-btn').disabled=false; }
+    addCopyButtons(bubble);
+  } catch(e){ bubble.innerHTML = `❌ ${e.message}`; }
+  finally {
+    document.getElementById('send-btn').disabled=false;
+    document.getElementById('messages-area').scrollTop = document.getElementById('messages-area').scrollHeight;
+  }
+}
+
+function addCopyButtons(container) {
+  container.querySelectorAll('pre').forEach(pre => {
+    if (pre.querySelector('.copy-btn')) return;
+    const btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = 'Copier';
+    btn.onclick = () => {
+      navigator.clipboard.writeText(pre.querySelector('code').innerText);
+      btn.textContent = 'Copié !';
+      setTimeout(() => btn.textContent = 'Copier', 2000);
+    };
+    pre.appendChild(btn);
+  });
 }
 
 function escapeHtml(t){ const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
@@ -525,8 +598,13 @@ function appendMsgHtml(role,html){
   div.innerHTML=`<div class="avatar">${role==='user'?'👤':'🤖'}</div><div class="bubble">${html}</div>`;
   area.appendChild(div); area.scrollTop=area.scrollHeight; return div;
 }
-function setBubble(div,text){ div.querySelector('.bubble').textContent=text; document.getElementById('messages-area').scrollTop=99999; }
-function newChat(){ document.getElementById('messages-area').innerHTML=''; convId=null; attachedImages=[]; renderChips(); appendMsg('ai','Nouvelle conversation. Comment puis-je vous aider ?'); }
+
+function newChat(){
+  document.getElementById('messages-area').innerHTML='';
+  convId=null; attachedImages=[]; renderChips();
+  const aiDiv = appendMsg('ai','');
+  aiDiv.querySelector('.bubble').innerHTML = marked.parse(welcomeMarkdown);
+}
 
 async function generateImage(){
   const prompt=document.getElementById('gen-prompt').value.trim();
@@ -552,15 +630,15 @@ async function analyzeImage(e){
   const reader=new FileReader();
   reader.onload=ev=>{document.getElementById('analyze-img').src=ev.target.result;document.getElementById('analyze-prev-wrap').style.display='block';};
   reader.readAsDataURL(file);
-  const q=document.getElementById('analyze-q').value.trim()||'Décris cette image en détail en français.';
+  const q=document.getElementById('analyze-q').value.trim()||'Décris cette image.';
   document.getElementById('analyze-result').style.display='block';
-  document.getElementById('analyze-text').textContent='⏳ Analyse en cours...';
+  document.getElementById('analyze-text').innerHTML='⏳ Analyse en cours...';
   const fd=new FormData();fd.append('image',file);fd.append('question',q);
   try{
     const r=await fetch(`${API}/analyze-image`,{method:'POST',body:fd});
     if(!r.ok)throw new Error(`Erreur ${r.status}`);
-    const data=await r.json();if(data.error)throw new Error(data.error);
-    document.getElementById('analyze-text').textContent=data.description;
+    const data=await r.json();
+    document.getElementById('analyze-text').innerHTML = marked.parse(data.description);
   }catch(e){document.getElementById('analyze-text').textContent='❌ '+e.message;}
 }
 

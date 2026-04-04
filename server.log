@@ -1,0 +1,71 @@
+Sat, 04 Apr 2026 13:58:03 GMT express:application set "x-powered-by" to true
+Sat, 04 Apr 2026 13:58:03 GMT express:application set "etag" to 'weak'
+Sat, 04 Apr 2026 13:58:03 GMT express:application set "etag fn" to [Function: generateETag]
+Sat, 04 Apr 2026 13:58:03 GMT express:application set "env" to 'production'
+Sat, 04 Apr 2026 13:58:03 GMT express:application set "query parser" to 'extended'
+Sat, 04 Apr 2026 13:58:03 GMT express:application set "query parser fn" to [Function: parseExtendedQueryString]
+Sat, 04 Apr 2026 13:58:03 GMT express:application set "subdomain offset" to 2
+Sat, 04 Apr 2026 13:58:03 GMT express:application set "trust proxy" to false
+Sat, 04 Apr 2026 13:58:03 GMT express:application set "trust proxy fn" to [Function: trustNone]
+Sat, 04 Apr 2026 13:58:03 GMT express:application booting in production mode
+Sat, 04 Apr 2026 13:58:03 GMT express:application set "view" to [Function: View]
+Sat, 04 Apr 2026 13:58:03 GMT express:application set "views" to '/app/views'
+Sat, 04 Apr 2026 13:58:03 GMT express:application set "jsonp callback name" to 'callback'
+Sat, 04 Apr 2026 13:58:03 GMT express:application set "view cache" to true
+Sat, 04 Apr 2026 13:58:03 GMT express:router use '/' query
+Sat, 04 Apr 2026 13:58:03 GMT express:router:layer new '/'
+Sat, 04 Apr 2026 13:58:03 GMT express:router use '/' expressInit
+Sat, 04 Apr 2026 13:58:03 GMT express:router:layer new '/'
+Sat, 04 Apr 2026 13:58:03 GMT express:router use '/' corsMiddleware
+Sat, 04 Apr 2026 13:58:03 GMT express:router:layer new '/'
+Sat, 04 Apr 2026 13:58:03 GMT express:router use '/' jsonParser
+Sat, 04 Apr 2026 13:58:03 GMT express:router:layer new '/'
+Sat, 04 Apr 2026 13:58:03 GMT express:router use '/' urlencodedParser
+Sat, 04 Apr 2026 13:58:03 GMT express:router:layer new '/'
+Sat, 04 Apr 2026 13:58:03 GMT express:router use '/' serveStatic
+Sat, 04 Apr 2026 13:58:03 GMT express:router:layer new '/'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:route new '/'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:layer new '/'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:route get '/'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:layer new '/'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:route new '/docs'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:layer new '/docs'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:route get '/docs'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:layer new '/'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:route new '/api/health'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:layer new '/api/health'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:route get '/api/health'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:layer new '/'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:route new '/api/models'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:layer new '/api/models'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:route get '/api/models'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:layer new '/'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:route new '/api/chat'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:layer new '/api/chat'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:route post '/api/chat'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:layer new '/'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:route new '/api/generate-image'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:layer new '/api/generate-image'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:route post '/api/generate-image'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:layer new '/'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:route new '/api/analyze-image'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:layer new '/api/analyze-image'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:route post '/api/analyze-image'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:layer new '/'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:route post '/api/analyze-image'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:layer new '/'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:route new '/api/edit-image'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:layer new '/api/edit-image'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:route post '/api/edit-image'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:layer new '/'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:route post '/api/edit-image'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:layer new '/'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:route new '/api/conversation/:userId/:id'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:layer new '/api/conversation/:userId/:id'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:route get '/api/conversation/:userId/:id'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:layer new '/'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:route new '/api/conversation/:userId/:id'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:layer new '/api/conversation/:userId/:id'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:route delete '/api/conversation/:userId/:id'
+Sat, 04 Apr 2026 13:58:03 GMT express:router:layer new '/'
+🤖 AIVERSE running on http://localhost:5000

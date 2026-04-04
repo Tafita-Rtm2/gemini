@@ -1,628 +1,86 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AIVERSE — Documentation</title>
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AIVERSE — API & Documentation</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-
     :root {
-      --primary: #6366f1;
-      --primary-dark: #4f46e5;
-      --bg: #0f0f1a;
-      --surface: rgba(255,255,255,.04);
-      --surface2: rgba(255,255,255,.08);
-      --border: rgba(255,255,255,.1);
+      --bg: #0a0b10;
+      --surface: #111218;
+      --border: #ffffff12;
+      --primary: #7c6fff;
       --text: #f1f5f9;
-      --text-sub: #94a3b8;
-      --accent: #10b981;
-      --yellow: #f59e0b;
+      --text2: #94a3b8;
     }
-
-    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
-
-    /* ====== NAV ====== */
-    nav {
-      display:flex; align-items:center; justify-content:space-between;
-      padding:16px 32px; border-bottom:1px solid var(--border);
-      background:rgba(15,15,26,.8); backdrop-filter:blur(12px);
-      position:sticky; top:0; z-index:100;
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Sora', sans-serif;
+      line-height: 1.6;
+      padding: 40px 20px;
+      max-width: 800px;
+      margin: 0 auto;
     }
-    .nav-logo { display:flex; align-items:center; gap:10px; font-weight:700; font-size:18px; }
-    .nav-badge {
-      width:32px; height:32px; background:linear-gradient(135deg,var(--primary),var(--primary-dark));
-      border-radius:8px; display:flex; align-items:center; justify-content:center;
-      font-weight:800; font-size:14px;
+    h1, h2 { color: white; }
+    h1 { font-size: 2.5rem; margin-bottom: 10px; }
+    .badge { background: var(--primary); padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; }
+    pre {
+      background: #0d0d0d;
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      color: #34d399;
     }
-    .nav-links { display:flex; gap:8px; }
-    .nav-link {
-      padding:7px 14px; border-radius:8px; font-size:13px; font-weight:500;
-      color:var(--text-sub); text-decoration:none; transition:.15s;
-    }
-    .nav-link:hover { background:var(--surface2); color:var(--text); }
-    .back-btn {
-      background:var(--primary); color:white; padding:7px 16px; border-radius:8px;
-      font-size:13px; font-weight:600; text-decoration:none; display:flex;
-      align-items:center; gap:6px; transition:.15s;
-    }
-    .back-btn:hover { opacity:.9; }
-
-    /* ====== HERO SLIDESHOW ====== */
-    .slideshow-section {
-      padding:64px 32px 32px;
-      background:radial-gradient(ellipse at 50% 0%, rgba(99,102,241,.2) 0%, transparent 70%);
-    }
-
-    .section-label {
-      display:inline-flex; align-items:center; gap:6px;
-      background:rgba(99,102,241,.15); border:1px solid rgba(99,102,241,.3);
-      color:#a5b4fc; font-size:11px; font-weight:700; text-transform:uppercase;
-      letter-spacing:.08em; padding:4px 12px; border-radius:99px; margin-bottom:16px;
-    }
-
-    .section-title { font-size:36px; font-weight:800; line-height:1.2; margin-bottom:8px; }
-    .section-sub { font-size:16px; color:var(--text-sub); margin-bottom:40px; }
-
-    .slideshow {
-      position:relative; overflow:hidden; border-radius:20px;
-      border:1px solid var(--border); background:var(--surface);
-      box-shadow:0 32px 80px rgba(0,0,0,.5);
-    }
-
-    .slides { display:flex; transition:transform .5s cubic-bezier(.25,.46,.45,.94); }
-
-    .slide {
-      min-width:100%; padding:48px 56px;
-      display:flex; flex-direction:column; align-items:flex-start; gap:20px;
-    }
-
-    .slide-number {
-      font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.1em;
-      color:var(--primary); background:rgba(99,102,241,.15); padding:4px 10px; border-radius:99px;
-    }
-    .slide-title { font-size:28px; font-weight:800; line-height:1.2; }
-    .slide-body { font-size:15px; line-height:1.75; color:var(--text-sub); max-width:640px; }
-    .slide-body strong { color:var(--text); }
-
-    .code-block {
-      background:#0d0d17; border:1px solid var(--border); border-radius:12px;
-      padding:20px 24px; font-family:'Courier New',monospace; font-size:13px;
-      line-height:1.65; color:#a5f3fc; overflow-x:auto; width:100%; max-width:680px;
-    }
-    .code-block .kw { color:#818cf8; }
-    .code-block .str { color:#86efac; }
-    .code-block .cm { color:#475569; }
-    .code-block .fn { color:#f9a8d4; }
-
-    .feature-list { display:flex; flex-direction:column; gap:10px; }
-    .feature-item {
-      display:flex; align-items:flex-start; gap:12px;
-      background:var(--surface2); border:1px solid var(--border);
-      border-radius:10px; padding:14px 16px;
-    }
-    .feature-icon { color:var(--accent); flex-shrink:0; margin-top:2px; }
-    .feature-text { font-size:14px; line-height:1.5; color:var(--text-sub); }
-    .feature-text strong { color:var(--text); display:block; margin-bottom:2px; }
-
-    .model-pills { display:flex; flex-wrap:wrap; gap:8px; }
-    .pill {
-      background:var(--surface2); border:1px solid var(--border);
-      padding:6px 14px; border-radius:99px; font-size:12px; font-weight:500;
-      color:var(--text);
-    }
-    .pill.green { background:rgba(16,185,129,.15); border-color:rgba(16,185,129,.3); color:#6ee7b7; }
-
-    /* slide controls */
-    .slide-controls {
-      display:flex; align-items:center; justify-content:space-between;
-      padding:20px 32px; border-top:1px solid var(--border);
-    }
-    .slide-dots { display:flex; gap:8px; }
-    .dot-btn {
-      width:8px; height:8px; border-radius:50%; background:var(--surface2);
-      border:none; cursor:pointer; transition:.2s;
-    }
-    .dot-btn.active { background:var(--primary); width:24px; border-radius:4px; }
-    .arrow-btn {
-      background:var(--surface2); border:1px solid var(--border);
-      color:var(--text); border-radius:8px; padding:8px 16px; cursor:pointer;
-      font-size:13px; font-weight:500; transition:.15s; display:flex; align-items:center; gap:6px;
-    }
-    .arrow-btn:hover { background:var(--surface); border-color:var(--primary); }
-    .arrow-btn:disabled { opacity:.3; cursor:not-allowed; }
-
-    /* ====== DOC SECTIONS ====== */
-    .docs-body { max-width:900px; margin:0 auto; padding:64px 32px; }
-    .doc-section { margin-bottom:64px; }
-    .doc-section-title {
-      font-size:22px; font-weight:700; margin-bottom:24px;
-      display:flex; align-items:center; gap:10px;
-    }
-    .endpoint-card {
-      background:var(--surface); border:1px solid var(--border);
-      border-radius:12px; margin-bottom:16px; overflow:hidden;
-    }
-    .endpoint-header {
-      display:flex; align-items:center; gap:12px; padding:16px 20px;
-      border-bottom:1px solid var(--border);
-    }
-    .method {
-      font-size:11px; font-weight:800; padding:3px 8px; border-radius:6px;
-      font-family:monospace;
-    }
-    .method.post { background:rgba(99,102,241,.2); color:#a5b4fc; }
-    .method.get  { background:rgba(16,185,129,.2); color:#6ee7b7; }
-    .method.del  { background:rgba(239,68,68,.2);  color:#fca5a5; }
-    .endpoint-path { font-family:monospace; font-size:14px; font-weight:600; }
-    .endpoint-desc { color:var(--text-sub); font-size:13px; margin-left:auto; }
-    .endpoint-body { padding:16px 20px; }
-    .param-table { width:100%; border-collapse:collapse; font-size:13px; }
-    .param-table th { text-align:left; color:var(--text-sub); font-size:11px; text-transform:uppercase; letter-spacing:.05em; padding:6px 8px; border-bottom:1px solid var(--border); }
-    .param-table td { padding:8px; vertical-align:top; color:var(--text-sub); }
-    .param-table td:first-child { font-family:monospace; color:var(--text); font-size:12px; }
-    .param-badge { font-size:10px; font-weight:700; padding:2px 6px; border-radius:4px; background:rgba(239,68,68,.2); color:#fca5a5; }
-    .param-badge.opt { background:rgba(99,102,241,.2); color:#a5b4fc; }
-
-    /* ====== EMBED SECTION ====== */
-    .embed-box {
-      background:#0d0d17; border:1px solid var(--border); border-radius:12px;
-      padding:24px; font-family:monospace; font-size:13px; line-height:1.7;
-      color:#a5f3fc; overflow-x:auto;
-    }
-    .embed-box .kw { color:#818cf8; }
-    .embed-box .str { color:#86efac; }
-    .embed-box .cm { color:#475569; }
-
-    /* ====== FOOTER ====== */
-    footer {
-      text-align:center; padding:32px; border-top:1px solid var(--border);
-      color:var(--text-sub); font-size:13px;
-    }
-
-    ::-webkit-scrollbar { width:6px; }
-    ::-webkit-scrollbar-thumb { background:#334155; border-radius:99px; }
+    code { font-family: 'JetBrains Mono', monospace; background: var(--surface); padding: 2px 5px; border-radius: 4px; }
+    .endpoint { margin: 30px 0; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
+    .method { font-weight: bold; color: var(--primary); margin-right: 10px; }
+    .url { color: var(--text2); }
   </style>
 </head>
 <body>
+  <h1>AIVERSE API Documentation <span class="badge">FREE</span></h1>
+  <p>Utilisez nos endpoints pour intégrer l'intelligence artificielle dans vos propres projets gratuitement.</p>
 
-<!-- NAV -->
-<nav>
-  <div class="nav-logo">
-    <div class="nav-badge">AI</div>
-    AIVERSE Docs
-  </div>
-  <div class="nav-links">
-    <a href="#guide" class="nav-link">Guide</a>
-    <a href="#api" class="nav-link">API</a>
-    <a href="#embed" class="nav-link">Intégration</a>
-    <a href="#models" class="nav-link">Modèles</a>
-  </div>
-  <a href="/" class="back-btn">
-    <i data-lucide="arrow-left" style="width:14px;height:14px"></i>
-    Retour à l'app
-  </a>
-</nav>
-
-<!-- SLIDESHOW SECTION -->
-<div class="slideshow-section" id="guide">
-  <div class="section-label">
-    <i data-lucide="book-open" style="width:12px;height:12px"></i>
-    Guide Démarrage Rapide
-  </div>
-  <h1 class="section-title">AIVERSE en 5 minutes</h1>
-  <p class="section-sub">Tout ce qu'il faut savoir pour utiliser et intégrer AIVERSE</p>
-
-  <div class="slideshow">
-    <div class="slides" id="slides-track">
-
-      <!-- Slide 1 -->
-      <div class="slide">
-        <span class="slide-number">1 / 6 — Introduction</span>
-        <h2 class="slide-title">Qu'est-ce que AIVERSE ?</h2>
-        <p class="slide-body">
-          AIVERSE est un assistant IA multimodal <strong>entièrement gratuit</strong> qui ne nécessite
-          <strong>aucune clé API</strong>. Il permet de chatter avec de nombreux modèles IA,
-          de générer des images, d'analyser des photos et de les modifier — le tout depuis
-          votre navigateur ou intégré dans votre propre site web.
-        </p>
-        <div class="feature-list">
-          <div class="feature-item">
-            <i data-lucide="zap" class="feature-icon" style="width:16px;height:16px"></i>
-            <div class="feature-text"><strong>Aucune inscription requise</strong>Ouvrez l'app et commencez immédiatement.</div>
-          </div>
-          <div class="feature-item">
-            <i data-lucide="shield-check" class="feature-icon" style="width:16px;height:16px"></i>
-            <div class="feature-text"><strong>100% gratuit via Pollinations.ai</strong>Pas de limite d'utilisation, pas de carte bancaire.</div>
-          </div>
-          <div class="feature-item">
-            <i data-lucide="code" class="feature-icon" style="width:16px;height:16px"></i>
-            <div class="feature_text"><strong>API REST intégrée</strong>Intégrez AIVERSE dans n'importe quel site web ou application.</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Slide 2 -->
-      <div class="slide">
-        <span class="slide-number">2 / 6 — Installation</span>
-        <h2 class="slide-title">Démarrer en 3 commandes</h2>
-        <p class="slide-body">Clonez ou téléchargez le projet, installez les dépendances et lancez :</p>
-        <div class="code-block">
-<span class="cm"># 1. Téléchargez le projet</span>
-git clone https://github.com/votre-repo/aiverse.git
-cd aiverse
-
-<span class="cm"># 2. Installez les dépendances</span>
-npm install
-
-<span class="cm"># 3. Démarrez le serveur</span>
-npm start
-
-<span class="cm"># L'app est accessible sur :</span>
-<span class="str">http://localhost:5000</span>
-        </div>
-        <div class="feature-item">
-          <i data-lucide="info" class="feature-icon" style="width:16px;height:16px"></i>
-          <div class="feature-text"><strong>Node.js 18+ requis.</strong>Aucun fichier .env n'est nécessaire — l'app fonctionne sans configuration.</div>
-        </div>
-      </div>
-
-      <!-- Slide 3 -->
-      <div class="slide">
-        <span class="slide-number">3 / 6 — Chat IA</span>
-        <h2 class="slide-title">Utiliser le Chat</h2>
-        <p class="slide-body">
-          Sélectionnez un modèle dans le menu déroulant, tapez votre message et appuyez sur
-          <strong>Entrée</strong>. L'historique de conversation est conservé en mémoire.
-          Cliquez sur <strong>"Nouveau chat"</strong> pour recommencer.
-        </p>
-        <div class="model-pills">
-          <span class="pill green">Mistral Large</span>
-          <span class="pill green">GPT-4o</span>
-          <span class="pill green">Gemini 2.0</span>
-          <span class="pill green">Claude</span>
-          <span class="pill green">Llama 3.3 70B</span>
-          <span class="pill green">DeepSeek-V3</span>
-          <span class="pill green">DeepSeek-R1</span>
-          <span class="pill green">Qwen-Max</span>
-          <span class="pill green">Phi-4</span>
-          <span class="pill green">SearchGPT 🌐</span>
-        </div>
-        <p class="slide-body">Tous les modèles ci-dessus sont <strong>gratuits et sans clé API</strong>.</p>
-      </div>
-
-      <!-- Slide 4 -->
-      <div class="slide">
-        <span class="slide-number">4 / 6 — Génération d'images</span>
-        <h2 class="slide-title">Créer des Images par IA</h2>
-        <p class="slide-body">
-          Allez dans <strong>Générer Image</strong>, décrivez l'image souhaitée en français ou en
-          anglais, sélectionnez le modèle et la taille, puis cliquez sur
-          <strong>"Générer l'Image"</strong>. Vous pouvez télécharger le résultat.
-        </p>
-        <div class="code-block">
-<span class="cm"># Exemples de prompts efficaces :</span>
-<span class="str">"Un chat astronaute sur la lune, style photoréaliste"</span>
-<span class="str">"Paysage de montagne au coucher de soleil, peinture à l'huile"</span>
-<span class="str">"Logo minimaliste pour une startup tech, fond blanc"</span>
-<span class="str">"Portrait d'une femme afro-futuriste, cyberpunk, 8K"</span>
-        </div>
-      </div>
-
-      <!-- Slide 5 -->
-      <div class="slide">
-        <span class="slide-number">5 / 6 — Analyse d'images</span>
-        <h2 class="slide-title">Analyser & Éditer des Photos</h2>
-        <p class="slide-body">
-          <strong>Analyser :</strong> Importez une image, posez une question optionnelle, et l'IA Vision décrit
-          ce qu'elle voit en français.<br><br>
-          <strong>Éditer :</strong> Importez une image, décrivez la modification voulue. L'IA analyse d'abord votre image,
-          puis génère une nouvelle version modifiée selon vos instructions.
-        </p>
-        <div class="feature-list">
-          <div class="feature-item">
-            <i data-lucide="eye" class="feature-icon" style="width:16px;height:16px"></i>
-            <div class="feature-text"><strong>Analyse Vision</strong>Powered by GPT-4 Vision via Pollinations — gratuit.</div>
-          </div>
-          <div class="feature-item">
-            <i data-lucide="wand-2" class="feature-icon" style="width:16px;height:16px"></i>
-            <div class="feature-text"><strong>Édition par description</strong>L'IA comprend votre image et génère une version modifiée.</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Slide 6 -->
-      <div class="slide">
-        <span class="slide-number">6 / 6 — Intégration</span>
-        <h2 class="slide-title">Intégrer dans votre Site</h2>
-        <p class="slide-body">
-          AIVERSE expose une API REST complète. Intégrez le chat IA dans n'importe quel site
-          ou application en quelques lignes de JavaScript, sans clé API.
-        </p>
-        <div class="code-block">
-<span class="cm">// Chat depuis n'importe quel site web</span>
-<span class="kw">const</span> response = <span class="kw">await</span> fetch(<span class="str">'http://votre-serveur/api/chat'</span>, {
-  method: <span class="str">'POST'</span>,
-  headers: { <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span> },
-  body: JSON.stringify({
-    message: <span class="str">'Bonjour, comment vas-tu ?'</span>,
-    model: <span class="str">'mistral'</span>
-  })
-});
-<span class="kw">const</span> data = <span class="kw">await</span> response.json();
-console.log(data.message); <span class="cm">// Réponse de l'IA</span>
-        </div>
-      </div>
-
-    </div><!-- /slides -->
-
-    <div class="slide-controls">
-      <button class="arrow-btn" id="prev-btn" onclick="prevSlide()" disabled>
-        <i data-lucide="arrow-left" style="width:14px;height:14px"></i> Précédent
-      </button>
-      <div class="slide-dots" id="slide-dots"></div>
-      <button class="arrow-btn" id="next-btn" onclick="nextSlide()">
-        Suivant <i data-lucide="arrow-right" style="width:14px;height:14px"></i>
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- API DOCS -->
-<div class="docs-body">
-
-  <div class="doc-section" id="api">
-    <h2 class="doc-section-title">
-      <i data-lucide="terminal" style="width:20px;height:20px;color:#6366f1"></i>
-      Référence API
-    </h2>
-
-    <!-- Chat -->
-    <div class="endpoint-card">
-      <div class="endpoint-header">
-        <span class="method post">POST</span>
-        <span class="endpoint-path">/api/chat</span>
-        <span class="endpoint-desc">Chat avec l'IA</span>
-      </div>
-      <div class="endpoint-body">
-        <table class="param-table">
-          <tr><th>Paramètre</th><th>Type</th><th>Requis</th><th>Description</th></tr>
-          <tr><td>message</td><td>string</td><td><span class="param-badge">requis</span></td><td>Message de l'utilisateur</td></tr>
-          <tr><td>model</td><td>string</td><td><span class="param-badge opt">optionnel</span></td><td>ID du modèle (défaut: mistral)</td></tr>
-          <tr><td>conversationId</td><td>string</td><td><span class="param-badge opt">optionnel</span></td><td>ID de conversation pour historique</td></tr>
-          <tr><td>systemPrompt</td><td>string</td><td><span class="param-badge opt">optionnel</span></td><td>Instruction système personnalisée</td></tr>
-        </table>
-      </div>
-    </div>
-
-    <!-- Generate Image -->
-    <div class="endpoint-card">
-      <div class="endpoint-header">
-        <span class="method post">POST</span>
-        <span class="endpoint-path">/api/generate-image</span>
-        <span class="endpoint-desc">Génère une image (retourne image/jpeg)</span>
-      </div>
-      <div class="endpoint-body">
-        <table class="param-table">
-          <tr><th>Paramètre</th><th>Type</th><th>Requis</th><th>Description</th></tr>
-          <tr><td>prompt</td><td>string</td><td><span class="param-badge">requis</span></td><td>Description de l'image</td></tr>
-          <tr><td>model</td><td>string</td><td><span class="param-badge opt">optionnel</span></td><td>flux | flux-pro | turbo</td></tr>
-          <tr><td>width</td><td>number</td><td><span class="param-badge opt">optionnel</span></td><td>Largeur en px (défaut: 1024)</td></tr>
-          <tr><td>height</td><td>number</td><td><span class="param-badge opt">optionnel</span></td><td>Hauteur en px (défaut: 1024)</td></tr>
-        </table>
-      </div>
-    </div>
-
-    <!-- Analyze -->
-    <div class="endpoint-card">
-      <div class="endpoint-header">
-        <span class="method post">POST</span>
-        <span class="endpoint-path">/api/analyze-image</span>
-        <span class="endpoint-desc">Analyse une image par Vision IA (multipart/form-data)</span>
-      </div>
-      <div class="endpoint-body">
-        <table class="param-table">
-          <tr><th>Paramètre</th><th>Type</th><th>Requis</th><th>Description</th></tr>
-          <tr><td>image</td><td>file</td><td><span class="param-badge">requis</span></td><td>Fichier image (PNG/JPG/WEBP)</td></tr>
-          <tr><td>question</td><td>string</td><td><span class="param-badge opt">optionnel</span></td><td>Question à poser sur l'image</td></tr>
-        </table>
-      </div>
-    </div>
-
-    <!-- Edit -->
-    <div class="endpoint-card">
-      <div class="endpoint-header">
-        <span class="method post">POST</span>
-        <span class="endpoint-path">/api/edit-image</span>
-        <span class="endpoint-desc">Modifie une image par IA (multipart/form-data)</span>
-      </div>
-      <div class="endpoint-body">
-        <table class="param-table">
-          <tr><th>Paramètre</th><th>Type</th><th>Requis</th><th>Description</th></tr>
-          <tr><td>image</td><td>file</td><td><span class="param-badge">requis</span></td><td>Image originale à modifier</td></tr>
-          <tr><td>prompt</td><td>string</td><td><span class="param-badge">requis</span></td><td>Instructions de modification</td></tr>
-          <tr><td>model</td><td>string</td><td><span class="param-badge opt">optionnel</span></td><td>flux | flux-pro | turbo</td></tr>
-        </table>
-      </div>
-    </div>
-
-    <!-- Health / Models / Conversation -->
-    <div class="endpoint-card">
-      <div class="endpoint-header">
-        <span class="method get">GET</span>
-        <span class="endpoint-path">/api/health</span>
-        <span class="endpoint-desc">Santé du serveur</span>
-      </div>
-    </div>
-    <div class="endpoint-card">
-      <div class="endpoint-header">
-        <span class="method get">GET</span>
-        <span class="endpoint-path">/api/models</span>
-        <span class="endpoint-desc">Liste des modèles disponibles</span>
-      </div>
-    </div>
-    <div class="endpoint-card">
-      <div class="endpoint-header">
-        <span class="method get">GET</span>
-        <span class="endpoint-path">/api/conversation/:id</span>
-        <span class="endpoint-desc">Historique d'une conversation</span>
-      </div>
-    </div>
-    <div class="endpoint-card">
-      <div class="endpoint-header">
-        <span class="method del">DELETE</span>
-        <span class="endpoint-path">/api/conversation/:id</span>
-        <span class="endpoint-desc">Supprimer une conversation</span>
-      </div>
-    </div>
+  <div class="endpoint">
+    <h2>💬 Chat & Texte</h2>
+    <p><span class="method">POST</span> <code class="url">/api/chat</code></p>
+    <pre>
+{
+  "message": "Bonjour !",
+  "model": "mistral",
+  "userId": "votre_id_unique"
+}</pre>
   </div>
 
-  <!-- EMBED SECTION -->
-  <div class="doc-section" id="embed">
-    <h2 class="doc-section-title">
-      <i data-lucide="globe" style="width:20px;height:20px;color:#10b981"></i>
-      Intégration dans votre site web
-    </h2>
-
-    <p style="color:var(--text-sub);font-size:14px;line-height:1.7;margin-bottom:24px;">
-      Intégrez AIVERSE dans n'importe quel site via <code style="background:rgba(255,255,255,.08);padding:2px 6px;border-radius:4px">iframe</code> 
-      ou directement via l'API REST avec fetch. Aucune clé API n'est requise.
-    </p>
-
-    <div style="margin-bottom:20px">
-      <div style="font-size:13px;font-weight:600;color:var(--text-sub);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">Option 1 — Intégrer via iframe</div>
-      <div class="embed-box">
-&lt;<span class="kw">iframe</span>
-  src=<span class="str">"http://votre-serveur:5000"</span>
-  width=<span class="str">"100%"</span>
-  height=<span class="str">"600"</span>
-  frameborder=<span class="str">"0"</span>
-  style=<span class="str">"border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,.1);"</span>
-&gt;&lt;/<span class="kw">iframe</span>&gt;
-      </div>
-    </div>
-
-    <div style="margin-bottom:20px">
-      <div style="font-size:13px;font-weight:600;color:var(--text-sub);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">Option 2 — API Fetch (JavaScript)</div>
-      <div class="embed-box">
-<span class="cm">// Chat IA — sans clé API</span>
-<span class="kw">async function</span> <span class="fn">chatWithAI</span>(message, model = <span class="str">'mistral'</span>) {
-  <span class="kw">const</span> res = <span class="kw">await</span> fetch(<span class="str">'http://votre-serveur/api/chat'</span>, {
-    method: <span class="str">'POST'</span>,
-    headers: { <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span> },
-    body: JSON.stringify({ message, model })
-  });
-  <span class="kw">const</span> data = <span class="kw">await</span> res.json();
-  <span class="kw">return</span> data.message;
-}
-
-<span class="cm">// Génération d'image</span>
-<span class="kw">async function</span> <span class="fn">generateImage</span>(prompt) {
-  <span class="kw">const</span> res = <span class="kw">await</span> fetch(<span class="str">'http://votre-serveur/api/generate-image'</span>, {
-    method: <span class="str">'POST'</span>,
-    headers: { <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span> },
-    body: JSON.stringify({ prompt, model: <span class="str">'flux'</span> })
-  });
-  <span class="kw">const</span> blob = <span class="kw">await</span> res.blob();
-  <span class="kw">return</span> URL.createObjectURL(blob); <span class="cm">// URL de l'image</span>
-}
-      </div>
-    </div>
-
-    <div>
-      <div style="font-size:13px;font-weight:600;color:var(--text-sub);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">Option 3 — Deploy sur Render/Railway (CORS déjà activé)</div>
-      <div class="embed-box">
-<span class="cm"># Sur Render.com — déploiement gratuit</span>
-Build Command:  <span class="str">npm install</span>
-Start Command:  <span class="str">npm start</span>
-Environment:    Node
-
-<span class="cm"># L'API sera accessible depuis :</span>
-<span class="str">https://votre-app.onrender.com/api/chat</span>
-      </div>
-    </div>
+  <div class="endpoint">
+    <h2>🎨 Génération d'Image</h2>
+    <p><span class="method">POST</span> <code class="url">/api/generate-image</code></p>
+    <pre>
+{
+  "prompt": "Un chat astronaute",
+  "width": 1024,
+  "height": 1024,
+  "model": "flux"
+}</pre>
   </div>
 
-  <!-- MODELS SECTION -->
-  <div class="doc-section" id="models">
-    <h2 class="doc-section-title">
-      <i data-lucide="cpu" style="width:20px;height:20px;color:#f59e0b"></i>
-      Modèles disponibles
-    </h2>
-    <div style="overflow-x:auto">
-      <table class="param-table" style="margin-bottom:24px">
-        <tr><th>ID Modèle</th><th>Nom</th><th>Fournisseur</th><th>Type</th><th>Gratuit</th></tr>
-        <tr><td>mistral</td><td>Mistral Large</td><td>Mistral AI</td><td>Texte</td><td>✅</td></tr>
-        <tr><td>llama</td><td>Llama 3.3 70B</td><td>Meta</td><td>Texte</td><td>✅</td></tr>
-        <tr><td>deepseek</td><td>DeepSeek-V3</td><td>DeepSeek</td><td>Texte</td><td>✅</td></tr>
-        <tr><td>deepseek-r1</td><td>DeepSeek-R1</td><td>DeepSeek</td><td>Raisonnement</td><td>✅</td></tr>
-        <tr><td>gpt-4o</td><td>GPT-4o</td><td>OpenAI</td><td>Texte + Vision</td><td>✅</td></tr>
-        <tr><td>gemini</td><td>Gemini 2.0 Flash</td><td>Google</td><td>Texte</td><td>✅</td></tr>
-        <tr><td>claude</td><td>Claude Sonnet</td><td>Anthropic</td><td>Texte</td><td>✅</td></tr>
-        <tr><td>qwen</td><td>Qwen-Max</td><td>Alibaba</td><td>Texte</td><td>✅</td></tr>
-        <tr><td>phi</td><td>Phi-4</td><td>Microsoft</td><td>Texte</td><td>✅</td></tr>
-        <tr><td>search</td><td>SearchGPT</td><td>OpenAI</td><td>Web Search</td><td>✅</td></tr>
-        <tr><td>flux</td><td>Flux.1 Schnell</td><td>Black Forest Labs</td><td>Image</td><td>✅</td></tr>
-        <tr><td>flux-pro</td><td>Flux.1 Pro</td><td>Black Forest Labs</td><td>Image HD</td><td>✅</td></tr>
-        <tr><td>turbo</td><td>SDXL Turbo</td><td>Stability AI</td><td>Image rapide</td><td>✅</td></tr>
-      </table>
-    </div>
-    <div style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:12px;padding:20px;color:#6ee7b7;font-size:14px;line-height:1.7">
-      <strong>🌐 Propulsé par Pollinations.ai</strong><br>
-      Tous ces modèles sont accessibles gratuitement via <a href="https://pollinations.ai" target="_blank" style="color:#34d399">pollinations.ai</a>,
-      un hub IA open-source qui agrège les modèles les plus populaires sans nécessiter de clé API.
-      Aucune donnée personnelle n'est stockée.
-    </div>
+  <div class="endpoint">
+    <h2>👁️ Analyse Visuelle</h2>
+    <p><span class="method">POST</span> <code class="url">/api/analyze-image</code></p>
+    <p>Envoyez un <code>FormData</code> avec un champ <code>image</code> (fichier) et <code>question</code> (optionnel).</p>
   </div>
 
-</div>
+  <div class="endpoint">
+    <h2>🤖 Liste des Modèles</h2>
+    <p><span class="method">GET</span> <code class="url">/api/models</code></p>
+  </div>
 
-<footer>
-  AIVERSE — 100% gratuit, propulsé par Pollinations.ai · Pas de clé API requise
-</footer>
-
-<script>
-  lucide.createIcons();
-
-  // ====== SLIDESHOW ======
-  const TOTAL = 6;
-  let current = 0;
-
-  const track = document.getElementById('slides-track');
-  const dots  = document.getElementById('slide-dots');
-  const prevBtn = document.getElementById('prev-btn');
-  const nextBtn = document.getElementById('next-btn');
-
-  // Create dots
-  for(let i=0;i<TOTAL;i++){
-    const d = document.createElement('button');
-    d.className = 'dot-btn' + (i===0?' active':'');
-    d.onclick = () => goTo(i);
-    dots.appendChild(d);
-  }
-
-  function goTo(n) {
-    current = Math.max(0, Math.min(TOTAL-1, n));
-    track.style.transform = `translateX(-${current * 100}%)`;
-    document.querySelectorAll('.dot-btn').forEach((d,i)=>d.classList.toggle('active', i===current));
-    prevBtn.disabled = current === 0;
-    nextBtn.disabled = current === TOTAL-1;
-  }
-
-  function prevSlide() { goTo(current - 1); }
-  function nextSlide() { goTo(current + 1); }
-
-  // Auto-advance
-  let autoTimer = setInterval(() => { if(current < TOTAL-1) nextSlide(); }, 6000);
-  track.addEventListener('click', () => { clearInterval(autoTimer); });
-
-  // Keyboard
-  document.addEventListener('keydown', e => {
-    if(e.key === 'ArrowLeft') prevSlide();
-    if(e.key === 'ArrowRight') nextSlide();
-  });
-</script>
+  <footer style="margin-top: 50px; text-align: center; color: var(--text2); font-size: 0.9rem;">
+    &copy; 2026 AIVERSE. Propulsé par la puissance de l'IA gratuite.
+  </footer>
 </body>
 </html>

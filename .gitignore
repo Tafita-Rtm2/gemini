@@ -1,0 +1,7 @@
+node_modules
+uploads
+server.log
+verification_output.txt
+verification_final.png
+error_screenshot.png
+verify_aiverse.cjs
