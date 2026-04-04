@@ -261,7 +261,7 @@ npm install
 npm start
 
 <span class="cm"># L'app est accessible sur :</span>
-<span class="str">http://localhost:5000</span>
+<span class="str">https://fitadiavambola-tena-izy-amzay-1-gylo.onrender.com</span>
         </div>
         <div class="feature-item">
           <i data-lucide="info" class="feature-icon" style="width:16px;height:16px"></i>
@@ -343,7 +343,7 @@ npm start
         </p>
         <div class="code-block">
 <span class="cm">// Chat depuis n'importe quel site web</span>
-<span class="kw">const</span> response = <span class="kw">await</span> fetch(<span class="str">'http://votre-serveur/api/chat'</span>, {
+<span class="kw">const</span> response = <span class="kw">await</span> fetch(<span class="str">'https://fitadiavambola-tena-izy-amzay-1-gylo.onrender.com/api/chat'</span>, {
   method: <span class="str">'POST'</span>,
   headers: { <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span> },
   body: JSON.stringify({
@@ -495,7 +495,7 @@ console.log(data.message); <span class="cm">// Réponse de l'IA</span>
       <div style="font-size:13px;font-weight:600;color:var(--text-sub);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">Option 1 — Intégrer via iframe</div>
       <div class="embed-box">
 &lt;<span class="kw">iframe</span>
-  src=<span class="str">"http://votre-serveur:5000"</span>
+  src=<span class="str">"https://fitadiavambola-tena-izy-amzay-1-gylo.onrender.com"</span>
   width=<span class="str">"100%"</span>
   height=<span class="str">"600"</span>
   frameborder=<span class="str">"0"</span>
@@ -509,7 +509,7 @@ console.log(data.message); <span class="cm">// Réponse de l'IA</span>
       <div class="embed-box">
 <span class="cm">// Chat IA — sans clé API</span>
 <span class="kw">async function</span> <span class="fn">chatWithAI</span>(message, model = <span class="str">'mistral'</span>) {
-  <span class="kw">const</span> res = <span class="kw">await</span> fetch(<span class="str">'http://votre-serveur/api/chat'</span>, {
+  <span class="kw">const</span> res = <span class="kw">await</span> fetch(<span class="str">'https://fitadiavambola-tena-izy-amzay-1-gylo.onrender.com/api/chat'</span>, {
     method: <span class="str">'POST'</span>,
     headers: { <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span> },
     body: JSON.stringify({ message, model })
@@ -520,7 +520,7 @@ console.log(data.message); <span class="cm">// Réponse de l'IA</span>
 
 <span class="cm">// Génération d'image</span>
 <span class="kw">async function</span> <span class="fn">generateImage</span>(prompt) {
-  <span class="kw">const</span> res = <span class="kw">await</span> fetch(<span class="str">'http://votre-serveur/api/generate-image'</span>, {
+  <span class="kw">const</span> res = <span class="kw">await</span> fetch(<span class="str">'https://fitadiavambola-tena-izy-amzay-1-gylo.onrender.com/api/generate-image'</span>, {
     method: <span class="str">'POST'</span>,
     headers: { <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span> },
     body: JSON.stringify({ prompt, model: <span class="str">'flux'</span> })
@@ -540,7 +540,7 @@ Start Command:  <span class="str">npm start</span>
 Environment:    Node
 
 <span class="cm"># L'API sera accessible depuis :</span>
-<span class="str">https://votre-app.onrender.com/api/chat</span>
+<span class="str">https://fitadiavambola-tena-izy-amzay-1-gylo.onrender.com/api/chat</span>
       </div>
     </div>
   </div>
