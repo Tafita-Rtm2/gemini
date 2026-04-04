@@ -6,6 +6,9 @@
   <title>AIVERSE — IA Gratuit</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -129,9 +132,28 @@
     .msg.ai { align-self: flex-start; }
     .avatar { width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 13px; border: 1px solid var(--border2); background: var(--surface2); }
     .msg.user .avatar { background: var(--primary); border: none; }
-    .bubble { padding: 10px 13px; border-radius: 16px; font-size: 14px; line-height: 1.7; background: var(--surface); border: 1px solid var(--border); white-space: pre-wrap; word-break: break-word; max-width: 100%; }
-    .msg.user .bubble { background: var(--primary); color: white; border-color: transparent; border-radius: 16px 4px 16px 16px; }
+    .bubble { padding: 10px 13px; border-radius: 16px; font-size: 14px; line-height: 1.7; background: var(--surface); border: 1px solid var(--border); word-break: break-word; max-width: 100%; }
+    .msg.user .bubble { background: var(--primary); color: white; border-color: transparent; border-radius: 16px 4px 16px 16px; white-space: pre-wrap; }
     .msg.ai .bubble { border-radius: 4px 16px 16px 16px; }
+
+    /* Markdown Styling */
+    .bubble h1, .bubble h2, .bubble h3 { margin-top: 12px; margin-bottom: 8px; font-weight: 700; }
+    .bubble h1 { font-size: 1.4em; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+    .bubble h2 { font-size: 1.2em; }
+    .bubble h3 { font-size: 1.1em; }
+    .bubble p { margin-bottom: 10px; }
+    .bubble ul, .bubble ol { margin-left: 20px; margin-bottom: 10px; }
+    .bubble code { font-family: var(--mono); background: var(--surface2); padding: 2px 4px; border-radius: 4px; font-size: 0.9em; }
+    .bubble pre { background: #0d0e14; border: 1px solid var(--border); border-radius: 8px; padding: 12px; margin: 12px 0; overflow-x: auto; position: relative; }
+    .bubble pre code { background: transparent; padding: 0; display: block; }
+    .bubble table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 13px; }
+    .bubble th, .bubble td { border: 1px solid var(--border); padding: 8px; text-align: left; }
+    .bubble th { background: var(--surface2); font-weight: 700; }
+    .bubble blockquote { border-left: 4px solid var(--primary); padding-left: 12px; color: var(--text2); font-style: italic; margin: 12px 0; }
+    .bubble hr { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+    .copy-btn { position: absolute; top: 8px; right: 8px; padding: 4px 8px; font-size: 10px; background: var(--surface3); border: 1px solid var(--border2); color: var(--text2); border-radius: 4px; cursor: pointer; transition: .15s; }
+    .copy-btn:hover { background: var(--primary); color: white; }
     .bubble .chat-img-preview { max-width: 200px; max-height: 150px; border-radius: 9px; display: block; margin-bottom: 7px; object-fit: cover; border: 1px solid rgba(255,255,255,.2); }
     .typing { display: flex; gap: 4px; align-items: center; padding: 4px 0; }
     .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--primary2); animation: bop .9s infinite; }
@@ -216,9 +238,10 @@
     <div class="nav-section">
       <div class="nav-label">Configuration</div>
       <button class="nav-item" onclick="showPanel('models',this)"><span class="nav-icon">🤖</span>Modèles IA</button>
+      <button class="nav-item" onclick="window.open('/docs', '_blank')"><span class="nav-icon">🔌</span>API & Docs</button>
     </div>
     <div class="sidebar-footer">
-      <div class="info-box"><strong>✅ 100% Gratuit</strong><br>Via Pollinations.ai — aucune clé API, illimité.</div>
+      <div class="info-box"><strong>✅ 100% Gratuit</strong><br>Aucune clé API, illimité.</div>
     </div>
   </aside>
 
@@ -235,15 +258,17 @@
       <div id="messages-area">
         <div class="msg ai">
           <div class="avatar">🤖</div>
-          <div class="bubble">👋 Bonjour ! Je suis <strong>AIVERSE</strong>.
+          <div class="bubble"># 👋 Bonjour ! Je suis **AIVERSE**.
+
+Nous sommes le **4 avril 2026**.
 
 Je peux vous aider à :
-• 💬 Répondre à toutes vos questions
-• 📎 Analyser vos images directement ici
-• 🎨 Générer des images (menu gauche)
-• ✏️ Modifier des images (menu gauche)
+* 💬 Répondre à toutes vos questions avec des **tableaux** et du **code**
+* 📎 Analyser vos images directement ici
+* 🎨 Générer des images (menu gauche)
+* ✏️ Modifier des images (menu gauche)
 
-<strong>Joignez des images avec le bouton 📎 !</strong>
+**Joignez des images avec le bouton 📎 !**
 
 100% gratuit — sans clé API requise</div>
         </div>
@@ -384,7 +409,7 @@ Je peux vous aider à :
           <h3>🎨 Modèles d'Image</h3>
           <div class="model-grid" id="image-model-grid"></div>
         </div>
-        <div class="info-box"><strong>✅ Comment ça marche ?</strong><br>Tous les modèles fonctionnent via <strong>Pollinations.ai</strong> — gratuit, sans compte, sans clé API. Illimité.</div>
+        <div class="info-box"><strong>✅ Comment ça marche ?</strong><br>Tous les modèles fonctionnent gratuitement — sans compte, sans clé API. Illimité.</div>
       </div>
     </div>
 
@@ -395,6 +420,8 @@ Je peux vous aider à :
 <script>
 const API = window.location.origin + '/api';
 let convId = null;
+let userId = localStorage.getItem('aiverse_user_id') || 'u_' + Math.random().toString(36).substring(2, 11);
+localStorage.setItem('aiverse_user_id', userId);
 let attachedImages = [];
 
 const TEXT_MODELS = [
@@ -416,7 +443,15 @@ const IMAGE_MODELS = [
 ];
 let selText = 'mistral', selImg = 'flux';
 
-window.onload = () => renderGrids();
+window.onload = () => {
+  renderGrids();
+  // Initial markdown parsing for the welcome message
+  const aiMsg = document.querySelector('.msg.ai');
+  if(aiMsg) {
+    const bubble = aiMsg.querySelector('.bubble');
+    setBubble(aiMsg, bubble.textContent);
+  }
+};
 
 function openSidebar() { document.getElementById('sidebar').classList.add('open'); document.getElementById('overlay').classList.add('show'); }
 function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('overlay').classList.remove('show'); }
@@ -492,20 +527,36 @@ async function sendChat() {
 
   try {
     if(imgsCopy.length > 0) {
-      // Analyze each image via backend
-      let results = [];
+      // Logic for multi-modal chat: Send the image in the prompt
+      let context = "";
       for(const imgObj of imgsCopy) {
         const fd = new FormData();
         fd.append('image', imgObj.file);
-        fd.append('question', msg || 'Décris cette image en détail en français.');
+        fd.append('question', "Describe this image in English very briefly.");
         const r = await fetch(`${API}/analyze-image`,{method:'POST',body:fd});
-        if(r.ok){ const d=await r.json(); results.push(d.description||'Analyse indisponible.'); }
-        else results.push('Erreur d\'analyse image.');
+        if(r.ok){ 
+          const d=await r.json(); 
+          context += `[Visual Context: ${d.description}] `; 
+        }
       }
-      const response = results.length===1 ? results[0] : results.map((t,i)=>`📸 Image ${i+1}:\n${t}`).join('\n\n');
-      setBubble(aiDiv, response);
+      
+      const r = await fetch(`${API}/chat`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          message: `${context}\n\nUser Question: ${msg || "Analyze these images."}`,
+          conversationId:convId,
+          userId,
+          model
+        })
+      });
+      
+      if(!r.ok){const e=await r.json().catch(()=>({error:'Erreur réseau'}));throw new Error(e.error||`Erreur ${r.status}`);}
+      const data = await r.json();
+      convId = data.conversationId;
+      setBubble(aiDiv, data.message);
     } else {
-      const r = await fetch(`${API}/chat`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,conversationId:convId,model})});
+      const r = await fetch(`${API}/chat`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,conversationId:convId,userId,model})});
       if(!r.ok){const e=await r.json().catch(()=>({error:'Erreur réseau'}));throw new Error(e.error||`Erreur ${r.status}`);}
       const data = await r.json();
       if(data.error) throw new Error(data.error);
@@ -525,7 +576,32 @@ function appendMsgHtml(role,html){
   div.innerHTML=`<div class="avatar">${role==='user'?'👤':'🤖'}</div><div class="bubble">${html}</div>`;
   area.appendChild(div); area.scrollTop=area.scrollHeight; return div;
 }
-function setBubble(div,text){ div.querySelector('.bubble').textContent=text; document.getElementById('messages-area').scrollTop=99999; }
+function setBubble(div, text) {
+  const bubble = div.querySelector('.bubble');
+  
+  // Use marked to parse markdown
+  const html = marked.parse(text);
+  bubble.innerHTML = html;
+  
+  // Apply highlighting
+  bubble.querySelectorAll('pre code').forEach((block) => {
+    hljs.highlightElement(block);
+    
+    // Add copy button
+    const pre = block.parentElement;
+    const btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = 'Copy';
+    btn.onclick = () => {
+      navigator.clipboard.writeText(block.innerText);
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 2000);
+    };
+    pre.appendChild(btn);
+  });
+  
+  document.getElementById('messages-area').scrollTop = 99999;
+}
 function newChat(){ document.getElementById('messages-area').innerHTML=''; convId=null; attachedImages=[]; renderChips(); appendMsg('ai','Nouvelle conversation. Comment puis-je vous aider ?'); }
 
 async function generateImage(){
