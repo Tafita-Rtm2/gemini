@@ -83,7 +83,7 @@ async function queryPollinationsText(messages, modelId = 'mistral', systemPrompt
     stream: false
   };
 
-  const response = await fetch('https://text.pollinations.ai/', {
+  const response = await fetch('https://text.pollinations.ai/openai', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
@@ -144,7 +144,7 @@ async function analyzeImageWithPollinations(base64Image, mimeType = 'image/jpeg'
     stream: false
   };
 
-  const response = await fetch('https://text.pollinations.ai/', {
+  const response = await fetch('https://text.pollinations.ai/openai', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
