@@ -1,804 +1,455 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Nano Banana API — Interface de Test</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --bg: #080a0d;
-      --surface: #0d1117;
-      --surface2: #161b22;
-      --border: #21262d;
-      --accent: #39d353;
-      --accent2: #58a6ff;
-      --accent3: #f0b429;
-      --text: #e6edf3;
-      --muted: #7d8590;
-      --error: #f85149;
-      --glow: 0 0 20px rgba(57, 211, 83, 0.3);
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Space Mono', monospace;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    /* Grid background */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(57, 211, 83, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(57, 211, 83, 0.03) 1px, transparent 1px);
-      background-size: 40px 40px;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .wrapper {
-      position: relative;
-      z-index: 1;
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 40px 24px 80px;
-    }
-
-    /* HEADER */
-    header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      margin-bottom: 48px;
-      flex-wrap: wrap;
-      gap: 16px;
-    }
-
-    .logo {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .logo-tag {
-      font-size: 10px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--accent);
-      font-family: 'Space Mono', monospace;
-    }
-
-    .logo h1 {
-      font-family: 'Syne', sans-serif;
-      font-size: clamp(28px, 5vw, 42px);
-      font-weight: 800;
-      line-height: 1;
-      color: var(--text);
-      letter-spacing: -1px;
-    }
-
-    .logo h1 span {
-      color: var(--accent);
-    }
-
-    .status-pill {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 100px;
-      padding: 8px 16px;
-      font-size: 11px;
-      color: var(--muted);
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      height: fit-content;
-    }
-
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--accent);
-      animation: pulse 2s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(57, 211, 83, 0.4); }
-      50% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(57, 211, 83, 0); }
-    }
-
-    /* URL BAR */
-    .url-bar {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px 20px;
-      margin-bottom: 32px;
-      font-size: 12px;
-      color: var(--muted);
-      overflow-x: auto;
-      white-space: nowrap;
-    }
-
-    .url-bar .method {
-      color: var(--accent3);
-      font-weight: 700;
-      margin-right: 12px;
-    }
-
-    .url-bar .url-text {
-      color: var(--accent2);
-    }
-
-    .url-bar .param-key { color: var(--accent3); }
-    .url-bar .param-val { color: var(--accent); }
-
-    /* GRID LAYOUT */
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-    }
-
-    @media (max-width: 768px) {
-      .grid { grid-template-columns: 1fr; }
-    }
-
-    /* PANEL */
-    .panel {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      overflow: hidden;
-    }
-
-    .panel-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--border);
-      background: var(--surface2);
-    }
-
-    .panel-header .icon {
-      width: 28px;
-      height: 28px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-    }
-
-    .icon-green { background: rgba(57, 211, 83, 0.15); }
-    .icon-blue  { background: rgba(88, 166, 255, 0.15); }
-    .icon-gold  { background: rgba(240, 180, 41, 0.15); }
-
-    .panel-title {
-      font-family: 'Syne', sans-serif;
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--text);
-    }
-
-    .panel-body { padding: 20px; }
-
-    /* FORM */
-    .field {
-      margin-bottom: 16px;
-    }
-
-    label {
-      display: block;
-      font-size: 10px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 8px;
-    }
-
-    input[type="text"],
-    input[type="url"],
-    textarea {
-      width: 100%;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text);
-      font-family: 'Space Mono', monospace;
-      font-size: 12px;
-      padding: 12px 14px;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-      resize: vertical;
-    }
-
-    input[type="text"]:focus,
-    input[type="url"]:focus,
-    textarea:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(57, 211, 83, 0.1);
-    }
-
-    textarea { min-height: 80px; }
-
-    /* UPLOAD ZONE */
-    .upload-zone {
-      border: 2px dashed var(--border);
-      border-radius: 8px;
-      padding: 24px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s;
-      background: var(--surface2);
-      position: relative;
-    }
-
-    .upload-zone:hover, .upload-zone.drag-over {
-      border-color: var(--accent);
-      background: rgba(57, 211, 83, 0.05);
-    }
-
-    .upload-zone input {
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      cursor: pointer;
-      width: 100%;
-      height: 100%;
-    }
-
-    .upload-zone .upload-icon { font-size: 24px; margin-bottom: 8px; }
-    .upload-zone .upload-text { font-size: 11px; color: var(--muted); }
-    .upload-zone .upload-text strong { color: var(--accent2); }
-
-    #preview-img {
-      width: 100%;
-      max-height: 200px;
-      object-fit: contain;
-      border-radius: 8px;
-      margin-top: 12px;
-      display: none;
-    }
-
-    /* TABS */
-    .tabs {
-      display: flex;
-      gap: 2px;
-      background: var(--surface2);
-      border-radius: 8px;
-      padding: 3px;
-      margin-bottom: 16px;
-    }
-
-    .tab-btn {
-      flex: 1;
-      padding: 7px;
-      background: transparent;
-      border: none;
-      border-radius: 6px;
-      color: var(--muted);
-      font-family: 'Space Mono', monospace;
-      font-size: 10px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .tab-btn.active {
-      background: var(--surface);
-      color: var(--accent);
-    }
-
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-
-    /* BUTTON */
-    .btn-generate {
-      width: 100%;
-      padding: 14px;
-      background: var(--accent);
-      border: none;
-      border-radius: 10px;
-      color: #080a0d;
-      font-family: 'Syne', sans-serif;
-      font-size: 14px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      margin-top: 20px;
-    }
-
-    .btn-generate:hover {
-      background: #4ade80;
-      box-shadow: var(--glow);
-      transform: translateY(-1px);
-    }
-
-    .btn-generate:active { transform: translateY(0); }
-
-    .btn-generate:disabled {
-      background: var(--border);
-      color: var(--muted);
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-
-    .spinner {
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(8, 10, 13, 0.3);
-      border-top-color: #080a0d;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      display: none;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* OUTPUT PANEL */
-    .output-area {
-      min-height: 300px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-    }
-
-    .output-placeholder {
-      text-align: center;
-      color: var(--muted);
-    }
-
-    .output-placeholder .big-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.4; }
-    .output-placeholder p { font-size: 12px; line-height: 1.8; }
-
-    #result-img {
-      width: 100%;
-      border-radius: 10px;
-      display: none;
-      animation: fadeIn 0.4s ease;
-    }
-
-    @keyframes fadeIn { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
-
-    .output-actions {
-      display: none;
-      gap: 10px;
-      width: 100%;
-    }
-
-    .btn-secondary {
-      flex: 1;
-      padding: 10px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text);
-      font-family: 'Space Mono', monospace;
-      font-size: 11px;
-      cursor: pointer;
-      transition: all 0.2s;
-      text-align: center;
-      text-decoration: none;
-    }
-
-    .btn-secondary:hover {
-      border-color: var(--accent2);
-      color: var(--accent2);
-    }
-
-    /* ERROR */
-    .error-box {
-      background: rgba(248, 81, 73, 0.1);
-      border: 1px solid rgba(248, 81, 73, 0.3);
-      border-radius: 8px;
-      padding: 14px 16px;
-      font-size: 12px;
-      color: var(--error);
-      display: none;
-      width: 100%;
-      word-break: break-word;
-    }
-
-    /* LOADING ANIMATION */
-    .loading-state {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-      text-align: center;
-    }
-
-    .loading-bars {
-      display: flex;
-      gap: 4px;
-      align-items: flex-end;
-      height: 32px;
-    }
-
-    .loading-bars span {
-      width: 5px;
-      background: var(--accent);
-      border-radius: 3px;
-      animation: bar 1s ease-in-out infinite;
-    }
-
-    .loading-bars span:nth-child(1) { animation-delay: 0s; }
-    .loading-bars span:nth-child(2) { animation-delay: 0.1s; }
-    .loading-bars span:nth-child(3) { animation-delay: 0.2s; }
-    .loading-bars span:nth-child(4) { animation-delay: 0.3s; }
-    .loading-bars span:nth-child(5) { animation-delay: 0.4s; }
-
-    @keyframes bar {
-      0%, 100% { height: 8px; opacity: 0.4; }
-      50% { height: 32px; opacity: 1; }
-    }
-
-    .loading-text {
-      font-size: 12px;
-      color: var(--muted);
-    }
-
-    .loading-text strong {
-      color: var(--accent);
-      display: block;
-      margin-bottom: 4px;
-    }
-
-    /* API REFERENCE */
-    .api-ref {
-      margin-top: 32px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      overflow: hidden;
-    }
-
-    .api-ref-header {
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--border);
-      background: var(--surface2);
-      font-family: 'Syne', sans-serif;
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .api-ref-body {
-      padding: 20px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-
-    @media (max-width: 768px) { .api-ref-body { grid-template-columns: 1fr; } }
-
-    .code-block {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 16px;
-      font-size: 11px;
-      line-height: 1.8;
-      overflow-x: auto;
-    }
-
-    .code-block .comment { color: var(--muted); }
-    .code-block .keyword { color: var(--accent3); }
-    .code-block .string { color: var(--accent); }
-    .code-block .method { color: var(--accent2); }
-    .code-block .label {
-      display: block;
-      font-size: 10px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 10px;
-    }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Nano Banana API</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#060810;--s1:#0b0f1a;--s2:#111827;--s3:#1a2236;--bd:#1f2d45;
+  --g:#00ff88;--gb:#00cc6a;--blue:#4facfe;--yellow:#ffe066;--red:#ff6b6b;
+  --text:#e2eaf6;--muted:#5a7090;--glow:0 0 30px rgba(0,255,136,.2);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'JetBrains Mono',monospace;min-height:100vh;overflow-x:hidden}
+
+/* animated bg */
+body::before{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 60% 50% at 10% 20%,rgba(0,255,136,.04) 0%,transparent 70%),
+    radial-gradient(ellipse 50% 40% at 90% 80%,rgba(79,172,254,.04) 0%,transparent 70%);
+  pointer-events:none;z-index:0;
+}
+body::after{
+  content:'';position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(0,255,136,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,255,136,.025) 1px,transparent 1px);
+  background-size:44px 44px;
+  pointer-events:none;z-index:0;
+}
+
+.wrap{position:relative;z-index:1;max-width:1160px;margin:0 auto;padding:32px 20px 60px}
+
+/* ── HEADER ── */
+header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:14px}
+.brand .eyebrow{font-size:10px;letter-spacing:3px;color:var(--g);text-transform:uppercase;margin-bottom:4px}
+.brand h1{font-family:'Syne',sans-serif;font-size:clamp(26px,5vw,40px);font-weight:800;letter-spacing:-1.5px;line-height:1}
+.brand h1 span{color:var(--g)}
+.live{display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--bd);border-radius:100px;padding:7px 16px;font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
+.dot{width:7px;height:7px;background:var(--g);border-radius:50%;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,255,136,.6)}50%{box-shadow:0 0 0 6px transparent}}
+
+/* ── MODEL PILL ── */
+.model-bar{background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:11px 18px;margin-bottom:28px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.model-bar .mname{color:var(--g);font-size:12px;font-weight:700}
+.model-bar .minfo{font-size:10px;color:var(--muted)}
+
+/* ── GRID ── */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:740px){.grid{grid-template-columns:1fr}}
+
+/* ── CARD ── */
+.card{background:var(--s1);border:1px solid var(--bd);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.card-hd{display:flex;align-items:center;gap:10px;padding:13px 16px;border-bottom:1px solid var(--bd);background:var(--s2)}
+.card-hd .ico{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.ico-g{background:rgba(0,255,136,.1)}
+.ico-b{background:rgba(79,172,254,.1)}
+.card-hd h2{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:.2px}
+.card-body{padding:16px;flex:1;display:flex;flex-direction:column;gap:13px}
+
+/* ── TABS ── */
+.tabs{display:flex;background:var(--s2);border-radius:8px;padding:3px;gap:2px;border:1px solid var(--bd)}
+.tab{flex:1;padding:8px 4px;background:transparent;border:none;border-radius:6px;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.8px;text-transform:uppercase;cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:5px}
+.tab.on{background:linear-gradient(135deg,rgba(0,255,136,.15),rgba(79,172,254,.1));color:var(--g);border:1px solid rgba(0,255,136,.2)}
+.pane{display:none}.pane.on{display:flex;flex-direction:column;gap:12px}
+
+/* ── FIELDS ── */
+label{font-size:9px;letter-spacing:2.5px;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:6px}
+input[type=url],input[type=text],textarea{
+  width:100%;background:var(--s2);border:1px solid var(--bd);border-radius:8px;
+  color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;
+  padding:10px 12px;outline:none;transition:border-color .18s,box-shadow .18s;resize:vertical
+}
+input:focus,textarea:focus{border-color:var(--g);box-shadow:0 0 0 3px rgba(0,255,136,.08)}
+textarea{min-height:88px}
+
+/* ── DROP ZONE ── */
+.drop{
+  border:2px dashed var(--bd);border-radius:10px;background:var(--s2);
+  padding:26px 16px;text-align:center;cursor:pointer;transition:all .18s;
+  position:relative;overflow:hidden;
+}
+.drop:hover,.drop.ov{border-color:var(--g);background:rgba(0,255,136,.03)}
+.drop input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.drop .dico{font-size:26px;display:block;margin-bottom:8px}
+.drop .dtxt{font-size:11px;color:var(--muted);line-height:1.8}
+.drop .dtxt b{color:var(--blue)}
+#preview-box{margin-top:10px;display:none;position:relative}
+#preview{width:100%;max-height:190px;object-fit:contain;border-radius:8px;border:1px solid var(--bd)}
+.clear-btn{position:absolute;top:6px;right:6px;background:rgba(6,8,16,.8);border:1px solid var(--bd);border-radius:6px;color:var(--muted);font-size:10px;padding:4px 8px;cursor:pointer;font-family:'JetBrains Mono',monospace}
+.clear-btn:hover{color:var(--red);border-color:var(--red)}
+.fname{font-size:10px;color:var(--g);margin-top:6px;word-break:break-all}
+
+/* ── GENERATE BTN ── */
+.gen-btn{
+  width:100%;padding:12px;margin-top:auto;
+  background:linear-gradient(135deg,var(--g),#00d4ff);
+  border:none;border-radius:10px;
+  color:#060810;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;
+  letter-spacing:1px;text-transform:uppercase;cursor:pointer;
+  transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px
+}
+.gen-btn:hover{filter:brightness(1.1);box-shadow:var(--glow);transform:translateY(-1px)}
+.gen-btn:active{transform:translateY(0)}
+.gen-btn:disabled{background:var(--s3);color:var(--muted);cursor:not-allowed;transform:none;box-shadow:none;filter:none}
+.spin{width:14px;height:14px;border:2px solid rgba(6,8,16,.3);border-top-color:#060810;border-radius:50%;animation:rot .65s linear infinite;display:none}
+@keyframes rot{to{transform:rotate(360deg)}}
+
+/* ── OUTPUT ── */
+.out-wrap{flex:1;min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+.ph{display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--muted)}
+.ph-icon{font-size:44px;opacity:.25}
+.ph p{font-size:11px;text-align:center;line-height:2}
+.loading{display:none;flex-direction:column;align-items:center;gap:16px}
+.bars{display:flex;gap:4px;align-items:flex-end;height:34px}
+.bars span{width:5px;background:var(--g);border-radius:3px;animation:wave 1s ease-in-out infinite}
+.bars span:nth-child(2){animation-delay:.1s}
+.bars span:nth-child(3){animation-delay:.2s}
+.bars span:nth-child(4){animation-delay:.3s}
+.bars span:nth-child(5){animation-delay:.4s}
+@keyframes wave{0%,100%{height:5px;opacity:.25}50%{height:34px;opacity:1}}
+.loading p{font-size:11px;color:var(--muted);text-align:center;line-height:2}
+.loading strong{color:var(--g);display:block}
+#result-img{width:100%;border-radius:10px;display:none;animation:pop .3s ease;cursor:zoom-in}
+@keyframes pop{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
+.err-box{background:rgba(255,107,107,.07);border:1px solid rgba(255,107,107,.25);border-radius:8px;padding:12px 14px;font-size:11px;color:var(--red);display:none;width:100%;word-break:break-word;line-height:1.8}
+.acts{display:none;gap:8px;width:100%}
+.act{flex:1;padding:9px 6px;background:var(--s2);border:1px solid var(--bd);border-radius:8px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:10px;cursor:pointer;transition:all .18s;text-align:center;text-decoration:none;letter-spacing:.5px;display:flex;align-items:center;justify-content:center;gap:5px}
+.act:hover{border-color:var(--blue);color:var(--blue)}
+
+/* ── LIGHTBOX ── */
+.lb{display:none;position:fixed;inset:0;background:rgba(6,8,16,.92);z-index:999;align-items:center;justify-content:center;padding:20px}
+.lb.show{display:flex}
+.lb img{max-width:90vw;max-height:90vh;border-radius:12px;border:1px solid var(--bd)}
+.lb-close{position:fixed;top:20px;right:24px;background:var(--s2);border:1px solid var(--bd);border-radius:8px;color:var(--text);font-size:18px;padding:6px 12px;cursor:pointer;z-index:1000}
+
+/* ── DOCS ── */
+.docs{margin-top:18px;background:var(--s1);border:1px solid var(--bd);border-radius:14px;overflow:hidden}
+.docs-hd{padding:13px 18px;border-bottom:1px solid var(--bd);background:var(--s2);font-family:'Syne',sans-serif;font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px}
+.docs-grid{display:grid;grid-template-columns:repeat(3,1fr)}
+@media(max-width:740px){.docs-grid{grid-template-columns:1fr}}
+.doc{padding:16px;border-right:1px solid var(--bd)}
+.doc:last-child{border-right:none}
+@media(max-width:740px){.doc{border-right:none;border-bottom:1px solid var(--bd)}}
+.mtag{display:inline-block;padding:2px 9px;border-radius:4px;font-size:9px;font-weight:700;letter-spacing:1.5px;margin-bottom:8px}
+.get{background:rgba(0,255,136,.12);color:var(--g)}
+.post{background:rgba(79,172,254,.12);color:var(--blue)}
+.ep{font-size:11px;color:var(--yellow);margin-bottom:8px;word-break:break-all;font-weight:700}
+.doc p{font-size:10px;color:var(--muted);line-height:1.8;margin-bottom:10px}
+.code{background:var(--bg);border:1px solid var(--bd);border-radius:6px;padding:12px;font-size:10px;line-height:1.9;overflow-x:auto}
+.k{color:var(--yellow)}.s{color:var(--g)}.f{color:var(--blue)}.c{color:var(--muted)}
+</style>
 </head>
 <body>
-<div class="wrapper">
+<div class="wrap">
 
   <header>
-    <div class="logo">
-      <span class="logo-tag">// Powered by Gemini 2.5 Flash Image</span>
+    <div class="brand">
+      <div class="eyebrow">// Google GenAI SDK officiel</div>
       <h1>Nano <span>Banana</span> API</h1>
     </div>
-    <div class="status-pill">
-      <div class="status-dot"></div>
-      Serveur actif
-    </div>
+    <div class="live"><div class="dot"></div>Serveur actif</div>
   </header>
 
-  <!-- URL bar -->
-  <div class="url-bar">
-    <span class="method">GET</span>
-    <span class="url-text">/api/img?</span><span class="param-key">url</span>=<span class="param-val">https://ton-image.jpg</span>&amp;<span class="param-key">prompt</span>=<span class="param-val">change le fond en plage</span>
+  <div class="model-bar">
+    <div>
+      <div class="mname">gemini-3.1-flash-image-preview</div>
+      <div class="minfo">Génération & édition d'images native — SDK @google/genai</div>
+    </div>
+    <div class="minfo">3 endpoints • Upload direct • URL • Texte seul</div>
   </div>
 
   <div class="grid">
 
-    <!-- LEFT: INPUT -->
-    <div class="panel">
-      <div class="panel-header">
-        <div class="icon icon-green">⚡</div>
-        <span class="panel-title">Paramètres de la requête</span>
+    <!-- INPUT -->
+    <div class="card">
+      <div class="card-hd">
+        <div class="ico ico-g">⚡</div>
+        <h2>Requête</h2>
       </div>
-      <div class="panel-body">
+      <div class="card-body">
 
         <div class="tabs">
-          <button class="tab-btn active" onclick="switchTab('url-tab', this)">URL d'image</button>
-          <button class="tab-btn" onclick="switchTab('upload-tab', this)">Upload fichier</button>
-          <button class="tab-btn" onclick="switchTab('text-tab', this)">Texte seul</button>
+          <button class="tab on" onclick="sw('p-upload',this)">📁 Upload</button>
+          <button class="tab" onclick="sw('p-url',this)">🔗 URL</button>
+          <button class="tab" onclick="sw('p-text',this)">✏️ Texte</button>
         </div>
 
-        <div id="url-tab" class="tab-content active">
-          <div class="field">
-            <label>URL de l'image source</label>
-            <input type="url" id="image-url" placeholder="https://iili.io/BAHlZTx.jpg" />
-          </div>
-        </div>
-
-        <div id="upload-tab" class="tab-content">
-          <div class="field">
-            <div class="upload-zone" id="upload-zone">
-              <input type="file" id="file-input" accept="image/*" onchange="handleFileUpload(event)" />
-              <div class="upload-icon">📁</div>
-              <div class="upload-text"><strong>Cliquez</strong> ou glissez une image<br>JPG, PNG, WEBP</div>
+        <!-- UPLOAD -->
+        <div id="p-upload" class="pane on">
+          <div>
+            <label>Image source (upload direct)</label>
+            <div class="drop" id="dz">
+              <input type="file" id="finp" accept="image/jpeg,image/png,image/webp,image/gif" onchange="onFile(event)"/>
+              <span class="dico">🖼️</span>
+              <div class="dtxt"><b>Clique</b> ou glisse ton image<br>JPG · PNG · WEBP · GIF · max 10 MB</div>
             </div>
-            <img id="preview-img" alt="Aperçu" />
+            <div id="preview-box">
+              <img id="preview" alt="aperçu"/>
+              <button class="clear-btn" onclick="clearFile()">✕ Retirer</button>
+              <div class="fname" id="fname"></div>
+            </div>
           </div>
         </div>
 
-        <div id="text-tab" class="tab-content">
-          <p style="font-size:11px;color:var(--muted);margin-bottom:12px;">Mode génération pure — sans image source. Décris simplement ce que tu veux créer.</p>
+        <!-- URL -->
+        <div id="p-url" class="pane">
+          <div>
+            <label>URL de l'image source</label>
+            <input type="url" id="img-url" placeholder="https://exemple.com/photo.jpg"/>
+          </div>
         </div>
 
-        <div class="field">
-          <label>Prompt (instruction)</label>
-          <textarea id="prompt" placeholder="Change le fond de cette image en plage tropicale avec palmiers et mer turquoise..."></textarea>
+        <!-- TEXT ONLY -->
+        <div id="p-text" class="pane">
+          <div style="background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:12px;font-size:10px;color:var(--muted);line-height:1.9">
+            Mode <b style="color:var(--g)">génération pure</b> — écris simplement<br>ce que tu veux créer, sans image source.
+          </div>
         </div>
 
-        <button class="btn-generate" id="gen-btn" onclick="generate()">
-          <span class="spinner" id="spinner"></span>
-          <span id="btn-text">🚀 Générer l'image</span>
+        <!-- Prompt commun à tous les tabs -->
+        <div>
+          <label>Prompt / Instruction</label>
+          <textarea id="prompt" placeholder="Change le fond de cette image en plage tropicale avec palmiers et mer turquoise…"></textarea>
+        </div>
+
+        <button class="gen-btn" id="gbtn" onclick="generate()">
+          <div class="spin" id="spin"></div>
+          <span id="glbl">🚀 Générer l'image</span>
         </button>
-
       </div>
     </div>
 
-    <!-- RIGHT: OUTPUT -->
-    <div class="panel">
-      <div class="panel-header">
-        <div class="icon icon-blue">🖼️</div>
-        <span class="panel-title">Résultat</span>
+    <!-- OUTPUT -->
+    <div class="card">
+      <div class="card-hd">
+        <div class="ico ico-b">🖼</div>
+        <h2>Résultat</h2>
       </div>
-      <div class="panel-body">
-        <div class="output-area" id="output-area">
+      <div class="card-body">
+        <div class="out-wrap" id="outwrap">
 
-          <div class="output-placeholder" id="placeholder">
-            <div class="big-icon">✦</div>
+          <div class="ph" id="ph">
+            <div class="ph-icon">🍌</div>
             <p>L'image générée<br>apparaîtra ici</p>
           </div>
 
-          <div class="loading-state" id="loading-state">
-            <div class="loading-bars">
-              <span></span><span></span><span></span><span></span><span></span>
-            </div>
-            <div class="loading-text">
-              <strong>Gemini génère votre image...</strong>
-              Nano Banana en action ⚡
-            </div>
+          <div class="loading" id="ld">
+            <div class="bars"><span></span><span></span><span></span><span></span><span></span></div>
+            <p><strong>Gemini génère votre image…</strong>gemini-3.1-flash-image-preview ⚡</p>
           </div>
 
-          <div class="error-box" id="error-box"></div>
-          <img id="result-img" alt="Image générée" />
-          <div class="output-actions" id="output-actions">
-            <a class="btn-secondary" id="download-btn" download="generated.jpg">⬇ Télécharger</a>
-            <button class="btn-secondary" onclick="copyApiUrl()">🔗 Copier URL API</button>
+          <div class="err-box" id="err"></div>
+          <img id="result-img" alt="résultat" onclick="openLb(this.src)"/>
+          <div class="acts" id="acts">
+            <a class="act" id="dlbtn" download="nano-banana.png">⬇ Télécharger</a>
+            <button class="act" onclick="copyApiUrl()">🔗 URL API</button>
+            <button class="act" onclick="openLb(document.getElementById('result-img').src)">🔍 Agrandir</button>
           </div>
-
         </div>
       </div>
     </div>
 
-  </div>
+  </div><!-- /grid -->
 
-  <!-- API Reference -->
-  <div class="api-ref">
-    <div class="api-ref-header">📚 Référence API — Intégration dans vos projets</div>
-    <div class="api-ref-body">
+  <!-- DOCS -->
+  <div class="docs">
+    <div class="docs-hd">📚 Intégration — 3 endpoints disponibles</div>
+    <div class="docs-grid">
 
-      <div class="code-block">
-        <span class="label">// JavaScript / Fetch</span>
-        <span class="comment">// Méthode GET — retourne l'image brute</span><br>
-        <span class="keyword">const</span> imageUrl = <span class="string">"https://ton-image.jpg"</span>;<br>
-        <span class="keyword">const</span> prompt = <span class="string">"change le fond en plage"</span>;<br><br>
-        <span class="keyword">const</span> url = <span class="string">`/api/img?url=${</span><span class="keyword">encodeURIComponent</span><span class="string">(imageUrl)}&prompt=${</span><span class="keyword">encodeURIComponent</span><span class="string">(prompt)}`</span>;<br><br>
-        <span class="keyword">const</span> res = <span class="keyword">await</span> <span class="method">fetch</span>(url);<br>
-        <span class="keyword">const</span> blob = <span class="keyword">await</span> res.<span class="method">blob</span>();<br>
-        <span class="keyword">const</span> src = <span class="method">URL.createObjectURL</span>(blob);<br>
-        img.<span class="method">src</span> = src;
+      <div class="doc">
+        <span class="mtag get">GET</span>
+        <div class="ep">/api/img?url=…&amp;prompt=…</div>
+        <p>Image distante → image brute. Utilisable directement dans <code style="color:var(--yellow)">&lt;img src="…"&gt;</code></p>
+        <div class="code">
+<span class="c">// Afficher dans une &lt;img&gt;</span><br>
+<span class="k">const</span> src = <span class="s">`/api/img?</span><br>
+&nbsp;<span class="s">url=</span><span class="f">$&#123;encodeURIComponent(imgUrl)&#125;</span><br>
+&nbsp;<span class="s">&amp;prompt=</span><span class="f">$&#123;encodeURIComponent(p)&#125;</span><span class="s">`</span>;<br>
+img.<span class="f">src</span> = src; <span class="c">// direct ✅</span>
+        </div>
       </div>
 
-      <div class="code-block">
-        <span class="label">// Python / requests</span>
-        <span class="comment"># Méthode POST — retourne JSON + base64</span><br>
-        <span class="keyword">import</span> requests<br><br>
-        res = requests.<span class="method">post</span>(<span class="string">"/api/img"</span>, json={<br>
-        &nbsp;&nbsp;<span class="string">"imageUrl"</span>: <span class="string">"https://ton-image.jpg"</span>,<br>
-        &nbsp;&nbsp;<span class="string">"prompt"</span>: <span class="string">"change le fond en plage"</span><br>
-        })<br><br>
-        data = res.<span class="method">json</span>()<br>
-        <span class="comment"># data["dataUrl"] → data:image/jpeg;base64,...</span>
+      <div class="doc">
+        <span class="mtag post">POST</span>
+        <div class="ep">/api/img  (JSON)</div>
+        <p>Envoie URL ou base64. Retourne JSON avec <code style="color:var(--yellow)">dataUrl</code></p>
+        <div class="code">
+<span class="k">const</span> r = <span class="k">await</span> <span class="f">fetch</span>(<span class="s">"/api/img"</span>,{<br>
+&nbsp;method:<span class="s">"POST"</span>,<br>
+&nbsp;headers:{<span class="s">"Content-Type"</span>:<span class="s">"application/json"</span>},<br>
+&nbsp;body:<span class="f">JSON.stringify</span>({<br>
+&nbsp;&nbsp;prompt:<span class="s">"change le fond"</span>,<br>
+&nbsp;&nbsp;imageUrl:<span class="s">"https://…"</span><br>
+&nbsp;})<br>
+});<br>
+<span class="k">const</span> &#123;dataUrl&#125; = <span class="k">await</span> r.<span class="f">json</span>();
+        </div>
+      </div>
+
+      <div class="doc">
+        <span class="mtag post">POST</span>
+        <div class="ep">/api/img/upload  (FormData)</div>
+        <p>Upload fichier local. Retourne l'image brute directement.</p>
+        <div class="code">
+<span class="k">const</span> fd = <span class="k">new</span> <span class="f">FormData</span>();<br>
+fd.<span class="f">append</span>(<span class="s">"file"</span>, input.files[0]);<br>
+fd.<span class="f">append</span>(<span class="s">"prompt"</span>,<span class="s">"change le fond"</span>);<br><br>
+<span class="k">const</span> r = <span class="k">await</span> <span class="f">fetch</span>(<br>
+&nbsp;<span class="s">"/api/img/upload"</span>,<br>
+&nbsp;&#123;method:<span class="s">"POST"</span>,body:fd&#125;<br>
+);<br>
+<span class="k">const</span> blob = <span class="k">await</span> r.<span class="f">blob</span>();<span class="c"> // ✅</span>
+        </div>
       </div>
 
     </div>
   </div>
 
+</div><!-- /wrap -->
+
+<!-- LIGHTBOX -->
+<div class="lb" id="lb" onclick="closeLb()">
+  <button class="lb-close" onclick="closeLb()">✕</button>
+  <img id="lb-img" alt=""/>
 </div>
 
 <script>
-  let uploadedBase64 = null;
-  let uploadedMime = null;
-  let lastGeneratedBlob = null;
-  let activeTab = 'url-tab';
+let uploadedFile = null;
+let activeTab = 'p-upload';
 
-  function switchTab(tabId, btn) {
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(tabId).classList.add('active');
-    btn.classList.add('active');
-    activeTab = tabId;
-  }
+// ── TABS ──
+function sw(id, btn) {
+  document.querySelectorAll('.pane').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  btn.classList.add('on');
+  activeTab = id;
+}
 
-  function handleFileUpload(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const result = ev.target.result;
-      const [header, data] = result.split(',');
-      uploadedBase64 = data;
-      uploadedMime = header.match(/:(.*?);/)[1];
-      const preview = document.getElementById('preview-img');
-      preview.src = result;
-      preview.style.display = 'block';
-    };
-    reader.readAsDataURL(file);
-  }
+// ── FILE UPLOAD ──
+function onFile(e) {
+  const file = e.target.files?.[0]; if (!file) return;
+  uploadedFile = file;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    document.getElementById('preview').src = ev.target.result;
+    document.getElementById('preview-box').style.display = 'block';
+    document.getElementById('fname').textContent = '📎 ' + file.name + ' (' + (file.size/1024).toFixed(0) + ' KB)';
+  };
+  reader.readAsDataURL(file);
+}
+function clearFile() {
+  uploadedFile = null;
+  document.getElementById('finp').value = '';
+  document.getElementById('preview-box').style.display = 'none';
+}
 
-  async function generate() {
-    const prompt = document.getElementById('prompt').value.trim();
-    if (!prompt) { alert('Entrez un prompt !'); return; }
+// Drag & drop
+const dz = document.getElementById('dz');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('ov'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('ov'));
+dz.addEventListener('drop', e => {
+  e.preventDefault(); dz.classList.remove('ov');
+  const f = e.dataTransfer.files[0];
+  if (f) { uploadedFile = f; onFile({ target: { files: [f] } }); }
+});
 
-    const btn = document.getElementById('gen-btn');
-    const spinner = document.getElementById('spinner');
-    const btnText = document.getElementById('btn-text');
+// ── GENERATE ──
+async function generate() {
+  const prompt = document.getElementById('prompt').value.trim();
+  if (!prompt) { alert('Écris un prompt !'); return; }
 
-    btn.disabled = true;
-    spinner.style.display = 'block';
-    btnText.textContent = 'Génération...';
+  setLoading(true);
 
-    // Reset UI
-    document.getElementById('placeholder').style.display = 'none';
-    document.getElementById('error-box').style.display = 'none';
-    document.getElementById('result-img').style.display = 'none';
-    document.getElementById('output-actions').style.display = 'none';
-    document.getElementById('loading-state').style.display = 'flex';
+  try {
+    let blob;
 
-    try {
-      let responseBlob = null;
-      let jsonData = null;
+    if (activeTab === 'p-upload') {
+      if (!uploadedFile) { alert('Sélectionne une image à uploader !'); setLoading(false); return; }
+      const fd = new FormData();
+      fd.append('file', uploadedFile);
+      fd.append('prompt', prompt);
+      const r = await fetch('/api/img/upload', { method: 'POST', body: fd });
+      if (!r.ok) { const j = await r.json().catch(()=>({})); throw new Error(j.error || `Erreur HTTP ${r.status}`); }
+      blob = await r.blob();
 
-      if (activeTab === 'url-tab') {
-        const imageUrl = document.getElementById('image-url').value.trim();
-        const params = new URLSearchParams({ prompt });
-        if (imageUrl) params.set('url', imageUrl);
-        const res = await fetch(`/api/img?${params}`);
-        if (!res.ok) {
-          const err = await res.json();
-          throw new Error(err.error || `HTTP ${res.status}`);
-        }
-        responseBlob = await res.blob();
-      } else if (activeTab === 'upload-tab') {
-        const body = { prompt };
-        if (uploadedBase64) {
-          body.imageBase64 = uploadedBase64;
-          body.imageMimeType = uploadedMime;
-        }
-        const res = await fetch('/api/img', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body),
-        });
-        jsonData = await res.json();
-        if (!res.ok) throw new Error(jsonData.error || `HTTP ${res.status}`);
-        const byteArr = Uint8Array.from(atob(jsonData.imageBase64), c => c.charCodeAt(0));
-        responseBlob = new Blob([byteArr], { type: jsonData.mimeType });
-      } else {
-        // Text only
-        const res = await fetch(`/api/img?${new URLSearchParams({ prompt })}`);
-        if (!res.ok) {
-          const err = await res.json();
-          throw new Error(err.error || `HTTP ${res.status}`);
-        }
-        responseBlob = await res.blob();
-      }
+    } else if (activeTab === 'p-url') {
+      const url = document.getElementById('img-url').value.trim();
+      const p = new URLSearchParams({ prompt });
+      if (url) p.set('url', url);
+      const r = await fetch(`/api/img?${p}`);
+      if (!r.ok) { const j = await r.json().catch(()=>({})); throw new Error(j.error || `Erreur HTTP ${r.status}`); }
+      blob = await r.blob();
 
-      lastGeneratedBlob = responseBlob;
-      const objectUrl = URL.createObjectURL(responseBlob);
-      const img = document.getElementById('result-img');
-      img.src = objectUrl;
-      img.style.display = 'block';
-
-      // Download button
-      const dlBtn = document.getElementById('download-btn');
-      dlBtn.href = objectUrl;
-      dlBtn.download = 'nano-banana-result.jpg';
-
-      document.getElementById('output-actions').style.display = 'flex';
-
-    } catch (err) {
-      const errBox = document.getElementById('error-box');
-      errBox.style.display = 'block';
-      errBox.textContent = '⚠ Erreur : ' + err.message;
-      document.getElementById('placeholder').style.display = 'block';
-    } finally {
-      document.getElementById('loading-state').style.display = 'none';
-      btn.disabled = false;
-      spinner.style.display = 'none';
-      btnText.textContent = '🚀 Générer l\'image';
+    } else {
+      // texte seul
+      const r = await fetch(`/api/img?${new URLSearchParams({ prompt })}`);
+      if (!r.ok) { const j = await r.json().catch(()=>({})); throw new Error(j.error || `Erreur HTTP ${r.status}`); }
+      blob = await r.blob();
     }
-  }
 
-  function copyApiUrl() {
-    const prompt = document.getElementById('prompt').value.trim();
-    const imageUrl = document.getElementById('image-url').value.trim();
-    const base = window.location.origin;
-    const params = new URLSearchParams({ prompt });
-    if (imageUrl) params.set('url', imageUrl);
-    const full = `${base}/api/img?${params}`;
-    navigator.clipboard.writeText(full).then(() => {
-      alert('URL copiée !\n\n' + full);
-    });
-  }
+    const src = URL.createObjectURL(blob);
+    const img = document.getElementById('result-img');
+    img.src = src; img.style.display = 'block';
+    document.getElementById('dlbtn').href = src;
+    show('acts', true, 'flex');
+    show('err', false);
 
-  // Drag and drop
-  const zone = document.getElementById('upload-zone');
-  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
-  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-  zone.addEventListener('drop', e => {
-    e.preventDefault();
-    zone.classList.remove('drag-over');
-    const file = e.dataTransfer.files[0];
-    if (file) {
-      document.getElementById('file-input').files = e.dataTransfer.files;
-      handleFileUpload({ target: { files: [file] } });
-    }
-  });
+  } catch (err) {
+    const el = document.getElementById('err');
+    el.textContent = '⚠ ' + err.message;
+    el.style.display = 'block';
+    show('result-img', false);
+    show('acts', false);
+  } finally {
+    setLoading(false);
+  }
+}
+
+function setLoading(on) {
+  document.getElementById('gbtn').disabled = on;
+  document.getElementById('spin').style.display = on ? 'block' : 'none';
+  document.getElementById('glbl').textContent = on ? 'Génération…' : '🚀 Générer l\'image';
+  show('ld', on, 'flex');
+  show('ph', false);
+}
+
+function show(id, on, d = 'block') {
+  const el = document.getElementById(id); if (!el) return;
+  el.style.display = on ? d : 'none';
+}
+
+function copyApiUrl() {
+  const prompt = document.getElementById('prompt').value.trim();
+  const url = document.getElementById('img-url').value.trim();
+  const p = new URLSearchParams({ prompt });
+  if (url) p.set('url', url);
+  const full = `${location.origin}/api/img?${p}`;
+  navigator.clipboard.writeText(full).then(() => alert('URL copiée !\n\n' + full));
+}
+
+// Lightbox
+function openLb(src) {
+  document.getElementById('lb-img').src = src;
+  document.getElementById('lb').classList.add('show');
+}
+function closeLb() { document.getElementById('lb').classList.remove('show'); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLb(); });
 </script>
 </body>
 </html>
