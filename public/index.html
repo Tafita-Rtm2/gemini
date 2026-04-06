@@ -1,617 +1,804 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🤖 Free AI API v2.0 — Test Interface</title>
-<style>
-  :root{--bg:#0a0a0f;--surface:#12121a;--card:#1a1a26;--border:#2a2a3e;--accent:#7c3aed;--accent2:#06b6d4;--accent3:#10b981;--text:#e2e8f0;--muted:#64748b;--success:#10b981;--error:#ef4444;--warn:#f59e0b}
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-  header{background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;gap:12px}
-  .logo{font-size:1.8rem}
-  header h1{font-size:1.3rem;font-weight:700}
-  header h1 span{color:var(--accent2)}
-  .badge{background:rgba(16,185,129,.15);border:1px solid var(--success);color:var(--success);padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;margin-left:auto}
-  .fix-badge{background:rgba(245,158,11,.15);border:1px solid var(--warn);color:var(--warn);padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;margin-left:8px}
-  .tabs{display:flex;gap:4px;padding:16px 24px 0;border-bottom:1px solid var(--border);background:var(--surface);overflow-x:auto}
-  .tab{padding:10px 18px;border-radius:8px 8px 0 0;cursor:pointer;font-weight:600;font-size:.85rem;color:var(--muted);transition:all .2s;border:none;background:transparent;white-space:nowrap;display:flex;align-items:center;gap:6px}
-  .tab:hover{color:var(--text);background:rgba(255,255,255,.05)}
-  .tab.active{color:var(--accent2);background:var(--card);border:1px solid var(--border);border-bottom:1px solid var(--card);margin-bottom:-1px}
-  .content{max-width:1050px;margin:0 auto;padding:24px}
-  .panel{display:none}.panel.active{display:block}
-  .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px}
-  .card-title{font-size:.95rem;font-weight:700;color:var(--accent2);margin-bottom:14px;display:flex;align-items:center;gap:8px}
-  .form-group{margin-bottom:14px}
-  label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:5px;font-weight:500}
-  input,select,textarea{width:100%;padding:9px 12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.92rem;outline:none;transition:border-color .2s;font-family:inherit}
-  input:focus,select:focus,textarea:focus{border-color:var(--accent2)}
-  textarea{resize:vertical;min-height:70px}
-  select option{background:var(--surface)}
-  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-  @media(max-width:600px){.grid-2{grid-template-columns:1fr}}
-  .btn{padding:10px 22px;border:none;border-radius:8px;font-weight:700;font-size:.92rem;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:7px}
-  .btn-primary{background:linear-gradient(135deg,var(--accent),#9333ea);color:#fff}
-  .btn-cyan{background:linear-gradient(135deg,var(--accent2),#0891b2);color:#fff}
-  .btn-green{background:linear-gradient(135deg,var(--accent3),#059669);color:#fff}
-  .btn-amber{background:linear-gradient(135deg,var(--warn),#d97706);color:#fff}
-  .btn:hover{opacity:.9;transform:translateY(-1px)}.btn:active{transform:none}
-  button:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
-  .btn-sm{padding:5px 12px;font-size:.78rem}
-  .btn-outline{background:transparent;border:1px solid var(--border);color:var(--muted)}
-  .btn-outline:hover{border-color:var(--accent2);color:var(--accent2)}
-  .url-box{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-family:monospace;font-size:.75rem;color:var(--accent2);word-break:break-all;margin:10px 0;display:flex;align-items:center;gap:8px}
-  .url-box span{flex:1}
-  .copy-btn{background:transparent;border:none;color:var(--muted);cursor:pointer;padding:2px 6px;border-radius:4px;font-size:.82rem;transition:color .2s;flex-shrink:0}
-  .copy-btn:hover{color:var(--accent2)}
-  .response-box{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;min-height:100px;font-size:.88rem;line-height:1.7;white-space:pre-wrap;word-break:break-word}
-  .response-box.code{font-family:monospace;font-size:.77rem}
-  .status{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;margin-bottom:7px}
-  .status.success{background:rgba(16,185,129,.15);color:var(--success);border:1px solid var(--success)}
-  .status.error{background:rgba(239,68,68,.15);color:var(--error);border:1px solid var(--error)}
-  .status.loading{background:rgba(124,58,237,.15);color:var(--accent);border:1px solid var(--accent)}
-  .spinner{width:14px;height:14px;border:2px solid rgba(124,58,237,.3);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;display:inline-block;flex-shrink:0}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .image-result{border-radius:10px;max-width:100%;border:2px solid var(--border);margin-top:10px;display:block}
-  .image-placeholder{background:var(--surface);border:2px dashed var(--border);border-radius:10px;height:260px;display:flex;align-items:center;justify-content:center;color:var(--muted);flex-direction:column;gap:8px;font-size:.88rem;margin-top:10px}
-  .timing{font-size:.72rem;color:var(--muted);text-align:right;margin-top:5px}
-  .info-box{background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.3);border-radius:8px;padding:12px 14px;font-size:.83rem;color:var(--accent2);margin-bottom:14px;line-height:1.6}
-  .warn-box{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:12px 14px;font-size:.83rem;color:var(--warn);margin-bottom:14px;line-height:1.6}
-  .chip{display:inline-block;padding:3px 10px;background:var(--surface);border:1px solid var(--border);border-radius:20px;font-size:.74rem;font-family:monospace;color:var(--muted);margin:2px}
-  .chip.ok{border-color:rgba(16,185,129,.5);color:var(--success)}
-  .chip.paid{border-color:rgba(239,68,68,.4);color:var(--error);text-decoration:line-through}
-  .ep-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:8px;font-family:monospace;font-size:.8rem}
-  .method{display:inline-block;background:rgba(16,185,129,.15);color:var(--success);border:1px solid rgba(16,185,129,.3);padding:1px 7px;border-radius:4px;font-size:.68rem;font-weight:700;margin-right:6px}
-  .ep-desc{font-family:sans-serif;font-size:.78rem;color:var(--muted);margin-top:5px}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nano Banana API — Interface de Test</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #080a0d;
+      --surface: #0d1117;
+      --surface2: #161b22;
+      --border: #21262d;
+      --accent: #39d353;
+      --accent2: #58a6ff;
+      --accent3: #f0b429;
+      --text: #e6edf3;
+      --muted: #7d8590;
+      --error: #f85149;
+      --glow: 0 0 20px rgba(57, 211, 83, 0.3);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Space Mono', monospace;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(57, 211, 83, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(57, 211, 83, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    /* HEADER */
+    header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 48px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .logo {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .logo-tag {
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-family: 'Space Mono', monospace;
+    }
+
+    .logo h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(28px, 5vw, 42px);
+      font-weight: 800;
+      line-height: 1;
+      color: var(--text);
+      letter-spacing: -1px;
+    }
+
+    .logo h1 span {
+      color: var(--accent);
+    }
+
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 8px 16px;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      height: fit-content;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(57, 211, 83, 0.4); }
+      50% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(57, 211, 83, 0); }
+    }
+
+    /* URL BAR */
+    .url-bar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 32px;
+      font-size: 12px;
+      color: var(--muted);
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .url-bar .method {
+      color: var(--accent3);
+      font-weight: 700;
+      margin-right: 12px;
+    }
+
+    .url-bar .url-text {
+      color: var(--accent2);
+    }
+
+    .url-bar .param-key { color: var(--accent3); }
+    .url-bar .param-val { color: var(--accent); }
+
+    /* GRID LAYOUT */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    /* PANEL */
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2);
+    }
+
+    .panel-header .icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .icon-green { background: rgba(57, 211, 83, 0.15); }
+    .icon-blue  { background: rgba(88, 166, 255, 0.15); }
+    .icon-gold  { background: rgba(240, 180, 41, 0.15); }
+
+    .panel-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .panel-body { padding: 20px; }
+
+    /* FORM */
+    .field {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    input[type="text"],
+    input[type="url"],
+    textarea {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      padding: 12px 14px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      resize: vertical;
+    }
+
+    input[type="text"]:focus,
+    input[type="url"]:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(57, 211, 83, 0.1);
+    }
+
+    textarea { min-height: 80px; }
+
+    /* UPLOAD ZONE */
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      padding: 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: var(--surface2);
+      position: relative;
+    }
+
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: var(--accent);
+      background: rgba(57, 211, 83, 0.05);
+    }
+
+    .upload-zone input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .upload-zone .upload-icon { font-size: 24px; margin-bottom: 8px; }
+    .upload-zone .upload-text { font-size: 11px; color: var(--muted); }
+    .upload-zone .upload-text strong { color: var(--accent2); }
+
+    #preview-img {
+      width: 100%;
+      max-height: 200px;
+      object-fit: contain;
+      border-radius: 8px;
+      margin-top: 12px;
+      display: none;
+    }
+
+    /* TABS */
+    .tabs {
+      display: flex;
+      gap: 2px;
+      background: var(--surface2);
+      border-radius: 8px;
+      padding: 3px;
+      margin-bottom: 16px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 7px;
+      background: transparent;
+      border: none;
+      border-radius: 6px;
+      color: var(--muted);
+      font-family: 'Space Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: var(--surface);
+      color: var(--accent);
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* BUTTON */
+    .btn-generate {
+      width: 100%;
+      padding: 14px;
+      background: var(--accent);
+      border: none;
+      border-radius: 10px;
+      color: #080a0d;
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 20px;
+    }
+
+    .btn-generate:hover {
+      background: #4ade80;
+      box-shadow: var(--glow);
+      transform: translateY(-1px);
+    }
+
+    .btn-generate:active { transform: translateY(0); }
+
+    .btn-generate:disabled {
+      background: var(--border);
+      color: var(--muted);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(8, 10, 13, 0.3);
+      border-top-color: #080a0d;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* OUTPUT PANEL */
+    .output-area {
+      min-height: 300px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .output-placeholder {
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .output-placeholder .big-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.4; }
+    .output-placeholder p { font-size: 12px; line-height: 1.8; }
+
+    #result-img {
+      width: 100%;
+      border-radius: 10px;
+      display: none;
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
+
+    .output-actions {
+      display: none;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .btn-secondary {
+      flex: 1;
+      padding: 10px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+      text-decoration: none;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent2);
+      color: var(--accent2);
+    }
+
+    /* ERROR */
+    .error-box {
+      background: rgba(248, 81, 73, 0.1);
+      border: 1px solid rgba(248, 81, 73, 0.3);
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-size: 12px;
+      color: var(--error);
+      display: none;
+      width: 100%;
+      word-break: break-word;
+    }
+
+    /* LOADING ANIMATION */
+    .loading-state {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      text-align: center;
+    }
+
+    .loading-bars {
+      display: flex;
+      gap: 4px;
+      align-items: flex-end;
+      height: 32px;
+    }
+
+    .loading-bars span {
+      width: 5px;
+      background: var(--accent);
+      border-radius: 3px;
+      animation: bar 1s ease-in-out infinite;
+    }
+
+    .loading-bars span:nth-child(1) { animation-delay: 0s; }
+    .loading-bars span:nth-child(2) { animation-delay: 0.1s; }
+    .loading-bars span:nth-child(3) { animation-delay: 0.2s; }
+    .loading-bars span:nth-child(4) { animation-delay: 0.3s; }
+    .loading-bars span:nth-child(5) { animation-delay: 0.4s; }
+
+    @keyframes bar {
+      0%, 100% { height: 8px; opacity: 0.4; }
+      50% { height: 32px; opacity: 1; }
+    }
+
+    .loading-text {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .loading-text strong {
+      color: var(--accent);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    /* API REFERENCE */
+    .api-ref {
+      margin-top: 32px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .api-ref-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2);
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .api-ref-body {
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 768px) { .api-ref-body { grid-template-columns: 1fr; } }
+
+    .code-block {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      font-size: 11px;
+      line-height: 1.8;
+      overflow-x: auto;
+    }
+
+    .code-block .comment { color: var(--muted); }
+    .code-block .keyword { color: var(--accent3); }
+    .code-block .string { color: var(--accent); }
+    .code-block .method { color: var(--accent2); }
+    .code-block .label {
+      display: block;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+  </style>
 </head>
 <body>
-<header>
-  <div class="logo">🤖</div>
-  <div>
-    <h1>Free AI API <span>Server</span></h1>
-    <div style="font-size:.75rem;color:var(--muted)">Pollinations.ai — No API Key Required</div>
-  </div>
-  <div class="badge">✅ 100% FREE</div>
-  <div class="fix-badge">v2.0 Fixed</div>
-</header>
+<div class="wrapper">
 
-<div class="tabs">
-  <button class="tab active" onclick="switchTab('chat',this)">💬 Chat / GPT</button>
-  <button class="tab" onclick="switchTab('image',this)">🎨 Image Generate</button>
-  <button class="tab" onclick="switchTab('edit',this)">✏️ Image Edit</button>
-  <button class="tab" onclick="switchTab('search',this)">🔍 Web Search</button>
-  <button class="tab" onclick="switchTab('vision',this)">👁️ Vision</button>
-  <button class="tab" onclick="switchTab('openai',this)">⚡ /api/openai</button>
-  <button class="tab" onclick="switchTab('docs',this)">📖 Docs</button>
+  <header>
+    <div class="logo">
+      <span class="logo-tag">// Powered by Gemini 2.5 Flash Image</span>
+      <h1>Nano <span>Banana</span> API</h1>
+    </div>
+    <div class="status-pill">
+      <div class="status-dot"></div>
+      Serveur actif
+    </div>
+  </header>
+
+  <!-- URL bar -->
+  <div class="url-bar">
+    <span class="method">GET</span>
+    <span class="url-text">/api/img?</span><span class="param-key">url</span>=<span class="param-val">https://ton-image.jpg</span>&amp;<span class="param-key">prompt</span>=<span class="param-val">change le fond en plage</span>
+  </div>
+
+  <div class="grid">
+
+    <!-- LEFT: INPUT -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="icon icon-green">⚡</div>
+        <span class="panel-title">Paramètres de la requête</span>
+      </div>
+      <div class="panel-body">
+
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab('url-tab', this)">URL d'image</button>
+          <button class="tab-btn" onclick="switchTab('upload-tab', this)">Upload fichier</button>
+          <button class="tab-btn" onclick="switchTab('text-tab', this)">Texte seul</button>
+        </div>
+
+        <div id="url-tab" class="tab-content active">
+          <div class="field">
+            <label>URL de l'image source</label>
+            <input type="url" id="image-url" placeholder="https://iili.io/BAHlZTx.jpg" />
+          </div>
+        </div>
+
+        <div id="upload-tab" class="tab-content">
+          <div class="field">
+            <div class="upload-zone" id="upload-zone">
+              <input type="file" id="file-input" accept="image/*" onchange="handleFileUpload(event)" />
+              <div class="upload-icon">📁</div>
+              <div class="upload-text"><strong>Cliquez</strong> ou glissez une image<br>JPG, PNG, WEBP</div>
+            </div>
+            <img id="preview-img" alt="Aperçu" />
+          </div>
+        </div>
+
+        <div id="text-tab" class="tab-content">
+          <p style="font-size:11px;color:var(--muted);margin-bottom:12px;">Mode génération pure — sans image source. Décris simplement ce que tu veux créer.</p>
+        </div>
+
+        <div class="field">
+          <label>Prompt (instruction)</label>
+          <textarea id="prompt" placeholder="Change le fond de cette image en plage tropicale avec palmiers et mer turquoise..."></textarea>
+        </div>
+
+        <button class="btn-generate" id="gen-btn" onclick="generate()">
+          <span class="spinner" id="spinner"></span>
+          <span id="btn-text">🚀 Générer l'image</span>
+        </button>
+
+      </div>
+    </div>
+
+    <!-- RIGHT: OUTPUT -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="icon icon-blue">🖼️</div>
+        <span class="panel-title">Résultat</span>
+      </div>
+      <div class="panel-body">
+        <div class="output-area" id="output-area">
+
+          <div class="output-placeholder" id="placeholder">
+            <div class="big-icon">✦</div>
+            <p>L'image générée<br>apparaîtra ici</p>
+          </div>
+
+          <div class="loading-state" id="loading-state">
+            <div class="loading-bars">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <div class="loading-text">
+              <strong>Gemini génère votre image...</strong>
+              Nano Banana en action ⚡
+            </div>
+          </div>
+
+          <div class="error-box" id="error-box"></div>
+          <img id="result-img" alt="Image générée" />
+          <div class="output-actions" id="output-actions">
+            <a class="btn-secondary" id="download-btn" download="generated.jpg">⬇ Télécharger</a>
+            <button class="btn-secondary" onclick="copyApiUrl()">🔗 Copier URL API</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- API Reference -->
+  <div class="api-ref">
+    <div class="api-ref-header">📚 Référence API — Intégration dans vos projets</div>
+    <div class="api-ref-body">
+
+      <div class="code-block">
+        <span class="label">// JavaScript / Fetch</span>
+        <span class="comment">// Méthode GET — retourne l'image brute</span><br>
+        <span class="keyword">const</span> imageUrl = <span class="string">"https://ton-image.jpg"</span>;<br>
+        <span class="keyword">const</span> prompt = <span class="string">"change le fond en plage"</span>;<br><br>
+        <span class="keyword">const</span> url = <span class="string">`/api/img?url=${</span><span class="keyword">encodeURIComponent</span><span class="string">(imageUrl)}&prompt=${</span><span class="keyword">encodeURIComponent</span><span class="string">(prompt)}`</span>;<br><br>
+        <span class="keyword">const</span> res = <span class="keyword">await</span> <span class="method">fetch</span>(url);<br>
+        <span class="keyword">const</span> blob = <span class="keyword">await</span> res.<span class="method">blob</span>();<br>
+        <span class="keyword">const</span> src = <span class="method">URL.createObjectURL</span>(blob);<br>
+        img.<span class="method">src</span> = src;
+      </div>
+
+      <div class="code-block">
+        <span class="label">// Python / requests</span>
+        <span class="comment"># Méthode POST — retourne JSON + base64</span><br>
+        <span class="keyword">import</span> requests<br><br>
+        res = requests.<span class="method">post</span>(<span class="string">"/api/img"</span>, json={<br>
+        &nbsp;&nbsp;<span class="string">"imageUrl"</span>: <span class="string">"https://ton-image.jpg"</span>,<br>
+        &nbsp;&nbsp;<span class="string">"prompt"</span>: <span class="string">"change le fond en plage"</span><br>
+        })<br><br>
+        data = res.<span class="method">json</span>()<br>
+        <span class="comment"># data["dataUrl"] → data:image/jpeg;base64,...</span>
+      </div>
+
+    </div>
+  </div>
+
 </div>
-
-<div class="content">
-
-<!-- ══ CHAT ══ -->
-<div class="panel active" id="panel-chat">
-  <div class="card">
-    <div class="card-title">💬 Chat — <code style="font-size:.75rem">GET /api/chat</code></div>
-    <div class="info-box">🚀 GPT-5, Claude, Gemini, DeepSeek et plus — aucune clé API !</div>
-    <div class="form-group">
-      <label>Message</label>
-      <textarea id="chat-query">Bonjour ! Qui es-tu et quels modèles tu utilises ?</textarea>
-    </div>
-    <div class="grid-2">
-      <div class="form-group">
-        <label>Modèle</label>
-        <select id="chat-model">
-          <option value="openai">openai (GPT-5 Mini) ⭐</option>
-          <option value="openai-fast">openai-fast (GPT-5 Nano)</option>
-          <option value="openai-large">openai-large (GPT-5.2)</option>
-          <option value="claude">claude (Claude Sonnet)</option>
-          <option value="claude-fast">claude-fast (Claude Haiku)</option>
-          <option value="gemini-fast">gemini-fast (Gemini 2.5 Lite) ✅ Gratuit</option>
-          <option value="gemini">gemini (Gemini 3 Flash)</option>
-          <option value="deepseek">deepseek (DeepSeek V3.2)</option>
-          <option value="deepseek-reasoning">deepseek-reasoning (R1)</option>
-          <option value="mistral">mistral (Mistral Small)</option>
-          <option value="qwen-coder">qwen-coder</option>
-          <option value="llama">llama (Llama 3)</option>
-          <option value="unity">unity (uncensored)</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>System Prompt</label>
-        <input id="chat-system" value="You are a helpful AI assistant.">
-      </div>
-    </div>
-    <div class="url-box"><span id="chat-url">...</span><button class="copy-btn" onclick="copyEl('chat-url')">📋</button></div>
-    <button class="btn btn-primary" id="chat-btn" onclick="runChat()">🚀 Envoyer</button>
-  </div>
-  <div class="card" id="chat-result" style="display:none">
-    <div class="card-title">📨 Réponse</div>
-    <div id="chat-status"></div>
-    <div class="response-box" id="chat-response"></div>
-    <div class="timing" id="chat-timing"></div>
-    <div style="margin-top:10px"><button class="btn btn-outline btn-sm" onclick="copyText('chat-response')">📋 Copier</button></div>
-  </div>
-</div>
-
-<!-- ══ IMAGE GENERATE ══ -->
-<div class="panel" id="panel-image">
-  <div class="card">
-    <div class="card-title">🎨 Génération Image — <code style="font-size:.75rem">GET /api/image</code></div>
-    <div class="info-box">🖼️ Retourne l'image <strong>directement en binaire</strong> — utilisable dans <code>&lt;img src="/api/image?..."&gt;</code></div>
-    <div class="warn-box">⚠️ <strong>kontext</strong> et <strong>gptimage</strong> ont été retirés — ils nécessitent maintenant une clé payante chez Pollinations. Modèles gratuits : flux, nanobanana, nanobanana-pro, seedream.</div>
-    <div class="form-group">
-      <label>Prompt</label>
-      <textarea id="img-prompt">A majestic dragon flying over a cyberpunk city at night, neon lights, 4K photorealistic</textarea>
-    </div>
-    <div class="grid-2">
-      <div class="form-group">
-        <label>Modèle (tous 100% gratuits ✅)</label>
-        <select id="img-model">
-          <option value="flux">flux (Flux Schnell) — Le plus rapide ⭐</option>
-          <option value="flux-realism">flux-realism — Photoréaliste</option>
-          <option value="flux-pro">flux-pro — Haute qualité</option>
-          <option value="turbo">turbo (SDXL Turbo) — Ultra rapide</option>
-          <option value="nanobanana">nanobanana (Gemini Flash) 🍌</option>
-          <option value="nanobanana-pro">nanobanana-pro (Gemini Pro) 🍌⭐</option>
-          <option value="seedream">seedream — Artistique</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Résolution</label>
-        <select id="img-size">
-          <option value="1024x1024">1024×1024 (Carré)</option>
-          <option value="1280x720">1280×720 (16:9)</option>
-          <option value="768x1344">768×1344 (Portrait)</option>
-          <option value="1344x768">1344×768 (Paysage)</option>
-          <option value="512x512">512×512 (Petit/Rapide)</option>
-        </select>
-      </div>
-    </div>
-    <div class="grid-2">
-      <div class="form-group"><label><input type="checkbox" id="img-enhance"> ✨ Enhance prompt (IA améliore)</label></div>
-      <div class="form-group"><label>Seed (optionnel)</label><input id="img-seed" type="number" placeholder="Ex: 42"></div>
-    </div>
-    <div class="url-box"><span id="img-url">...</span><button class="copy-btn" onclick="copyEl('img-url')">📋</button></div>
-    <button class="btn btn-cyan" id="img-btn" onclick="runImage()">🎨 Générer</button>
-  </div>
-  <div class="card" id="img-result" style="display:none">
-    <div class="card-title">🖼️ Résultat</div>
-    <div id="img-status"></div>
-    <div id="img-container"><div class="image-placeholder">🖼️<span>L'image apparaîtra ici</span></div></div>
-    <div class="timing" id="img-timing"></div>
-    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
-      <a id="img-dl" class="btn btn-outline btn-sm" download="ai-image.jpg">⬇️ Télécharger</a>
-      <button class="btn btn-outline btn-sm" onclick="copyEl('img-url')">📋 Copier URL</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══ IMAGE EDIT ══ -->
-<div class="panel" id="panel-edit">
-  <div class="card">
-    <div class="card-title">✏️ Édition Image — <code style="font-size:.75rem">GET /api/image?imgurl=...</code></div>
-    <div class="info-box">✅ Fournissez une image source + un prompt. Modèles recommandés : <strong>nanobanana-pro</strong> (meilleur) et <strong>nanobanana</strong>.</div>
-    <div class="form-group">
-      <label>URL de l'image source</label>
-      <input id="edit-imgurl" type="url" placeholder="https://example.com/photo.jpg">
-    </div>
-    <div class="form-group">
-      <label>Instruction d'édition</label>
-      <textarea id="edit-prompt">Transform this image into anime art style, keep the same composition</textarea>
-    </div>
-    <div class="grid-2">
-      <div class="form-group">
-        <label>Modèle (tous gratuits ✅)</label>
-        <select id="edit-model">
-          <option value="nanobanana-pro">nanobanana-pro 🍌⭐ Meilleur</option>
-          <option value="nanobanana">nanobanana 🍌</option>
-          <option value="seedream">seedream</option>
-          <option value="flux-realism">flux-realism</option>
-          <option value="flux">flux</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Résolution</label>
-        <select id="edit-size">
-          <option value="1024x1024">1024×1024</option>
-          <option value="1280x720">1280×720</option>
-          <option value="768x1344">768×1344</option>
-        </select>
-      </div>
-    </div>
-    <div class="url-box"><span id="edit-url">...</span><button class="copy-btn" onclick="copyEl('edit-url')">📋</button></div>
-    <button class="btn btn-primary" id="edit-btn" onclick="runEdit()">✏️ Éditer</button>
-  </div>
-  <div class="card" id="edit-result" style="display:none">
-    <div class="card-title">🖼️ Résultat</div>
-    <div id="edit-status"></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-      <div>
-        <div style="font-size:.78rem;color:var(--muted);margin-bottom:5px">📸 Source</div>
-        <img id="edit-src" style="width:100%;border-radius:8px;border:1px solid var(--border)">
-      </div>
-      <div>
-        <div style="font-size:.78rem;color:var(--muted);margin-bottom:5px">✨ Résultat</div>
-        <div id="edit-container"><div class="image-placeholder" style="height:180px">✨<span>Résultat ici</span></div></div>
-      </div>
-    </div>
-    <div class="timing" id="edit-timing"></div>
-  </div>
-</div>
-
-<!-- ══ WEB SEARCH ══ -->
-<div class="panel" id="panel-search">
-  <div class="card">
-    <div class="card-title">🔍 Web Search — <code style="font-size:.75rem">GET /api/search</code></div>
-    <div class="info-box">🌐 Recherche web temps réel — résultats actuels avec sources !</div>
-    <div class="form-group">
-      <label>Requête</label>
-      <textarea id="search-query">Quelles sont les dernières nouvelles en intelligence artificielle aujourd'hui ?</textarea>
-    </div>
-    <div class="form-group">
-      <label>Modèle de recherche</label>
-      <select id="search-model">
-        <option value="searchgpt">searchgpt ⭐ (SearchGPT — web search natif)</option>
-        <option value="gemini-search">gemini-search (Gemini + Google Search)</option>
-        <option value="gemini-fast">gemini-fast (Gemini 2.5 Lite)</option>
-      </select>
-    </div>
-    <div class="url-box"><span id="search-url">...</span><button class="copy-btn" onclick="copyEl('search-url')">📋</button></div>
-    <button class="btn btn-green" id="search-btn" onclick="runSearch()">🔍 Rechercher</button>
-  </div>
-  <div class="card" id="search-result" style="display:none">
-    <div class="card-title">📰 Résultats</div>
-    <div id="search-status"></div>
-    <div class="response-box" id="search-response"></div>
-    <div class="timing" id="search-timing"></div>
-    <div style="margin-top:10px"><button class="btn btn-outline btn-sm" onclick="copyText('search-response')">📋 Copier</button></div>
-  </div>
-</div>
-
-<!-- ══ VISION ══ -->
-<div class="panel" id="panel-vision">
-  <div class="card">
-    <div class="card-title">👁️ Vision — Analyse d'Image — <code style="font-size:.75rem">GET /api/openai?imgurl=...</code></div>
-    <div class="info-box">✅ <strong>Vision maintenant fonctionnelle !</strong> Le serveur récupère l'image et l'envoie en base64 au modèle. Modèles recommandés : <strong>gemini-fast</strong> (gratuit et rapide) ou <strong>claude-fast</strong>.</div>
-    <div class="form-group">
-      <label>URL de l'image à analyser</label>
-      <input id="vis-imgurl" type="url" placeholder="https://example.com/photo.jpg" value="https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/320px-PNG_transparency_demonstration_1.png">
-    </div>
-    <div class="form-group">
-      <label>Question sur l'image</label>
-      <textarea id="vis-query">Décris cette image en détail. Qu'est-ce que tu vois ?</textarea>
-    </div>
-    <div class="form-group">
-      <label>Modèle Vision (tous supportent les images)</label>
-      <select id="vis-model">
-        <option value="gemini-fast">gemini-fast ⭐ Gratuit + Rapide</option>
-        <option value="claude-fast">claude-fast (Claude Haiku)</option>
-        <option value="claude">claude (Claude Sonnet)</option>
-        <option value="gemini">gemini (Gemini 3 Flash)</option>
-        <option value="openai">openai (GPT-5 Mini)</option>
-        <option value="openai-large">openai-large (GPT-5.2)</option>
-      </select>
-    </div>
-    <div id="vis-img-preview" style="margin-bottom:12px"></div>
-    <div class="url-box"><span id="vis-url">...</span><button class="copy-btn" onclick="copyEl('vis-url')">📋</button></div>
-    <button class="btn btn-amber" id="vis-btn" onclick="runVision()">👁️ Analyser l'image</button>
-  </div>
-  <div class="card" id="vis-result" style="display:none">
-    <div class="card-title">🧠 Analyse</div>
-    <div id="vis-status"></div>
-    <div class="response-box" id="vis-response"></div>
-    <div class="timing" id="vis-timing"></div>
-    <div style="margin-top:10px"><button class="btn btn-outline btn-sm" onclick="copyText('vis-response')">📋 Copier</button></div>
-  </div>
-</div>
-
-<!-- ══ OPENAI COMPAT ══ -->
-<div class="panel" id="panel-openai">
-  <div class="card">
-    <div class="card-title">⚡ Endpoint Unifié — <code style="font-size:.75rem">GET /api/openai</code></div>
-    <div class="info-box">🔗 Format <strong>reixz-style</strong> compatible : <code>/api/openai?query=Hello&uid=3&model=openai&imgurl=(optionnel)</code></div>
-    <div class="form-group">
-      <label>Query (message)</label>
-      <input id="oa-query" value="Décris ce que tu vois dans cette image et présente-toi.">
-    </div>
-    <div class="grid-2">
-      <div class="form-group"><label>UID</label><input id="oa-uid" value="1"></div>
-      <div class="form-group">
-        <label>Modèle</label>
-        <select id="oa-model">
-          <option value="openai">openai (GPT-5 Mini) ⭐</option>
-          <option value="openai-fast">openai-fast</option>
-          <option value="claude">claude</option>
-          <option value="gemini-fast">gemini-fast ✅ Vision</option>
-          <option value="claude-fast">claude-fast ✅ Vision</option>
-          <option value="deepseek">deepseek</option>
-        </select>
-      </div>
-    </div>
-    <div class="form-group">
-      <label>Image URL (optionnel — active la vision)</label>
-      <input id="oa-imgurl" type="url" placeholder="https://example.com/image.jpg">
-    </div>
-    <div class="url-box"><span id="oa-url">...</span><button class="copy-btn" onclick="copyEl('oa-url')">📋</button></div>
-    <button class="btn btn-primary" id="oa-btn" onclick="runOpenAI()">⚡ Exécuter</button>
-  </div>
-  <div class="card" id="oa-result" style="display:none">
-    <div class="card-title">📨 Réponse JSON</div>
-    <div id="oa-status"></div>
-    <div class="response-box code" id="oa-response"></div>
-    <div class="timing" id="oa-timing"></div>
-    <div style="margin-top:10px"><button class="btn btn-outline btn-sm" onclick="copyText('oa-response')">📋 Copier JSON</button></div>
-  </div>
-</div>
-
-<!-- ══ DOCS ══ -->
-<div class="panel" id="panel-docs">
-  <div class="card">
-    <div class="card-title">📖 Documentation des Endpoints</div>
-    <div class="ep-card"><span class="method">GET</span><span style="color:var(--accent2)">/api/chat?query=Hello&model=openai&system=...</span><div class="ep-desc">Chat text — retourne JSON avec la réponse.</div></div>
-    <div class="ep-card"><span class="method">GET</span><span style="color:var(--accent2)">/api/image?prompt=A+cat&model=flux&width=1024&height=1024</span><div class="ep-desc">Génère une image et la retourne <strong>directement en binaire</strong> (image/jpeg). Utilisable dans &lt;img src&gt;.</div></div>
-    <div class="ep-card"><span class="method">GET</span><span style="color:var(--accent2)">/api/image?prompt=Add+hat&model=nanobanana-pro&imgurl=https://...</span><div class="ep-desc">Édition d'image — fournir l'image source via <code>imgurl</code>. Retourne l'image éditée en binaire.</div></div>
-    <div class="ep-card"><span class="method">GET</span><span style="color:var(--accent2)">/api/search?query=Latest+AI+news&model=searchgpt</span><div class="ep-desc">Recherche web temps réel avec résumé IA et sources.</div></div>
-    <div class="ep-card"><span class="method">GET</span><span style="color:var(--accent2)">/api/openai?query=Hello&uid=3&model=openai&imgurl=(opt)</span><div class="ep-desc">Endpoint unifié. Vision activée automatiquement si <code>imgurl</code> fourni. Serveur récupère l'image en base64.</div></div>
-    <div class="ep-card"><span class="method">GET</span><span style="color:var(--accent2)">/api/models</span><div class="ep-desc">Liste tous les modèles disponibles.</div></div>
-  </div>
-  <div class="card">
-    <div class="card-title">✅ Modèles Image — Gratuits</div>
-    <span class="chip ok">flux ⭐</span><span class="chip ok">flux-realism</span><span class="chip ok">flux-pro</span>
-    <span class="chip ok">turbo</span><span class="chip ok">nanobanana 🍌</span><span class="chip ok">nanobanana-pro 🍌⭐</span>
-    <span class="chip ok">seedream</span>
-    <span class="chip paid">kontext (payant)</span><span class="chip paid">gptimage (payant)</span>
-  </div>
-  <div class="card">
-    <div class="card-title">✅ Modèles Chat — Gratuits</div>
-    <span class="chip ok">openai ⭐</span><span class="chip ok">openai-fast</span><span class="chip ok">openai-large</span>
-    <span class="chip ok">claude</span><span class="chip ok">claude-fast</span><span class="chip ok">gemini-fast ✅ Vision</span>
-    <span class="chip ok">gemini</span><span class="chip ok">gemini-search 🔍</span><span class="chip ok">deepseek</span>
-    <span class="chip ok">deepseek-reasoning</span><span class="chip ok">mistral</span><span class="chip ok">searchgpt 🔍</span>
-    <span class="chip ok">qwen-coder</span><span class="chip ok">llama</span><span class="chip ok">unity</span>
-  </div>
-</div>
-
-</div><!-- /content -->
 
 <script>
-const BASE = window.location.origin;
+  let uploadedBase64 = null;
+  let uploadedMime = null;
+  let lastGeneratedBlob = null;
+  let activeTab = 'url-tab';
 
-function switchTab(name, el) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('panel-' + name).classList.add('active');
-  el.classList.add('active');
-}
+  function switchTab(tabId, btn) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    btn.classList.add('active');
+    activeTab = tabId;
+  }
 
-function setStatus(id, type, msg) {
-  document.getElementById(id).innerHTML = `<div class="status ${type}">${type==='loading'?'<span class="spinner"></span>':type==='success'?'✅':'❌'} ${msg}</div>`;
-}
+  function handleFileUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const result = ev.target.result;
+      const [header, data] = result.split(',');
+      uploadedBase64 = data;
+      uploadedMime = header.match(/:(.*?);/)[1];
+      const preview = document.getElementById('preview-img');
+      preview.src = result;
+      preview.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
 
-function copyEl(id) {
-  navigator.clipboard.writeText(document.getElementById(id).textContent);
-  event.target.textContent = '✅'; setTimeout(() => event.target.textContent = '📋', 1400);
-}
+  async function generate() {
+    const prompt = document.getElementById('prompt').value.trim();
+    if (!prompt) { alert('Entrez un prompt !'); return; }
 
-function copyText(id) {
-  navigator.clipboard.writeText(document.getElementById(id).textContent);
-  const b = event.target; const o = b.textContent;
-  b.textContent = '✅ Copié!'; setTimeout(() => b.textContent = o, 1400);
-}
+    const btn = document.getElementById('gen-btn');
+    const spinner = document.getElementById('spinner');
+    const btnText = document.getElementById('btn-text');
 
-function setLoading(id, on) {
-  const b = document.getElementById(id);
-  b.disabled = on;
-  if (on) { b._t = b.innerHTML; b.innerHTML = '<span class="spinner"></span> En cours...'; }
-  else b.innerHTML = b._t;
-}
+    btn.disabled = true;
+    spinner.style.display = 'block';
+    btnText.textContent = 'Génération...';
 
-// ── CHAT ──
-function updateChatUrl() {
-  const q = document.getElementById('chat-query').value || 'Hello';
-  const m = document.getElementById('chat-model').value;
-  document.getElementById('chat-url').textContent = `${BASE}/api/chat?query=${encodeURIComponent(q)}&model=${m}`;
-}
-document.getElementById('chat-query').addEventListener('input', updateChatUrl);
-document.getElementById('chat-model').addEventListener('change', updateChatUrl);
-updateChatUrl();
+    // Reset UI
+    document.getElementById('placeholder').style.display = 'none';
+    document.getElementById('error-box').style.display = 'none';
+    document.getElementById('result-img').style.display = 'none';
+    document.getElementById('output-actions').style.display = 'none';
+    document.getElementById('loading-state').style.display = 'flex';
 
-async function runChat() {
-  const q = document.getElementById('chat-query').value.trim();
-  const m = document.getElementById('chat-model').value;
-  const s = document.getElementById('chat-system').value;
-  if (!q) return alert('Entrez un message !');
-  const url = `${BASE}/api/chat?query=${encodeURIComponent(q)}&model=${m}&system=${encodeURIComponent(s)}`;
-  document.getElementById('chat-url').textContent = url;
-  document.getElementById('chat-result').style.display = 'block';
-  setStatus('chat-status','loading','En cours...'); setLoading('chat-btn',true);
-  const t0 = Date.now();
-  try {
-    const r = await fetch(url); const d = await r.json();
-    const el = ((Date.now()-t0)/1000).toFixed(2);
-    if (d.status) { setStatus('chat-status','success',`${d.model} — ${el}s`); document.getElementById('chat-response').textContent = d.response; }
-    else setStatus('chat-status','error', d.error);
-    document.getElementById('chat-timing').textContent = `⏱️ ${el}s`;
-  } catch(e) { setStatus('chat-status','error',e.message); }
-  finally { setLoading('chat-btn',false); }
-}
+    try {
+      let responseBlob = null;
+      let jsonData = null;
 
-// ── IMAGE GEN ──
-function updateImgUrl() {
-  const p = document.getElementById('img-prompt').value || 'A cat';
-  const m = document.getElementById('img-model').value;
-  const [w,h] = document.getElementById('img-size').value.split('x');
-  const en = document.getElementById('img-enhance').checked;
-  const seed = document.getElementById('img-seed').value;
-  let url = `${BASE}/api/image?prompt=${encodeURIComponent(p)}&model=${m}&width=${w}&height=${h}`;
-  if (en) url += '&enhance=true';
-  if (seed) url += `&seed=${seed}`;
-  document.getElementById('img-url').textContent = url;
-}
-['img-prompt','img-model','img-size','img-seed'].forEach(id => document.getElementById(id).addEventListener('input', updateImgUrl));
-document.getElementById('img-model').addEventListener('change', updateImgUrl);
-document.getElementById('img-size').addEventListener('change', updateImgUrl);
-document.getElementById('img-enhance').addEventListener('change', updateImgUrl);
-updateImgUrl();
+      if (activeTab === 'url-tab') {
+        const imageUrl = document.getElementById('image-url').value.trim();
+        const params = new URLSearchParams({ prompt });
+        if (imageUrl) params.set('url', imageUrl);
+        const res = await fetch(`/api/img?${params}`);
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.error || `HTTP ${res.status}`);
+        }
+        responseBlob = await res.blob();
+      } else if (activeTab === 'upload-tab') {
+        const body = { prompt };
+        if (uploadedBase64) {
+          body.imageBase64 = uploadedBase64;
+          body.imageMimeType = uploadedMime;
+        }
+        const res = await fetch('/api/img', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+        jsonData = await res.json();
+        if (!res.ok) throw new Error(jsonData.error || `HTTP ${res.status}`);
+        const byteArr = Uint8Array.from(atob(jsonData.imageBase64), c => c.charCodeAt(0));
+        responseBlob = new Blob([byteArr], { type: jsonData.mimeType });
+      } else {
+        // Text only
+        const res = await fetch(`/api/img?${new URLSearchParams({ prompt })}`);
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.error || `HTTP ${res.status}`);
+        }
+        responseBlob = await res.blob();
+      }
 
-async function runImage() {
-  const url = document.getElementById('img-url').textContent;
-  document.getElementById('img-result').style.display = 'block';
-  setStatus('img-status','loading','Génération... (10-40s)'); setLoading('img-btn',true);
-  document.getElementById('img-container').innerHTML = '<div class="image-placeholder">⏳<span>Génération en cours...</span></div>';
-  const t0 = Date.now();
-  try {
-    const r = await fetch(url);
-    if (!r.ok) throw new Error(`Erreur ${r.status}`);
-    const blob = await r.blob(); const el = ((Date.now()-t0)/1000).toFixed(2);
-    const obj = URL.createObjectURL(blob);
-    const img = document.createElement('img'); img.src = obj; img.className = 'image-result';
-    document.getElementById('img-container').innerHTML = ''; document.getElementById('img-container').appendChild(img);
-    setStatus('img-status','success',`Image générée en ${el}s`);
-    document.getElementById('img-timing').textContent = `⏱️ ${el}s`;
-    document.getElementById('img-dl').href = obj;
-  } catch(e) {
-    setStatus('img-status','error',e.message);
-    document.getElementById('img-container').innerHTML = `<div class="image-placeholder">❌<span>${e.message}</span></div>`;
-  } finally { setLoading('img-btn',false); }
-}
+      lastGeneratedBlob = responseBlob;
+      const objectUrl = URL.createObjectURL(responseBlob);
+      const img = document.getElementById('result-img');
+      img.src = objectUrl;
+      img.style.display = 'block';
 
-// ── IMAGE EDIT ──
-function updateEditUrl() {
-  const p = document.getElementById('edit-prompt').value || 'Edit this image';
-  const m = document.getElementById('edit-model').value;
-  const [w,h] = document.getElementById('edit-size').value.split('x');
-  const imgurl = document.getElementById('edit-imgurl').value;
-  let url = `${BASE}/api/image?prompt=${encodeURIComponent(p)}&model=${m}&width=${w}&height=${h}`;
-  if (imgurl) url += `&imgurl=${encodeURIComponent(imgurl)}`;
-  document.getElementById('edit-url').textContent = url;
-}
-document.getElementById('edit-prompt').addEventListener('input', updateEditUrl);
-document.getElementById('edit-model').addEventListener('change', updateEditUrl);
-document.getElementById('edit-size').addEventListener('change', updateEditUrl);
-document.getElementById('edit-imgurl').addEventListener('input', () => {
-  const v = document.getElementById('edit-imgurl').value;
-  if (v) document.getElementById('edit-src').src = v;
-  updateEditUrl();
-});
-updateEditUrl();
+      // Download button
+      const dlBtn = document.getElementById('download-btn');
+      dlBtn.href = objectUrl;
+      dlBtn.download = 'nano-banana-result.jpg';
 
-async function runEdit() {
-  const imgurl = document.getElementById('edit-imgurl').value.trim();
-  if (!imgurl) return alert('Entrez une URL d\'image source !');
-  const url = document.getElementById('edit-url').textContent;
-  document.getElementById('edit-result').style.display = 'block';
-  document.getElementById('edit-src').src = imgurl;
-  setStatus('edit-status','loading','Édition... (20-60s)'); setLoading('edit-btn',true);
-  document.getElementById('edit-container').innerHTML = '<div class="image-placeholder" style="height:180px">⏳<span>Édition...</span></div>';
-  const t0 = Date.now();
-  try {
-    const r = await fetch(url);
-    if (!r.ok) throw new Error(`Erreur ${r.status}`);
-    const blob = await r.blob(); const el = ((Date.now()-t0)/1000).toFixed(2);
-    const obj = URL.createObjectURL(blob);
-    const img = document.createElement('img'); img.src = obj; img.style.cssText = 'width:100%;border-radius:8px;border:1px solid var(--border)';
-    document.getElementById('edit-container').innerHTML = ''; document.getElementById('edit-container').appendChild(img);
-    setStatus('edit-status','success',`Éditée en ${el}s`);
-    document.getElementById('edit-timing').textContent = `⏱️ ${el}s`;
-  } catch(e) {
-    setStatus('edit-status','error',e.message);
-    document.getElementById('edit-container').innerHTML = `<div class="image-placeholder" style="height:180px">❌<span>${e.message}</span></div>`;
-  } finally { setLoading('edit-btn',false); }
-}
+      document.getElementById('output-actions').style.display = 'flex';
 
-// ── SEARCH ──
-function updateSearchUrl() {
-  const q = document.getElementById('search-query').value || 'Latest news';
-  const m = document.getElementById('search-model').value;
-  document.getElementById('search-url').textContent = `${BASE}/api/search?query=${encodeURIComponent(q)}&model=${m}`;
-}
-document.getElementById('search-query').addEventListener('input', updateSearchUrl);
-document.getElementById('search-model').addEventListener('change', updateSearchUrl);
-updateSearchUrl();
+    } catch (err) {
+      const errBox = document.getElementById('error-box');
+      errBox.style.display = 'block';
+      errBox.textContent = '⚠ Erreur : ' + err.message;
+      document.getElementById('placeholder').style.display = 'block';
+    } finally {
+      document.getElementById('loading-state').style.display = 'none';
+      btn.disabled = false;
+      spinner.style.display = 'none';
+      btnText.textContent = '🚀 Générer l\'image';
+    }
+  }
 
-async function runSearch() {
-  const q = document.getElementById('search-query').value.trim();
-  const m = document.getElementById('search-model').value;
-  if (!q) return alert('Entrez une requête !');
-  const url = `${BASE}/api/search?query=${encodeURIComponent(q)}&model=${m}`;
-  document.getElementById('search-url').textContent = url;
-  document.getElementById('search-result').style.display = 'block';
-  setStatus('search-status','loading','Recherche en cours...'); setLoading('search-btn',true);
-  const t0 = Date.now();
-  try {
-    const r = await fetch(url); const d = await r.json();
-    const el = ((Date.now()-t0)/1000).toFixed(2);
-    if (d.status) { setStatus('search-status','success',`Résultats via ${d.model} — ${el}s`); document.getElementById('search-response').textContent = d.response; }
-    else setStatus('search-status','error',d.error);
-    document.getElementById('search-timing').textContent = `⏱️ ${el}s`;
-  } catch(e) { setStatus('search-status','error',e.message); }
-  finally { setLoading('search-btn',false); }
-}
+  function copyApiUrl() {
+    const prompt = document.getElementById('prompt').value.trim();
+    const imageUrl = document.getElementById('image-url').value.trim();
+    const base = window.location.origin;
+    const params = new URLSearchParams({ prompt });
+    if (imageUrl) params.set('url', imageUrl);
+    const full = `${base}/api/img?${params}`;
+    navigator.clipboard.writeText(full).then(() => {
+      alert('URL copiée !\n\n' + full);
+    });
+  }
 
-// ── VISION ──
-function updateVisUrl() {
-  const q = document.getElementById('vis-query').value || 'Describe this image';
-  const m = document.getElementById('vis-model').value;
-  const imgurl = document.getElementById('vis-imgurl').value;
-  document.getElementById('vis-url').textContent = `${BASE}/api/openai?query=${encodeURIComponent(q)}&model=${m}&uid=1&imgurl=${encodeURIComponent(imgurl)}`;
-}
-document.getElementById('vis-query').addEventListener('input', updateVisUrl);
-document.getElementById('vis-model').addEventListener('change', updateVisUrl);
-document.getElementById('vis-imgurl').addEventListener('input', () => {
-  const v = document.getElementById('vis-imgurl').value;
-  const prev = document.getElementById('vis-img-preview');
-  if (v) prev.innerHTML = `<img src="${v}" style="max-height:150px;border-radius:8px;border:1px solid var(--border);margin-bottom:8px">`;
-  updateVisUrl();
-});
-updateVisUrl();
-
-async function runVision() {
-  const imgurl = document.getElementById('vis-imgurl').value.trim();
-  if (!imgurl) return alert('Entrez une URL d\'image !');
-  const url = document.getElementById('vis-url').textContent;
-  document.getElementById('vis-result').style.display = 'block';
-  setStatus('vis-status','loading','Analyse en cours...'); setLoading('vis-btn',true);
-  const t0 = Date.now();
-  try {
-    const r = await fetch(url); const d = await r.json();
-    const el = ((Date.now()-t0)/1000).toFixed(2);
-    if (d.status) { setStatus('vis-status','success',`${d.model_used} — ${el}s`); document.getElementById('vis-response').textContent = d.response; }
-    else setStatus('vis-status','error',d.error);
-    document.getElementById('vis-timing').textContent = `⏱️ ${el}s`;
-  } catch(e) { setStatus('vis-status','error',e.message); }
-  finally { setLoading('vis-btn',false); }
-}
-
-// ── OPENAI COMPAT ──
-function updateOaUrl() {
-  const q = document.getElementById('oa-query').value || 'Hello';
-  const uid = document.getElementById('oa-uid').value || '1';
-  const m = document.getElementById('oa-model').value;
-  const img = document.getElementById('oa-imgurl').value;
-  let url = `${BASE}/api/openai?query=${encodeURIComponent(q)}&uid=${uid}&model=${m}`;
-  if (img) url += `&imgurl=${encodeURIComponent(img)}`;
-  document.getElementById('oa-url').textContent = url;
-}
-['oa-query','oa-uid','oa-imgurl'].forEach(id => document.getElementById(id).addEventListener('input', updateOaUrl));
-document.getElementById('oa-model').addEventListener('change', updateOaUrl);
-updateOaUrl();
-
-async function runOpenAI() {
-  const url = document.getElementById('oa-url').textContent;
-  document.getElementById('oa-result').style.display = 'block';
-  setStatus('oa-status','loading','En cours...'); setLoading('oa-btn',true);
-  const t0 = Date.now();
-  try {
-    const r = await fetch(url); const d = await r.json();
-    const el = ((Date.now()-t0)/1000).toFixed(2);
-    if (d.status) setStatus('oa-status','success',`${d.model_used}${d.vision_mode?' 👁️ Vision':''} — ${el}s`);
-    else setStatus('oa-status','error',d.error);
-    document.getElementById('oa-response').textContent = JSON.stringify(d, null, 2);
-    document.getElementById('oa-timing').textContent = `⏱️ ${el}s`;
-  } catch(e) { setStatus('oa-status','error',e.message); }
-  finally { setLoading('oa-btn',false); }
-}
+  // Drag and drop
+  const zone = document.getElementById('upload-zone');
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      document.getElementById('file-input').files = e.dataTransfer.files;
+      handleFileUpload({ target: { files: [file] } });
+    }
+  });
 </script>
 </body>
 </html>
