@@ -1,228 +1,222 @@
-import express from "express";
-import cors from "cors";
-import path from "path";
-import { fileURLToPath } from "url";
-import multer from "multer";
-import { GoogleGenAI } from "@google/genai";
+const express = require("express");
+const axios = require("axios");
+const cors = require("cors");
+const crypto = require("crypto");
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const PORT = process.env.PORT || 3000;
-
-// ── Clé API (variable d'environnement Render) ──────────────────────────────
-const API_KEY = process.env.GEMINI_API_KEY;
-if (!API_KEY) {
-  console.error("❌  GEMINI_API_KEY manquante dans les variables d'environnement !");
-  process.exit(1);
-}
-
-// ── Client officiel Google GenAI ───────────────────────────────────────────
-const ai = new GoogleGenAI({ apiKey: API_KEY });
-
-// ── Express setup ──────────────────────────────────────────────────────────
 const app = express();
 app.use(cors());
-app.use(express.json({ limit: "30mb" }));
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.json({ limit: "50mb" }));
 
-// Multer — stockage en mémoire (pas sur disque)
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB
-  fileFilter: (_, file, cb) => {
-    const ok = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"];
-    ok.includes(file.mimetype)
-      ? cb(null, true)
-      : cb(new Error("Format non supporté. Utilise JPG, PNG, WEBP ou GIF."));
-  },
-});
+const DEVICE_ID   = "1b27e69d2cc370e1703973d158363b54";
+const DEVICE_UUID = "1b27e69d2cc370e1703973d158363b54";
+const IDENTITY_ID = "190e1a0fcdac428bb1115e1d3d82646287c6ae94c5cc7cd01ff5f0a7e060c762";
+const API_BASE    = "https://api.easemate.ai";
+const MODEL_ID    = 10041;
+const OPERATION_ID = 419;
 
-// ── Helper : télécharge une image distante → buffer ───────────────────────
-async function fetchImageBuffer(url) {
-  const r = await fetch(url, {
-    headers: { "User-Agent": "Mozilla/5.0" },
-    signal: AbortSignal.timeout(15_000),
-  });
-  if (!r.ok) throw new Error(`Impossible de télécharger l'image (HTTP ${r.status})`);
-  const buf = Buffer.from(await r.arrayBuffer());
-  const mime = (r.headers.get("content-type") || "image/jpeg").split(";")[0].trim();
-  return { buffer: buf, mimeType: mime };
+function makeSign(timestamp) {
+  return crypto.createHash("md5").update(String(timestamp)).digest("hex");
 }
 
-// ── Core : appelle Gemini avec le SDK officiel ─────────────────────────────
-async function generateImage({ prompt, imageBuffer, imageMimeType }) {
-  // Construction du prompt selon la doc officielle
-  const parts = [];
+function buildHeaders() {
+  const timestamp = Date.now();
+  const sign = makeSign(timestamp);
+  return {
+    "Accept":             "application/json",
+    "Accept-Encoding":    "gzip, deflate, br",
+    "Accept-Language":    "en-US,en;q=0.9",
+    "Client-Name":        "chatpdf",
+    "Client-Type":        "web",
+    "Content-Type":       "application/json;charset=UTF-8",
+    "Device-Identifier":  DEVICE_ID,
+    "Device-Platform":    "Android,Chrome",
+    "Device-Type":        "web",
+    "Device-Uuid":        DEVICE_UUID,
+    "Identity-Id":        IDENTITY_ID,
+    "Lang":               "en",
+    "Language":           "en-US",
+    "Origin":             "https://www.easemate.ai",
+    "Product-Code":       "888",
+    "Referer":            "https://www.easemate.ai/",
+    "Sec-Ch-Ua":          '"Chromium";v="139", "Not;A=Brand";v="99"',
+    "Sec-Ch-Ua-Mobile":   "?1",
+    "Sec-Ch-Ua-Platform": '"Android"',
+    "Sec-Fetch-Dest":     "empty",
+    "Sec-Fetch-Mode":     "cors",
+    "Sec-Fetch-Site":     "same-site",
+    "Sign":               sign,
+    "Site":               "www.easemate.ai",
+    "Timestamp":          String(timestamp),
+    "User-Agent":         "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Mobile Safari/537.36",
+  };
+}
 
-  // Texte en premier (comme dans la doc)
-  parts.push({ text: prompt });
-
-  // Image optionnelle
-  if (imageBuffer) {
-    parts.push({
-      inlineData: {
-        mimeType: imageMimeType || "image/jpeg",
-        data: imageBuffer.toString("base64"),
-      },
-    });
-  }
-
-  const response = await ai.models.generateContent({
-    model: "gemini-3.1-flash-image-preview",
-    contents: parts,
-    // Config pour forcer la sortie image
-    generationConfig: {
-      responseModalities: ["TEXT", "IMAGE"],
-    },
-  });
-
-  // Extraction résultat (même logique que la doc)
-  let resultImageBuffer = null;
-  let resultMimeType = "image/png";
-  let resultText = null;
-
-  for (const part of response.candidates[0].content.parts) {
-    if (part.text) {
-      resultText = part.text;
-    } else if (part.inlineData) {
-      resultImageBuffer = Buffer.from(part.inlineData.data, "base64");
-      resultMimeType = part.inlineData.mimeType || "image/png";
+async function pollResult(taskId, maxTries = 30) {
+  for (let i = 0; i < maxTries; i++) {
+    await new Promise(r => setTimeout(r, 2000));
+    try {
+      const res = await axios.post(
+        `${API_BASE}/api2/async/query_generate_image`,
+        { taskId, task_type: MODEL_ID },
+        { headers: buildHeaders(), timeout: 15000, decompress: true }
+      );
+      const d = res.data;
+      if (d?.code === 200 && d?.data?.status === "SUCCESS") return d.data;
+      if (d?.data?.status === "FAILED") throw new Error("Génération échouée: " + (d?.data?.msg || ""));
+    } catch (e) {
+      if (e.message.includes("échouée")) throw e;
     }
   }
+  throw new Error("Timeout : image pas prête après 60s");
+}
 
-  if (!resultImageBuffer) {
-    throw new Error(
-      resultText
-        ? `Gemini a répondu en texte : "${resultText}"`
-        : "Gemini n'a retourné aucune image."
+app.all("/api/img", async (req, res) => {
+  try {
+    const p = req.method === "GET" ? req.query : req.body;
+    const { url: imageUrl, prompt, ratio = "1:1" } = p;
+
+    if (!prompt) return res.status(400).json({ error: "Paramètre 'prompt' requis" });
+    if (!imageUrl) return res.status(400).json({ error: "Paramètre 'url' requis" });
+
+    const body = {
+      model_id: MODEL_ID,
+      operation_info: { id: OPERATION_ID, operation: "IMAGE_GENERATION" },
+      object_info: [{ url: imageUrl }],
+      parameters: JSON.stringify({ prompt, aspectRatio: ratio, outputFormat: "jpeg" })
+    };
+
+    const createRes = await axios.post(
+      `${API_BASE}/api2/async/create_generate_image`,
+      body,
+      { headers: buildHeaders(), timeout: 30000, decompress: true }
     );
-  }
 
-  return { buffer: resultImageBuffer, mimeType: resultMimeType, text: resultText };
-}
+    const taskId = createRes.data?.data?.taskId;
+    if (!taskId) return res.status(500).json({ error: "Pas de taskId", raw: createRes.data });
 
-// ── Helper : envoie l'image brute en réponse HTTP ─────────────────────────
-function sendImage(res, buffer, mimeType) {
-  res.set({
-    "Content-Type": mimeType,
-    "Content-Length": buffer.length,
-    "Access-Control-Allow-Origin": "*",
-    "Cache-Control": "no-cache",
-  });
-  res.send(buffer);
-}
+    const result = await pollResult(taskId);
 
-// ═══════════════════════════════════════════════════════════════════════════
-// ENDPOINT 1 — GET /api/img
-// Params : ?prompt=...  &  ?url=IMAGE_URL (optionnel)
-// Retourne : image brute (binary) — utilisable dans <img src="...">
-// ═══════════════════════════════════════════════════════════════════════════
-app.get("/api/img", async (req, res) => {
-  const { prompt, url: imageUrl } = req.query;
-  if (!prompt) return res.status(400).json({ error: "Paramètre 'prompt' requis." });
-
-  try {
-    let imageBuffer = null;
-    let imageMimeType = null;
-
-    if (imageUrl) {
-      const fetched = await fetchImageBuffer(imageUrl);
-      imageBuffer = fetched.buffer;
-      imageMimeType = fetched.mimeType;
-    }
-
-    const result = await generateImage({ prompt, imageBuffer, imageMimeType });
-    sendImage(res, result.buffer, result.mimeType);
-  } catch (e) {
-    console.error("[GET /api/img]", e.message);
-    res.status(500).json({ error: e.message });
-  }
-});
-
-// ═══════════════════════════════════════════════════════════════════════════
-// ENDPOINT 2 — POST /api/img  (JSON)
-// Body : { prompt, imageUrl?, imageBase64?, imageMimeType? }
-// Retourne : JSON { success, dataUrl, imageBase64, mimeType, text }
-// ═══════════════════════════════════════════════════════════════════════════
-app.post("/api/img", async (req, res) => {
-  const { prompt, imageUrl, imageBase64, imageMimeType } = req.body;
-  if (!prompt) return res.status(400).json({ error: "Paramètre 'prompt' requis." });
-
-  try {
-    let imageBuffer = null;
-    let mimeType = imageMimeType || null;
-
-    if (imageBase64) {
-      imageBuffer = Buffer.from(imageBase64, "base64");
-    } else if (imageUrl) {
-      const fetched = await fetchImageBuffer(imageUrl);
-      imageBuffer = fetched.buffer;
-      mimeType = fetched.mimeType;
-    }
-
-    const result = await generateImage({ prompt, imageBuffer, imageMimeType: mimeType });
-
-    res.json({
+    return res.json({
       success: true,
-      imageBase64: result.buffer.toString("base64"),
-      mimeType: result.mimeType,
-      dataUrl: `data:${result.mimeType};base64,${result.buffer.toString("base64")}`,
-      text: result.text,
+      imageUrl: result.url,
+      thumbnailUrl: result.thumbnail_url,
+      taskId: result.taskId,
     });
-  } catch (e) {
-    console.error("[POST /api/img]", e.message);
-    res.status(500).json({ error: e.message });
+
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
   }
 });
 
-// ═══════════════════════════════════════════════════════════════════════════
-// ENDPOINT 3 — POST /api/img/upload  (multipart/form-data)
-// Fields : file (image), prompt (string)
-// Retourne : image brute (binary)
-// ═══════════════════════════════════════════════════════════════════════════
-app.post("/api/img/upload", upload.single("file"), async (req, res) => {
-  const { prompt } = req.body;
-  if (!prompt) return res.status(400).json({ error: "Champ 'prompt' requis." });
-  if (!req.file) return res.status(400).json({ error: "Champ 'file' requis (image)." });
+app.get("/", (req, res) => {
+  res.send(`<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nano Banana — Image Editor API</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:system-ui,sans-serif;background:#0f0f0f;color:#eee;padding:20px;min-height:100vh}
+  h1{text-align:center;font-size:1.8rem;margin-bottom:4px}
+  .sub{text-align:center;color:#888;margin-bottom:28px;font-size:.9rem}
+  .card{background:#1a1a1a;border-radius:14px;padding:22px;max-width:680px;margin:0 auto 20px}
+  label{display:block;margin-bottom:5px;color:#bbb;font-size:.83rem;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+  input,textarea,select{width:100%;padding:10px 13px;border-radius:8px;border:1px solid #2a2a2a;background:#111;color:#eee;font-size:.93rem;margin-bottom:14px;outline:none;transition:border .2s}
+  input:focus,textarea:focus{border-color:#f5c518}
+  textarea{resize:vertical;min-height:75px}
+  button{width:100%;padding:13px;border-radius:9px;border:none;background:linear-gradient(135deg,#f5c518,#d4a017);color:#000;font-size:1rem;font-weight:700;cursor:pointer;transition:opacity .2s}
+  button:hover{opacity:.88}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  .loading{text-align:center;color:#f5c518;margin-top:14px;font-size:.92rem;display:none}
+  .result{margin-top:18px}
+  .result img{width:100%;border-radius:10px;border:2px solid #2a2a2a}
+  .dl{display:block;margin-top:10px;text-align:center;color:#f5c518;font-weight:600;text-decoration:none}
+  .error{color:#ff6b6b;background:#1e0808;padding:12px;border-radius:8px;margin-top:12px;font-size:.88rem}
+  .code{background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:13px;font-family:monospace;font-size:.78rem;color:#7ec8e3;word-break:break-all;margin-bottom:12px;line-height:1.6;white-space:pre-wrap}
+  .tag{font-size:.75rem;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+</style>
+</head>
+<body>
+<h1>🍌 Nano Banana</h1>
+<p class="sub">Éditeur d'images IA · Sans compte · Sans API key</p>
 
+<div class="card">
+  <p class="tag">🖼 Tester l'éditeur</p>
+  <label>URL de l'image à éditer</label>
+  <input id="imgUrl" type="url" placeholder="https://exemple.com/photo.jpg" value="https://iili.io/BAHlZTx.jpg">
+  <label>Prompt (instruction d'édition)</label>
+  <textarea id="prompt">change the background to a sunny beach, keep the subject intact</textarea>
+  <label>Ratio de sortie</label>
+  <select id="ratio">
+    <option value="1:1">1:1 — Carré</option>
+    <option value="16:9">16:9 — Paysage</option>
+    <option value="9:16">9:16 — Portrait</option>
+    <option value="3:2">3:2</option>
+    <option value="2:3">2:3</option>
+  </select>
+  <button id="btn" onclick="generate()">⚡ Éditer l'image</button>
+  <div class="loading" id="loading">⏳ Génération en cours... (15–60s)</div>
+  <div class="result" id="result"></div>
+</div>
+
+<div class="card">
+  <p class="tag">📡 Documentation API</p>
+  <label>GET</label>
+  <div class="code">GET /api/img?url=https://ton-image.jpg&prompt=change background to beach&ratio=1:1</div>
+  <label>POST JSON</label>
+  <div class="code">POST /api/img
+Content-Type: application/json
+
+{
+  "url": "https://ton-image.jpg",
+  "prompt": "change the background to a beach",
+  "ratio": "1:1"
+}</div>
+  <label>Réponse</label>
+  <div class="code">{
+  "success": true,
+  "imageUrl": "https://d1ptb5b3fy36g3.cloudfront.net/...",
+  "thumbnailUrl": "https://...",
+  "taskId": "..."
+}</div>
+</div>
+
+<script>
+async function generate() {
+  const url = document.getElementById('imgUrl').value.trim();
+  const prompt = document.getElementById('prompt').value.trim();
+  const ratio = document.getElementById('ratio').value;
+  const btn = document.getElementById('btn');
+  const loading = document.getElementById('loading');
+  const result = document.getElementById('result');
+  if (!url || !prompt) { alert('URL et prompt requis !'); return; }
+  btn.disabled = true;
+  loading.style.display = 'block';
+  result.innerHTML = '';
   try {
-    const result = await generateImage({
-      prompt,
-      imageBuffer: req.file.buffer,
-      imageMimeType: req.file.mimetype,
+    const r = await fetch('/api/img', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ url, prompt, ratio })
     });
-    sendImage(res, result.buffer, result.mimeType);
-  } catch (e) {
-    console.error("[POST /api/img/upload]", e.message);
-    res.status(500).json({ error: e.message });
+    const data = await r.json();
+    if (data.success && data.imageUrl) {
+      result.innerHTML = '<img src="'+data.imageUrl+'" alt="Image éditée"><a class="dl" href="'+data.imageUrl+'" target="_blank" download>⬇ Télécharger</a>';
+    } else {
+      result.innerHTML = '<div class="error">❌ '+(data.error || JSON.stringify(data))+'</div>';
+    }
+  } catch(e) {
+    result.innerHTML = '<div class="error">❌ Erreur réseau : '+e.message+'</div>';
+  } finally {
+    btn.disabled = false;
+    loading.style.display = 'none';
   }
+}
+</script>
+</body>
+</html>`);
 });
 
-// ── Health check ───────────────────────────────────────────────────────────
-app.get("/health", (_, res) =>
-  res.json({
-    status: "ok",
-    model: "gemini-3.1-flash-image-preview",
-    sdk: "@google/genai",
-    key_configured: !!API_KEY,
-    endpoints: {
-      "GET  /api/img": "?prompt=PROMPT&url=IMG_URL → image brute",
-      "POST /api/img": "{ prompt, imageUrl?, imageBase64? } → JSON",
-      "POST /api/img/upload": "multipart: file + prompt → image brute",
-    },
-  })
-);
-
-app.get("/", (_, res) => res.sendFile(path.join(__dirname, "public", "index.html")));
-
-// Gestion erreurs multer
-app.use((err, req, res, next) => {
-  if (err.code === "LIMIT_FILE_SIZE")
-    return res.status(400).json({ error: "Fichier trop grand (max 10 MB)" });
-  res.status(500).json({ error: err.message });
-});
-
-app.listen(PORT, () => {
-  console.log(`✅  Serveur: http://localhost:${PORT}`);
-  console.log(`🤖  Modèle : gemini-3.1-flash-image-preview`);
-  console.log(`🔑  Clé   : ${API_KEY ? "configurée ✅" : "MANQUANTE ❌"}`);
-});
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log("Nano Banana API — port " + PORT));
