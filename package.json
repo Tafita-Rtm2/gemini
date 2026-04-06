@@ -1,23 +1,21 @@
 {
   "name": "nano-banana-api",
-  "version": "1.0.0",
-  "description": "API endpoint pour Gemini 2.5 Flash Image (Nano Banana) - édition et génération d'images",
+  "version": "3.0.0",
+  "description": "Image generation/editing API using gemini-3.1-flash-image-preview",
   "main": "server.js",
+  "type": "module",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "node --watch server.js"
   },
   "dependencies": {
+    "@google/genai": "^1.0.0",
     "cors": "^2.8.5",
     "express": "^4.18.2",
-    "node-fetch": "^2.7.0"
-  },
-  "devDependencies": {
-    "nodemon": "^3.0.2"
+    "multer": "^1.4.5-lts.1"
   },
   "engines": {
     "node": ">=18.0.0"
   },
-  "keywords": ["gemini", "ai", "image", "nano-banana", "api"],
   "license": "MIT"
 }
