@@ -3,1070 +3,615 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🤖 Free AI API — Test Interface</title>
+<title>🤖 Free AI API v2.0 — Test Interface</title>
 <style>
-  :root {
-    --bg: #0a0a0f;
-    --surface: #12121a;
-    --card: #1a1a26;
-    --border: #2a2a3e;
-    --accent: #7c3aed;
-    --accent2: #06b6d4;
-    --accent3: #10b981;
-    --accent4: #f59e0b;
-    --text: #e2e8f0;
-    --muted: #64748b;
-    --success: #10b981;
-    --error: #ef4444;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Segoe UI', system-ui, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-  }
-
-  /* HEADER */
-  header {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-    border-bottom: 1px solid var(--border);
-    padding: 20px 32px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-  .logo { font-size: 2rem; }
-  header h1 { font-size: 1.5rem; font-weight: 700; }
-  header h1 span { color: var(--accent2); }
-  .badge {
-    background: rgba(16,185,129,0.15);
-    border: 1px solid var(--success);
-    color: var(--success);
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    margin-left: auto;
-  }
-
-  /* NAV TABS */
-  .tabs {
-    display: flex;
-    gap: 4px;
-    padding: 20px 32px 0;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
-    overflow-x: auto;
-  }
-  .tab {
-    padding: 12px 24px;
-    border-radius: 8px 8px 0 0;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 0.9rem;
-    color: var(--muted);
-    transition: all 0.2s;
-    border: none;
-    background: transparent;
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .tab:hover { color: var(--text); background: rgba(255,255,255,0.05); }
-  .tab.active {
-    color: var(--accent2);
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-bottom: 1px solid var(--card);
-    margin-bottom: -1px;
-  }
-
-  /* CONTENT */
-  .content {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 32px;
-  }
-
-  .panel { display: none; }
-  .panel.active { display: block; }
-
-  /* CARD */
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 24px;
-    margin-bottom: 20px;
-  }
-  .card-title {
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--accent2);
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  /* FORM ELEMENTS */
-  .form-group { margin-bottom: 16px; }
-  label {
-    display: block;
-    font-size: 0.85rem;
-    color: var(--muted);
-    margin-bottom: 6px;
-    font-weight: 500;
-  }
-  input, select, textarea {
-    width: 100%;
-    padding: 10px 14px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text);
-    font-size: 0.95rem;
-    outline: none;
-    transition: border-color 0.2s;
-    font-family: inherit;
-  }
-  input:focus, select:focus, textarea:focus {
-    border-color: var(--accent2);
-  }
-  textarea { resize: vertical; min-height: 80px; }
-  select option { background: var(--surface); }
-
-  /* GRID */
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  @media(max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
-
-  /* BUTTONS */
-  .btn {
-    padding: 11px 24px;
-    border: none;
-    border-radius: 8px;
-    font-weight: 700;
-    font-size: 0.95rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .btn-primary {
-    background: linear-gradient(135deg, var(--accent), #9333ea);
-    color: white;
-  }
-  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
-  .btn-primary:active { transform: translateY(0); }
-  .btn-cyan {
-    background: linear-gradient(135deg, var(--accent2), #0891b2);
-    color: white;
-  }
-  .btn-cyan:hover { opacity: 0.9; transform: translateY(-1px); }
-  .btn-green {
-    background: linear-gradient(135deg, var(--accent3), #059669);
-    color: white;
-  }
-  .btn-green:hover { opacity: 0.9; transform: translateY(-1px); }
-  .btn-sm {
-    padding: 6px 14px;
-    font-size: 0.8rem;
-    border-radius: 6px;
-  }
-  .btn-outline {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--muted);
-  }
-  .btn-outline:hover { border-color: var(--accent2); color: var(--accent2); }
-  button:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
-
-  /* URL DISPLAY */
-  .url-box {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 14px;
-    font-family: 'Courier New', monospace;
-    font-size: 0.8rem;
-    color: var(--accent2);
-    word-break: break-all;
-    margin: 12px 0;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .url-box span { flex: 1; }
-
-  /* RESPONSE */
-  .response-box {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 16px;
-    min-height: 120px;
-    font-size: 0.9rem;
-    line-height: 1.7;
-    white-space: pre-wrap;
-    word-break: break-word;
-  }
-  .response-box.code {
-    font-family: 'Courier New', monospace;
-    font-size: 0.8rem;
-  }
-  .response-box.loading {
-    color: var(--muted);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  /* IMAGE RESULT */
-  .image-result {
-    border-radius: 10px;
-    max-width: 100%;
-    border: 2px solid var(--border);
-    margin-top: 12px;
-    display: block;
-  }
-  .image-placeholder {
-    background: var(--surface);
-    border: 2px dashed var(--border);
-    border-radius: 10px;
-    height: 300px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--muted);
-    flex-direction: column;
-    gap: 8px;
-    font-size: 0.9rem;
-    margin-top: 12px;
-  }
-
-  /* STATUS */
-  .status {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    margin-bottom: 8px;
-  }
-  .status.success { background: rgba(16,185,129,0.15); color: var(--success); border: 1px solid var(--success); }
-  .status.error { background: rgba(239,68,68,0.15); color: var(--error); border: 1px solid var(--error); }
-  .status.loading { background: rgba(124,58,237,0.15); color: var(--accent); border: 1px solid var(--accent); }
-
-  /* SPINNER */
-  .spinner {
-    width: 16px; height: 16px;
-    border: 2px solid rgba(124,58,237,0.3);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    display: inline-block;
-    flex-shrink: 0;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* MODELS GRID */
-  .models-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 8px;
-  }
-  .model-chip {
-    padding: 5px 12px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    font-size: 0.78rem;
-    color: var(--muted);
-    cursor: pointer;
-    transition: all 0.15s;
-    font-family: monospace;
-  }
-  .model-chip:hover { border-color: var(--accent2); color: var(--accent2); }
-  .model-chip.chat { border-color: rgba(124,58,237,0.4); }
-  .model-chip.image { border-color: rgba(6,182,212,0.4); }
-  .model-chip.search { border-color: rgba(16,185,129,0.4); }
-
-  /* ENDPOINT CARD */
-  .endpoint-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 14px 16px;
-    margin-bottom: 10px;
-    font-family: monospace;
-    font-size: 0.82rem;
-  }
-  .endpoint-method {
-    display: inline-block;
-    background: rgba(16,185,129,0.15);
-    color: var(--success);
-    border: 1px solid rgba(16,185,129,0.3);
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 0.7rem;
-    font-weight: 700;
-    margin-right: 8px;
-  }
-  .endpoint-path { color: var(--accent2); }
-  .endpoint-desc { font-family: sans-serif; font-size: 0.8rem; color: var(--muted); margin-top: 6px; }
-
-  /* COPY BUTTON */
-  .copy-btn {
-    background: transparent;
-    border: none;
-    color: var(--muted);
-    cursor: pointer;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 0.85rem;
-    transition: color 0.2s;
-    flex-shrink: 0;
-  }
-  .copy-btn:hover { color: var(--accent2); }
-
-  /* DIVIDER */
-  .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
-
-  /* INFO BOX */
-  .info-box {
-    background: rgba(6,182,212,0.08);
-    border: 1px solid rgba(6,182,212,0.3);
-    border-radius: 8px;
-    padding: 14px 16px;
-    font-size: 0.85rem;
-    color: var(--accent2);
-    margin-bottom: 16px;
-  }
-
-  /* TIMING */
-  .timing {
-    font-size: 0.75rem;
-    color: var(--muted);
-    text-align: right;
-    margin-top: 6px;
-  }
+  :root{--bg:#0a0a0f;--surface:#12121a;--card:#1a1a26;--border:#2a2a3e;--accent:#7c3aed;--accent2:#06b6d4;--accent3:#10b981;--text:#e2e8f0;--muted:#64748b;--success:#10b981;--error:#ef4444;--warn:#f59e0b}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+  header{background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;gap:12px}
+  .logo{font-size:1.8rem}
+  header h1{font-size:1.3rem;font-weight:700}
+  header h1 span{color:var(--accent2)}
+  .badge{background:rgba(16,185,129,.15);border:1px solid var(--success);color:var(--success);padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;margin-left:auto}
+  .fix-badge{background:rgba(245,158,11,.15);border:1px solid var(--warn);color:var(--warn);padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;margin-left:8px}
+  .tabs{display:flex;gap:4px;padding:16px 24px 0;border-bottom:1px solid var(--border);background:var(--surface);overflow-x:auto}
+  .tab{padding:10px 18px;border-radius:8px 8px 0 0;cursor:pointer;font-weight:600;font-size:.85rem;color:var(--muted);transition:all .2s;border:none;background:transparent;white-space:nowrap;display:flex;align-items:center;gap:6px}
+  .tab:hover{color:var(--text);background:rgba(255,255,255,.05)}
+  .tab.active{color:var(--accent2);background:var(--card);border:1px solid var(--border);border-bottom:1px solid var(--card);margin-bottom:-1px}
+  .content{max-width:1050px;margin:0 auto;padding:24px}
+  .panel{display:none}.panel.active{display:block}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px}
+  .card-title{font-size:.95rem;font-weight:700;color:var(--accent2);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  .form-group{margin-bottom:14px}
+  label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:5px;font-weight:500}
+  input,select,textarea{width:100%;padding:9px 12px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.92rem;outline:none;transition:border-color .2s;font-family:inherit}
+  input:focus,select:focus,textarea:focus{border-color:var(--accent2)}
+  textarea{resize:vertical;min-height:70px}
+  select option{background:var(--surface)}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:600px){.grid-2{grid-template-columns:1fr}}
+  .btn{padding:10px 22px;border:none;border-radius:8px;font-weight:700;font-size:.92rem;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:7px}
+  .btn-primary{background:linear-gradient(135deg,var(--accent),#9333ea);color:#fff}
+  .btn-cyan{background:linear-gradient(135deg,var(--accent2),#0891b2);color:#fff}
+  .btn-green{background:linear-gradient(135deg,var(--accent3),#059669);color:#fff}
+  .btn-amber{background:linear-gradient(135deg,var(--warn),#d97706);color:#fff}
+  .btn:hover{opacity:.9;transform:translateY(-1px)}.btn:active{transform:none}
+  button:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
+  .btn-sm{padding:5px 12px;font-size:.78rem}
+  .btn-outline{background:transparent;border:1px solid var(--border);color:var(--muted)}
+  .btn-outline:hover{border-color:var(--accent2);color:var(--accent2)}
+  .url-box{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-family:monospace;font-size:.75rem;color:var(--accent2);word-break:break-all;margin:10px 0;display:flex;align-items:center;gap:8px}
+  .url-box span{flex:1}
+  .copy-btn{background:transparent;border:none;color:var(--muted);cursor:pointer;padding:2px 6px;border-radius:4px;font-size:.82rem;transition:color .2s;flex-shrink:0}
+  .copy-btn:hover{color:var(--accent2)}
+  .response-box{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;min-height:100px;font-size:.88rem;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+  .response-box.code{font-family:monospace;font-size:.77rem}
+  .status{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;margin-bottom:7px}
+  .status.success{background:rgba(16,185,129,.15);color:var(--success);border:1px solid var(--success)}
+  .status.error{background:rgba(239,68,68,.15);color:var(--error);border:1px solid var(--error)}
+  .status.loading{background:rgba(124,58,237,.15);color:var(--accent);border:1px solid var(--accent)}
+  .spinner{width:14px;height:14px;border:2px solid rgba(124,58,237,.3);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;display:inline-block;flex-shrink:0}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .image-result{border-radius:10px;max-width:100%;border:2px solid var(--border);margin-top:10px;display:block}
+  .image-placeholder{background:var(--surface);border:2px dashed var(--border);border-radius:10px;height:260px;display:flex;align-items:center;justify-content:center;color:var(--muted);flex-direction:column;gap:8px;font-size:.88rem;margin-top:10px}
+  .timing{font-size:.72rem;color:var(--muted);text-align:right;margin-top:5px}
+  .info-box{background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.3);border-radius:8px;padding:12px 14px;font-size:.83rem;color:var(--accent2);margin-bottom:14px;line-height:1.6}
+  .warn-box{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:12px 14px;font-size:.83rem;color:var(--warn);margin-bottom:14px;line-height:1.6}
+  .chip{display:inline-block;padding:3px 10px;background:var(--surface);border:1px solid var(--border);border-radius:20px;font-size:.74rem;font-family:monospace;color:var(--muted);margin:2px}
+  .chip.ok{border-color:rgba(16,185,129,.5);color:var(--success)}
+  .chip.paid{border-color:rgba(239,68,68,.4);color:var(--error);text-decoration:line-through}
+  .ep-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:8px;font-family:monospace;font-size:.8rem}
+  .method{display:inline-block;background:rgba(16,185,129,.15);color:var(--success);border:1px solid rgba(16,185,129,.3);padding:1px 7px;border-radius:4px;font-size:.68rem;font-weight:700;margin-right:6px}
+  .ep-desc{font-family:sans-serif;font-size:.78rem;color:var(--muted);margin-top:5px}
 </style>
 </head>
 <body>
-
 <header>
   <div class="logo">🤖</div>
   <div>
     <h1>Free AI API <span>Server</span></h1>
-    <div style="font-size:0.8rem;color:var(--muted);">Powered by Pollinations.ai — No API Key Required</div>
+    <div style="font-size:.75rem;color:var(--muted)">Pollinations.ai — No API Key Required</div>
   </div>
   <div class="badge">✅ 100% FREE</div>
+  <div class="fix-badge">v2.0 Fixed</div>
 </header>
 
-<div class="tabs" id="tabs">
-  <button class="tab active" onclick="switchTab('chat')">💬 Chat / GPT</button>
-  <button class="tab" onclick="switchTab('image')">🎨 Image Generate</button>
-  <button class="tab" onclick="switchTab('edit')">✏️ Image Edit</button>
-  <button class="tab" onclick="switchTab('search')">🔍 Web Search</button>
-  <button class="tab" onclick="switchTab('openai')">⚡ /api/openai</button>
-  <button class="tab" onclick="switchTab('docs')">📖 Docs</button>
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('chat',this)">💬 Chat / GPT</button>
+  <button class="tab" onclick="switchTab('image',this)">🎨 Image Generate</button>
+  <button class="tab" onclick="switchTab('edit',this)">✏️ Image Edit</button>
+  <button class="tab" onclick="switchTab('search',this)">🔍 Web Search</button>
+  <button class="tab" onclick="switchTab('vision',this)">👁️ Vision</button>
+  <button class="tab" onclick="switchTab('openai',this)">⚡ /api/openai</button>
+  <button class="tab" onclick="switchTab('docs',this)">📖 Docs</button>
 </div>
 
 <div class="content">
 
-  <!-- ══════════════ CHAT TAB ══════════════ -->
-  <div class="panel active" id="panel-chat">
-    <div class="card">
-      <div class="card-title">💬 Chat / GPT — <code style="font-size:0.8rem">GET /api/chat</code></div>
-
-      <div class="info-box">
-        🚀 Accès gratuit à GPT-4, Claude, Gemini, DeepSeek et plus — sans aucune clé API !
-      </div>
-
-      <div class="form-group">
-        <label>Message / Prompt</label>
-        <textarea id="chat-query" placeholder="Ex: Explain quantum computing in simple terms...">Bonjour ! Qui es-tu et quels modèles tu peux utiliser ?</textarea>
-      </div>
-
-      <div class="grid-2">
-        <div class="form-group">
-          <label>Modèle</label>
-          <select id="chat-model">
-            <option value="openai">openai (GPT-4.1) ⭐</option>
-            <option value="openai-fast">openai-fast (GPT-4.1-mini)</option>
-            <option value="openai-reasoning">openai-reasoning (o4-mini)</option>
-            <option value="claude">claude (Claude Sonnet)</option>
-            <option value="gemini">gemini (Gemini 2.0 Flash)</option>
-            <option value="gemini-thinking">gemini-thinking</option>
-            <option value="deepseek">deepseek (DeepSeek V3)</option>
-            <option value="deepseek-reasoning">deepseek-reasoning (R1)</option>
-            <option value="mistral">mistral</option>
-            <option value="llama">llama</option>
-            <option value="qwen-coder">qwen-coder</option>
-            <option value="unity">unity (uncensored)</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>System Prompt (optionnel)</label>
-          <input id="chat-system" type="text" placeholder="You are a helpful assistant." value="You are a helpful AI assistant.">
-        </div>
-      </div>
-
-      <div class="url-box" id="chat-url-box">
-        <span id="chat-url-display">L'URL sera générée ici...</span>
-        <button class="copy-btn" onclick="copyUrl('chat-url-display')">📋</button>
-      </div>
-
-      <button class="btn btn-primary" onclick="runChat()" id="chat-btn">
-        🚀 Envoyer la requête
-      </button>
+<!-- ══ CHAT ══ -->
+<div class="panel active" id="panel-chat">
+  <div class="card">
+    <div class="card-title">💬 Chat — <code style="font-size:.75rem">GET /api/chat</code></div>
+    <div class="info-box">🚀 GPT-5, Claude, Gemini, DeepSeek et plus — aucune clé API !</div>
+    <div class="form-group">
+      <label>Message</label>
+      <textarea id="chat-query">Bonjour ! Qui es-tu et quels modèles tu utilises ?</textarea>
     </div>
-
-    <div class="card" id="chat-result" style="display:none">
-      <div class="card-title">📨 Réponse</div>
-      <div id="chat-status"></div>
-      <div class="response-box" id="chat-response"></div>
-      <div class="timing" id="chat-timing"></div>
-      <div style="margin-top:12px">
-        <button class="btn btn-outline btn-sm" onclick="copyText('chat-response')">📋 Copier</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══════════════ IMAGE GENERATE TAB ══════════════ -->
-  <div class="panel" id="panel-image">
-    <div class="card">
-      <div class="card-title">🎨 Génération d'Image — <code style="font-size:0.8rem">GET /api/image</code></div>
-
-      <div class="info-box">
-        🖼️ L'endpoint retourne l'image <strong>directement en binaire</strong> (image/jpeg) — parfait pour <code>&lt;img src="/api/image?..."&gt;</code>
-      </div>
-
-      <div class="form-group">
-        <label>Prompt (description de l'image)</label>
-        <textarea id="img-prompt" placeholder="A beautiful sunset over the ocean, photorealistic, 4k">A majestic dragon flying over a futuristic cyberpunk city at night, neon lights, detailed, 4k</textarea>
-      </div>
-
-      <div class="grid-2">
-        <div class="form-group">
-          <label>Modèle</label>
-          <select id="img-model">
-            <option value="flux">flux (Rapide & Gratuit) ⭐</option>
-            <option value="flux-realism">flux-realism</option>
-            <option value="flux-pro">flux-pro</option>
-            <option value="gptimage">gptimage (OpenAI)</option>
-            <option value="nanobanana">nanobanana (Gemini Flash) 🍌</option>
-            <option value="nanobanana-pro">nanobanana-pro (Gemini Pro) 🍌⭐</option>
-            <option value="seedream">seedream</option>
-            <option value="turbo">turbo (SDXL)</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Résolution</label>
-          <select id="img-size">
-            <option value="1024x1024">1024×1024 (Carré)</option>
-            <option value="1280x720">1280×720 (16:9)</option>
-            <option value="768x1344">768×1344 (Portrait)</option>
-            <option value="1344x768">1344×768 (Paysage)</option>
-            <option value="512x512">512×512 (Petit)</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="grid-2">
-        <div class="form-group">
-          <label><input type="checkbox" id="img-enhance"> ✨ Enhance prompt (IA améliore le prompt)</label>
-        </div>
-        <div class="form-group">
-          <label>Seed (optionnel, pour résultats reproductibles)</label>
-          <input id="img-seed" type="number" placeholder="Ex: 42">
-        </div>
-      </div>
-
-      <div class="url-box" id="img-url-box">
-        <span id="img-url-display">L'URL sera générée ici...</span>
-        <button class="copy-btn" onclick="copyUrl('img-url-display')">📋</button>
-      </div>
-
-      <button class="btn btn-cyan" onclick="runImage()" id="img-btn">
-        🎨 Générer l'image
-      </button>
-    </div>
-
-    <div class="card" id="img-result" style="display:none">
-      <div class="card-title">🖼️ Résultat</div>
-      <div id="img-status"></div>
-      <div id="img-container"><div class="image-placeholder">🖼️<span>L'image apparaîtra ici</span></div></div>
-      <div class="timing" id="img-timing"></div>
-      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap" id="img-actions" style="display:none">
-        <a id="img-download" class="btn btn-outline btn-sm" download="ai-image.jpg">⬇️ Télécharger</a>
-        <button class="btn btn-outline btn-sm" onclick="copyUrl('img-url-display')">📋 Copier l'URL</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══════════════ IMAGE EDIT TAB ══════════════ -->
-  <div class="panel" id="panel-edit">
-    <div class="card">
-      <div class="card-title">✏️ Édition d'Image (Image-to-Image) — <code style="font-size:0.8rem">GET /api/image?imgurl=...</code></div>
-
-      <div class="info-box">
-        ✏️ Fournissez une image source + un prompt pour la transformer. Utilisez le modèle <strong>kontext</strong> ou <strong>nanobanana</strong> pour les meilleurs résultats d'édition.
-      </div>
-
-      <div class="form-group">
-        <label>URL de l'image source (à modifier)</label>
-        <input id="edit-imgurl" type="url" placeholder="https://example.com/mon-image.jpg" value="">
-      </div>
-
-      <div class="form-group">
-        <label>Instruction d'édition</label>
-        <textarea id="edit-prompt" placeholder="Ex: Add a hat to the person, change background to beach, make it anime style...">Transform this image into an anime art style, keep the same composition</textarea>
-      </div>
-
-      <div class="grid-2">
-        <div class="form-group">
-          <label>Modèle (kontext = meilleur pour l'édition)</label>
-          <select id="edit-model">
-            <option value="kontext">kontext (Flux Kontext) ⭐ Meilleur</option>
-            <option value="nanobanana">nanobanana (Gemini Flash) 🍌</option>
-            <option value="nanobanana-pro">nanobanana-pro (Gemini Pro) 🍌</option>
-            <option value="seedream">seedream</option>
-            <option value="flux">flux</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Résolution</label>
-          <select id="edit-size">
-            <option value="1024x1024">1024×1024</option>
-            <option value="1280x720">1280×720</option>
-            <option value="768x1344">768×1344</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="url-box">
-        <span id="edit-url-display">L'URL sera générée ici...</span>
-        <button class="copy-btn" onclick="copyUrl('edit-url-display')">📋</button>
-      </div>
-
-      <button class="btn btn-primary" onclick="runEdit()" id="edit-btn">
-        ✏️ Éditer l'image
-      </button>
-    </div>
-
-    <div class="card" id="edit-result" style="display:none">
-      <div class="card-title">🖼️ Image Éditée</div>
-      <div id="edit-status"></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px" id="edit-compare">
-        <div>
-          <div style="font-size:0.8rem;color:var(--muted);margin-bottom:6px">📸 Source</div>
-          <img id="edit-source-preview" style="width:100%;border-radius:8px;border:1px solid var(--border)">
-        </div>
-        <div>
-          <div style="font-size:0.8rem;color:var(--muted);margin-bottom:6px">✨ Résultat</div>
-          <div id="edit-container"><div class="image-placeholder" style="height:200px">✨<span>Résultat ici</span></div></div>
-        </div>
-      </div>
-      <div class="timing" id="edit-timing"></div>
-    </div>
-  </div>
-
-  <!-- ══════════════ SEARCH TAB ══════════════ -->
-  <div class="panel" id="panel-search">
-    <div class="card">
-      <div class="card-title">🔍 Web Search — <code style="font-size:0.8rem">GET /api/search</code></div>
-
-      <div class="info-box">
-        🌐 Recherche web en temps réel via IA — résultats actuels avec sources, sans clé API !
-      </div>
-
-      <div class="form-group">
-        <label>Requête de recherche</label>
-        <textarea id="search-query" placeholder="Ex: Latest AI news today, Prix du bitcoin maintenant...">Quelles sont les dernières nouvelles en intelligence artificielle aujourd'hui ?</textarea>
-      </div>
-
+    <div class="grid-2">
       <div class="form-group">
         <label>Modèle</label>
-        <select id="search-model">
-          <option value="searchgpt">searchgpt ⭐ (Optimisé recherche)</option>
-          <option value="gemini">gemini (Google Search intégré)</option>
-          <option value="openai">openai</option>
+        <select id="chat-model">
+          <option value="openai">openai (GPT-5 Mini) ⭐</option>
+          <option value="openai-fast">openai-fast (GPT-5 Nano)</option>
+          <option value="openai-large">openai-large (GPT-5.2)</option>
+          <option value="claude">claude (Claude Sonnet)</option>
+          <option value="claude-fast">claude-fast (Claude Haiku)</option>
+          <option value="gemini-fast">gemini-fast (Gemini 2.5 Lite) ✅ Gratuit</option>
+          <option value="gemini">gemini (Gemini 3 Flash)</option>
+          <option value="deepseek">deepseek (DeepSeek V3.2)</option>
+          <option value="deepseek-reasoning">deepseek-reasoning (R1)</option>
+          <option value="mistral">mistral (Mistral Small)</option>
+          <option value="qwen-coder">qwen-coder</option>
+          <option value="llama">llama (Llama 3)</option>
+          <option value="unity">unity (uncensored)</option>
         </select>
       </div>
-
-      <div class="url-box">
-        <span id="search-url-display">L'URL sera générée ici...</span>
-        <button class="copy-btn" onclick="copyUrl('search-url-display')">📋</button>
-      </div>
-
-      <button class="btn btn-green" onclick="runSearch()" id="search-btn">
-        🔍 Rechercher
-      </button>
-    </div>
-
-    <div class="card" id="search-result" style="display:none">
-      <div class="card-title">📰 Résultats</div>
-      <div id="search-status"></div>
-      <div class="response-box" id="search-response"></div>
-      <div class="timing" id="search-timing"></div>
-      <div style="margin-top:12px">
-        <button class="btn btn-outline btn-sm" onclick="copyText('search-response')">📋 Copier</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══════════════ OPENAI COMPAT TAB ══════════════ -->
-  <div class="panel" id="panel-openai">
-    <div class="card">
-      <div class="card-title">⚡ Endpoint Unifié — <code style="font-size:0.8rem">GET /api/openai</code></div>
-
-      <div class="info-box">
-        🔗 Format compatible <strong>reixz-style</strong> : <code>/api/openai?query=Hello&uid=3&model=openai&imgurl=(optionnel)</code><br>
-        Si <code>imgurl</code> est fourni → mode Vision (analyse d'image). Sinon → Chat standard.
-      </div>
-
       <div class="form-group">
-        <label>Query (message)</label>
-        <input id="oa-query" type="text" value="Describe what you see and who you are" placeholder="Votre message...">
+        <label>System Prompt</label>
+        <input id="chat-system" value="You are a helpful AI assistant.">
       </div>
+    </div>
+    <div class="url-box"><span id="chat-url">...</span><button class="copy-btn" onclick="copyEl('chat-url')">📋</button></div>
+    <button class="btn btn-primary" id="chat-btn" onclick="runChat()">🚀 Envoyer</button>
+  </div>
+  <div class="card" id="chat-result" style="display:none">
+    <div class="card-title">📨 Réponse</div>
+    <div id="chat-status"></div>
+    <div class="response-box" id="chat-response"></div>
+    <div class="timing" id="chat-timing"></div>
+    <div style="margin-top:10px"><button class="btn btn-outline btn-sm" onclick="copyText('chat-response')">📋 Copier</button></div>
+  </div>
+</div>
 
-      <div class="grid-2">
-        <div class="form-group">
-          <label>UID (identifiant utilisateur)</label>
-          <input id="oa-uid" type="text" value="1" placeholder="1">
-        </div>
-        <div class="form-group">
-          <label>Modèle</label>
-          <select id="oa-model">
-            <option value="openai">openai (GPT-4.1) ⭐</option>
-            <option value="openai-fast">openai-fast</option>
-            <option value="claude">claude</option>
-            <option value="gemini">gemini</option>
-            <option value="deepseek">deepseek</option>
-          </select>
-        </div>
-      </div>
-
+<!-- ══ IMAGE GENERATE ══ -->
+<div class="panel" id="panel-image">
+  <div class="card">
+    <div class="card-title">🎨 Génération Image — <code style="font-size:.75rem">GET /api/image</code></div>
+    <div class="info-box">🖼️ Retourne l'image <strong>directement en binaire</strong> — utilisable dans <code>&lt;img src="/api/image?..."&gt;</code></div>
+    <div class="warn-box">⚠️ <strong>kontext</strong> et <strong>gptimage</strong> ont été retirés — ils nécessitent maintenant une clé payante chez Pollinations. Modèles gratuits : flux, nanobanana, nanobanana-pro, seedream.</div>
+    <div class="form-group">
+      <label>Prompt</label>
+      <textarea id="img-prompt">A majestic dragon flying over a cyberpunk city at night, neon lights, 4K photorealistic</textarea>
+    </div>
+    <div class="grid-2">
       <div class="form-group">
-        <label>Image URL (optionnel — pour analyse d'image / vision)</label>
-        <input id="oa-imgurl" type="url" placeholder="https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/320px-PNG_transparency_demonstration_1.png">
+        <label>Modèle (tous 100% gratuits ✅)</label>
+        <select id="img-model">
+          <option value="flux">flux (Flux Schnell) — Le plus rapide ⭐</option>
+          <option value="flux-realism">flux-realism — Photoréaliste</option>
+          <option value="flux-pro">flux-pro — Haute qualité</option>
+          <option value="turbo">turbo (SDXL Turbo) — Ultra rapide</option>
+          <option value="nanobanana">nanobanana (Gemini Flash) 🍌</option>
+          <option value="nanobanana-pro">nanobanana-pro (Gemini Pro) 🍌⭐</option>
+          <option value="seedream">seedream — Artistique</option>
+        </select>
       </div>
-
-      <div class="url-box">
-        <span id="oa-url-display">L'URL sera générée ici...</span>
-        <button class="copy-btn" onclick="copyUrl('oa-url-display')">📋</button>
+      <div class="form-group">
+        <label>Résolution</label>
+        <select id="img-size">
+          <option value="1024x1024">1024×1024 (Carré)</option>
+          <option value="1280x720">1280×720 (16:9)</option>
+          <option value="768x1344">768×1344 (Portrait)</option>
+          <option value="1344x768">1344×768 (Paysage)</option>
+          <option value="512x512">512×512 (Petit/Rapide)</option>
+        </select>
       </div>
-
-      <button class="btn btn-primary" onclick="runOpenAI()" id="oa-btn">
-        ⚡ Exécuter
-      </button>
     </div>
-
-    <div class="card" id="oa-result" style="display:none">
-      <div class="card-title">📨 Réponse JSON</div>
-      <div id="oa-status"></div>
-      <div class="response-box code" id="oa-response"></div>
-      <div class="timing" id="oa-timing"></div>
-      <div style="margin-top:12px">
-        <button class="btn btn-outline btn-sm" onclick="copyText('oa-response')">📋 Copier JSON</button>
-      </div>
+    <div class="grid-2">
+      <div class="form-group"><label><input type="checkbox" id="img-enhance"> ✨ Enhance prompt (IA améliore)</label></div>
+      <div class="form-group"><label>Seed (optionnel)</label><input id="img-seed" type="number" placeholder="Ex: 42"></div>
+    </div>
+    <div class="url-box"><span id="img-url">...</span><button class="copy-btn" onclick="copyEl('img-url')">📋</button></div>
+    <button class="btn btn-cyan" id="img-btn" onclick="runImage()">🎨 Générer</button>
+  </div>
+  <div class="card" id="img-result" style="display:none">
+    <div class="card-title">🖼️ Résultat</div>
+    <div id="img-status"></div>
+    <div id="img-container"><div class="image-placeholder">🖼️<span>L'image apparaîtra ici</span></div></div>
+    <div class="timing" id="img-timing"></div>
+    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+      <a id="img-dl" class="btn btn-outline btn-sm" download="ai-image.jpg">⬇️ Télécharger</a>
+      <button class="btn btn-outline btn-sm" onclick="copyEl('img-url')">📋 Copier URL</button>
     </div>
   </div>
+</div>
 
-  <!-- ══════════════ DOCS TAB ══════════════ -->
-  <div class="panel" id="panel-docs">
-    <div class="card">
-      <div class="card-title">📖 Documentation des Endpoints</div>
-
-      <div class="endpoint-card">
-        <span class="endpoint-method">GET</span>
-        <span class="endpoint-path">/api/chat?query=Hello&model=openai&system=You+are+helpful</span>
-        <div class="endpoint-desc">Chat avec GPT, Claude, Gemini, DeepSeek... Retourne du JSON avec la réponse texte.</div>
+<!-- ══ IMAGE EDIT ══ -->
+<div class="panel" id="panel-edit">
+  <div class="card">
+    <div class="card-title">✏️ Édition Image — <code style="font-size:.75rem">GET /api/image?imgurl=...</code></div>
+    <div class="info-box">✅ Fournissez une image source + un prompt. Modèles recommandés : <strong>nanobanana-pro</strong> (meilleur) et <strong>nanobanana</strong>.</div>
+    <div class="form-group">
+      <label>URL de l'image source</label>
+      <input id="edit-imgurl" type="url" placeholder="https://example.com/photo.jpg">
+    </div>
+    <div class="form-group">
+      <label>Instruction d'édition</label>
+      <textarea id="edit-prompt">Transform this image into anime art style, keep the same composition</textarea>
+    </div>
+    <div class="grid-2">
+      <div class="form-group">
+        <label>Modèle (tous gratuits ✅)</label>
+        <select id="edit-model">
+          <option value="nanobanana-pro">nanobanana-pro 🍌⭐ Meilleur</option>
+          <option value="nanobanana">nanobanana 🍌</option>
+          <option value="seedream">seedream</option>
+          <option value="flux-realism">flux-realism</option>
+          <option value="flux">flux</option>
+        </select>
       </div>
-
-      <div class="endpoint-card">
-        <span class="endpoint-method">GET</span>
-        <span class="endpoint-path">/api/image?prompt=A+cat&model=flux&width=1024&height=1024</span>
-        <div class="endpoint-desc">Génère une image et la retourne <strong>directement en binaire</strong> (image/jpeg). Utilisable directement dans &lt;img src&gt;.</div>
-      </div>
-
-      <div class="endpoint-card">
-        <span class="endpoint-method">GET</span>
-        <span class="endpoint-path">/api/image?prompt=Add+hat&model=kontext&imgurl=https://...</span>
-        <div class="endpoint-desc">Édition d'image (image-to-image). Fournir une image source via <code>imgurl</code>.</div>
-      </div>
-
-      <div class="endpoint-card">
-        <span class="endpoint-method">GET</span>
-        <span class="endpoint-path">/api/search?query=Latest+AI+news&model=searchgpt</span>
-        <div class="endpoint-desc">Recherche web en temps réel avec résumé IA et sources.</div>
-      </div>
-
-      <div class="endpoint-card">
-        <span class="endpoint-method">GET</span>
-        <span class="endpoint-path">/api/openai?query=Hello&uid=3&model=openai&imgurl=(optionnel)</span>
-        <div class="endpoint-desc">Endpoint unifié style reixz. Vision activée automatiquement si <code>imgurl</code> fourni.</div>
-      </div>
-
-      <div class="endpoint-card">
-        <span class="endpoint-method">GET</span>
-        <span class="endpoint-path">/api/models</span>
-        <div class="endpoint-desc">Liste tous les modèles disponibles (chat, image, search).</div>
+      <div class="form-group">
+        <label>Résolution</label>
+        <select id="edit-size">
+          <option value="1024x1024">1024×1024</option>
+          <option value="1280x720">1280×720</option>
+          <option value="768x1344">768×1344</option>
+        </select>
       </div>
     </div>
-
-    <div class="card">
-      <div class="card-title">🍌 Modèles Image disponibles</div>
-      <div class="models-grid" id="img-models-list">
-        <div class="model-chip image">flux</div>
-        <div class="model-chip image">flux-realism</div>
-        <div class="model-chip image">flux-pro</div>
-        <div class="model-chip image">gptimage</div>
-        <div class="model-chip image">nanobanana 🍌</div>
-        <div class="model-chip image">nanobanana-pro 🍌⭐</div>
-        <div class="model-chip image">seedream</div>
-        <div class="model-chip image">kontext (edit)</div>
-        <div class="model-chip image">turbo</div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">💬 Modèles Chat disponibles</div>
-      <div class="models-grid">
-        <div class="model-chip chat">openai (GPT-4.1) ⭐</div>
-        <div class="model-chip chat">openai-fast</div>
-        <div class="model-chip chat">openai-reasoning</div>
-        <div class="model-chip chat">claude</div>
-        <div class="model-chip chat">gemini</div>
-        <div class="model-chip chat">gemini-thinking</div>
-        <div class="model-chip chat">deepseek</div>
-        <div class="model-chip chat">deepseek-reasoning</div>
-        <div class="model-chip chat">mistral</div>
-        <div class="model-chip chat">llama</div>
-        <div class="model-chip chat">searchgpt 🔍</div>
-        <div class="model-chip chat">unity</div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">ℹ️ À propos</div>
-      <p style="font-size:0.9rem;line-height:1.7;color:var(--muted)">
-        Ce serveur utilise <strong style="color:var(--text)">Pollinations.ai</strong> comme backend — une plateforme open-source 100% gratuite sans clé API requise.<br><br>
-        • <strong style="color:var(--text)">Chat</strong> : GPT-4.1, Claude Sonnet, Gemini 2.0, DeepSeek V3, et plus<br>
-        • <strong style="color:var(--text)">Images</strong> : Flux, Nano Banana (Gemini), GPT Image, Seedream, SDXL<br>
-        • <strong style="color:var(--text)">Image Edit</strong> : Kontext (Flux), Nano Banana — retourne l'image directement en binaire<br>
-        • <strong style="color:var(--text)">Web Search</strong> : SearchGPT, Gemini avec recherche en temps réel
-      </p>
-    </div>
+    <div class="url-box"><span id="edit-url">...</span><button class="copy-btn" onclick="copyEl('edit-url')">📋</button></div>
+    <button class="btn btn-primary" id="edit-btn" onclick="runEdit()">✏️ Éditer</button>
   </div>
+  <div class="card" id="edit-result" style="display:none">
+    <div class="card-title">🖼️ Résultat</div>
+    <div id="edit-status"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div>
+        <div style="font-size:.78rem;color:var(--muted);margin-bottom:5px">📸 Source</div>
+        <img id="edit-src" style="width:100%;border-radius:8px;border:1px solid var(--border)">
+      </div>
+      <div>
+        <div style="font-size:.78rem;color:var(--muted);margin-bottom:5px">✨ Résultat</div>
+        <div id="edit-container"><div class="image-placeholder" style="height:180px">✨<span>Résultat ici</span></div></div>
+      </div>
+    </div>
+    <div class="timing" id="edit-timing"></div>
+  </div>
+</div>
+
+<!-- ══ WEB SEARCH ══ -->
+<div class="panel" id="panel-search">
+  <div class="card">
+    <div class="card-title">🔍 Web Search — <code style="font-size:.75rem">GET /api/search</code></div>
+    <div class="info-box">🌐 Recherche web temps réel — résultats actuels avec sources !</div>
+    <div class="form-group">
+      <label>Requête</label>
+      <textarea id="search-query">Quelles sont les dernières nouvelles en intelligence artificielle aujourd'hui ?</textarea>
+    </div>
+    <div class="form-group">
+      <label>Modèle de recherche</label>
+      <select id="search-model">
+        <option value="searchgpt">searchgpt ⭐ (SearchGPT — web search natif)</option>
+        <option value="gemini-search">gemini-search (Gemini + Google Search)</option>
+        <option value="gemini-fast">gemini-fast (Gemini 2.5 Lite)</option>
+      </select>
+    </div>
+    <div class="url-box"><span id="search-url">...</span><button class="copy-btn" onclick="copyEl('search-url')">📋</button></div>
+    <button class="btn btn-green" id="search-btn" onclick="runSearch()">🔍 Rechercher</button>
+  </div>
+  <div class="card" id="search-result" style="display:none">
+    <div class="card-title">📰 Résultats</div>
+    <div id="search-status"></div>
+    <div class="response-box" id="search-response"></div>
+    <div class="timing" id="search-timing"></div>
+    <div style="margin-top:10px"><button class="btn btn-outline btn-sm" onclick="copyText('search-response')">📋 Copier</button></div>
+  </div>
+</div>
+
+<!-- ══ VISION ══ -->
+<div class="panel" id="panel-vision">
+  <div class="card">
+    <div class="card-title">👁️ Vision — Analyse d'Image — <code style="font-size:.75rem">GET /api/openai?imgurl=...</code></div>
+    <div class="info-box">✅ <strong>Vision maintenant fonctionnelle !</strong> Le serveur récupère l'image et l'envoie en base64 au modèle. Modèles recommandés : <strong>gemini-fast</strong> (gratuit et rapide) ou <strong>claude-fast</strong>.</div>
+    <div class="form-group">
+      <label>URL de l'image à analyser</label>
+      <input id="vis-imgurl" type="url" placeholder="https://example.com/photo.jpg" value="https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/320px-PNG_transparency_demonstration_1.png">
+    </div>
+    <div class="form-group">
+      <label>Question sur l'image</label>
+      <textarea id="vis-query">Décris cette image en détail. Qu'est-ce que tu vois ?</textarea>
+    </div>
+    <div class="form-group">
+      <label>Modèle Vision (tous supportent les images)</label>
+      <select id="vis-model">
+        <option value="gemini-fast">gemini-fast ⭐ Gratuit + Rapide</option>
+        <option value="claude-fast">claude-fast (Claude Haiku)</option>
+        <option value="claude">claude (Claude Sonnet)</option>
+        <option value="gemini">gemini (Gemini 3 Flash)</option>
+        <option value="openai">openai (GPT-5 Mini)</option>
+        <option value="openai-large">openai-large (GPT-5.2)</option>
+      </select>
+    </div>
+    <div id="vis-img-preview" style="margin-bottom:12px"></div>
+    <div class="url-box"><span id="vis-url">...</span><button class="copy-btn" onclick="copyEl('vis-url')">📋</button></div>
+    <button class="btn btn-amber" id="vis-btn" onclick="runVision()">👁️ Analyser l'image</button>
+  </div>
+  <div class="card" id="vis-result" style="display:none">
+    <div class="card-title">🧠 Analyse</div>
+    <div id="vis-status"></div>
+    <div class="response-box" id="vis-response"></div>
+    <div class="timing" id="vis-timing"></div>
+    <div style="margin-top:10px"><button class="btn btn-outline btn-sm" onclick="copyText('vis-response')">📋 Copier</button></div>
+  </div>
+</div>
+
+<!-- ══ OPENAI COMPAT ══ -->
+<div class="panel" id="panel-openai">
+  <div class="card">
+    <div class="card-title">⚡ Endpoint Unifié — <code style="font-size:.75rem">GET /api/openai</code></div>
+    <div class="info-box">🔗 Format <strong>reixz-style</strong> compatible : <code>/api/openai?query=Hello&uid=3&model=openai&imgurl=(optionnel)</code></div>
+    <div class="form-group">
+      <label>Query (message)</label>
+      <input id="oa-query" value="Décris ce que tu vois dans cette image et présente-toi.">
+    </div>
+    <div class="grid-2">
+      <div class="form-group"><label>UID</label><input id="oa-uid" value="1"></div>
+      <div class="form-group">
+        <label>Modèle</label>
+        <select id="oa-model">
+          <option value="openai">openai (GPT-5 Mini) ⭐</option>
+          <option value="openai-fast">openai-fast</option>
+          <option value="claude">claude</option>
+          <option value="gemini-fast">gemini-fast ✅ Vision</option>
+          <option value="claude-fast">claude-fast ✅ Vision</option>
+          <option value="deepseek">deepseek</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Image URL (optionnel — active la vision)</label>
+      <input id="oa-imgurl" type="url" placeholder="https://example.com/image.jpg">
+    </div>
+    <div class="url-box"><span id="oa-url">...</span><button class="copy-btn" onclick="copyEl('oa-url')">📋</button></div>
+    <button class="btn btn-primary" id="oa-btn" onclick="runOpenAI()">⚡ Exécuter</button>
+  </div>
+  <div class="card" id="oa-result" style="display:none">
+    <div class="card-title">📨 Réponse JSON</div>
+    <div id="oa-status"></div>
+    <div class="response-box code" id="oa-response"></div>
+    <div class="timing" id="oa-timing"></div>
+    <div style="margin-top:10px"><button class="btn btn-outline btn-sm" onclick="copyText('oa-response')">📋 Copier JSON</button></div>
+  </div>
+</div>
+
+<!-- ══ DOCS ══ -->
+<div class="panel" id="panel-docs">
+  <div class="card">
+    <div class="card-title">📖 Documentation des Endpoints</div>
+    <div class="ep-card"><span class="method">GET</span><span style="color:var(--accent2)">/api/chat?query=Hello&model=openai&system=...</span><div class="ep-desc">Chat text — retourne JSON avec la réponse.</div></div>
+    <div class="ep-card"><span class="method">GET</span><span style="color:var(--accent2)">/api/image?prompt=A+cat&model=flux&width=1024&height=1024</span><div class="ep-desc">Génère une image et la retourne <strong>directement en binaire</strong> (image/jpeg). Utilisable dans &lt;img src&gt;.</div></div>
+    <div class="ep-card"><span class="method">GET</span><span style="color:var(--accent2)">/api/image?prompt=Add+hat&model=nanobanana-pro&imgurl=https://...</span><div class="ep-desc">Édition d'image — fournir l'image source via <code>imgurl</code>. Retourne l'image éditée en binaire.</div></div>
+    <div class="ep-card"><span class="method">GET</span><span style="color:var(--accent2)">/api/search?query=Latest+AI+news&model=searchgpt</span><div class="ep-desc">Recherche web temps réel avec résumé IA et sources.</div></div>
+    <div class="ep-card"><span class="method">GET</span><span style="color:var(--accent2)">/api/openai?query=Hello&uid=3&model=openai&imgurl=(opt)</span><div class="ep-desc">Endpoint unifié. Vision activée automatiquement si <code>imgurl</code> fourni. Serveur récupère l'image en base64.</div></div>
+    <div class="ep-card"><span class="method">GET</span><span style="color:var(--accent2)">/api/models</span><div class="ep-desc">Liste tous les modèles disponibles.</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">✅ Modèles Image — Gratuits</div>
+    <span class="chip ok">flux ⭐</span><span class="chip ok">flux-realism</span><span class="chip ok">flux-pro</span>
+    <span class="chip ok">turbo</span><span class="chip ok">nanobanana 🍌</span><span class="chip ok">nanobanana-pro 🍌⭐</span>
+    <span class="chip ok">seedream</span>
+    <span class="chip paid">kontext (payant)</span><span class="chip paid">gptimage (payant)</span>
+  </div>
+  <div class="card">
+    <div class="card-title">✅ Modèles Chat — Gratuits</div>
+    <span class="chip ok">openai ⭐</span><span class="chip ok">openai-fast</span><span class="chip ok">openai-large</span>
+    <span class="chip ok">claude</span><span class="chip ok">claude-fast</span><span class="chip ok">gemini-fast ✅ Vision</span>
+    <span class="chip ok">gemini</span><span class="chip ok">gemini-search 🔍</span><span class="chip ok">deepseek</span>
+    <span class="chip ok">deepseek-reasoning</span><span class="chip ok">mistral</span><span class="chip ok">searchgpt 🔍</span>
+    <span class="chip ok">qwen-coder</span><span class="chip ok">llama</span><span class="chip ok">unity</span>
+  </div>
+</div>
 
 </div><!-- /content -->
 
 <script>
-  const BASE = window.location.origin;
+const BASE = window.location.origin;
 
-  // ── TAB SWITCHING ──
-  function switchTab(name) {
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.getElementById('panel-' + name).classList.add('active');
-    event.target.classList.add('active');
-  }
+function switchTab(name, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  el.classList.add('active');
+}
 
-  // ── UTILS ──
-  function setStatus(id, type, msg) {
-    const el = document.getElementById(id);
-    el.innerHTML = `<div class="status ${type}">${type === 'loading' ? '<span class="spinner"></span>' : type === 'success' ? '✅' : '❌'} ${msg}</div>`;
-  }
+function setStatus(id, type, msg) {
+  document.getElementById(id).innerHTML = `<div class="status ${type}">${type==='loading'?'<span class="spinner"></span>':type==='success'?'✅':'❌'} ${msg}</div>`;
+}
 
-  function copyUrl(id) {
-    const text = document.getElementById(id).textContent;
-    navigator.clipboard.writeText(text).then(() => {
-      const btn = event.target;
-      btn.textContent = '✅';
-      setTimeout(() => btn.textContent = '📋', 1500);
-    });
-  }
+function copyEl(id) {
+  navigator.clipboard.writeText(document.getElementById(id).textContent);
+  event.target.textContent = '✅'; setTimeout(() => event.target.textContent = '📋', 1400);
+}
 
-  function copyText(id) {
-    const text = document.getElementById(id).textContent;
-    navigator.clipboard.writeText(text).then(() => {
-      const btn = event.target;
-      const orig = btn.textContent;
-      btn.textContent = '✅ Copié!';
-      setTimeout(() => btn.textContent = orig, 1500);
-    });
-  }
+function copyText(id) {
+  navigator.clipboard.writeText(document.getElementById(id).textContent);
+  const b = event.target; const o = b.textContent;
+  b.textContent = '✅ Copié!'; setTimeout(() => b.textContent = o, 1400);
+}
 
-  function setLoading(btnId, loading) {
-    const btn = document.getElementById(btnId);
-    btn.disabled = loading;
-    if (loading) {
-      btn._origText = btn.innerHTML;
-      btn.innerHTML = '<span class="spinner"></span> En cours...';
-    } else {
-      btn.innerHTML = btn._origText;
-    }
-  }
+function setLoading(id, on) {
+  const b = document.getElementById(id);
+  b.disabled = on;
+  if (on) { b._t = b.innerHTML; b.innerHTML = '<span class="spinner"></span> En cours...'; }
+  else b.innerHTML = b._t;
+}
 
-  // ── CHAT ──
-  function updateChatUrl() {
-    const q = document.getElementById('chat-query').value || 'Hello';
-    const m = document.getElementById('chat-model').value;
-    const url = `${BASE}/api/chat?query=${encodeURIComponent(q)}&model=${m}`;
-    document.getElementById('chat-url-display').textContent = url;
-  }
+// ── CHAT ──
+function updateChatUrl() {
+  const q = document.getElementById('chat-query').value || 'Hello';
+  const m = document.getElementById('chat-model').value;
+  document.getElementById('chat-url').textContent = `${BASE}/api/chat?query=${encodeURIComponent(q)}&model=${m}`;
+}
+document.getElementById('chat-query').addEventListener('input', updateChatUrl);
+document.getElementById('chat-model').addEventListener('change', updateChatUrl);
+updateChatUrl();
 
-  document.getElementById('chat-query').addEventListener('input', updateChatUrl);
-  document.getElementById('chat-model').addEventListener('change', updateChatUrl);
-  updateChatUrl();
+async function runChat() {
+  const q = document.getElementById('chat-query').value.trim();
+  const m = document.getElementById('chat-model').value;
+  const s = document.getElementById('chat-system').value;
+  if (!q) return alert('Entrez un message !');
+  const url = `${BASE}/api/chat?query=${encodeURIComponent(q)}&model=${m}&system=${encodeURIComponent(s)}`;
+  document.getElementById('chat-url').textContent = url;
+  document.getElementById('chat-result').style.display = 'block';
+  setStatus('chat-status','loading','En cours...'); setLoading('chat-btn',true);
+  const t0 = Date.now();
+  try {
+    const r = await fetch(url); const d = await r.json();
+    const el = ((Date.now()-t0)/1000).toFixed(2);
+    if (d.status) { setStatus('chat-status','success',`${d.model} — ${el}s`); document.getElementById('chat-response').textContent = d.response; }
+    else setStatus('chat-status','error', d.error);
+    document.getElementById('chat-timing').textContent = `⏱️ ${el}s`;
+  } catch(e) { setStatus('chat-status','error',e.message); }
+  finally { setLoading('chat-btn',false); }
+}
 
-  async function runChat() {
-    const query = document.getElementById('chat-query').value.trim();
-    const model = document.getElementById('chat-model').value;
-    const system = document.getElementById('chat-system').value;
-    if (!query) return alert('Entrez un message !');
+// ── IMAGE GEN ──
+function updateImgUrl() {
+  const p = document.getElementById('img-prompt').value || 'A cat';
+  const m = document.getElementById('img-model').value;
+  const [w,h] = document.getElementById('img-size').value.split('x');
+  const en = document.getElementById('img-enhance').checked;
+  const seed = document.getElementById('img-seed').value;
+  let url = `${BASE}/api/image?prompt=${encodeURIComponent(p)}&model=${m}&width=${w}&height=${h}`;
+  if (en) url += '&enhance=true';
+  if (seed) url += `&seed=${seed}`;
+  document.getElementById('img-url').textContent = url;
+}
+['img-prompt','img-model','img-size','img-seed'].forEach(id => document.getElementById(id).addEventListener('input', updateImgUrl));
+document.getElementById('img-model').addEventListener('change', updateImgUrl);
+document.getElementById('img-size').addEventListener('change', updateImgUrl);
+document.getElementById('img-enhance').addEventListener('change', updateImgUrl);
+updateImgUrl();
 
-    const url = `${BASE}/api/chat?query=${encodeURIComponent(query)}&model=${model}&system=${encodeURIComponent(system)}`;
-    document.getElementById('chat-url-display').textContent = url;
-    document.getElementById('chat-result').style.display = 'block';
-    setStatus('chat-status', 'loading', 'Requête en cours...');
-    document.getElementById('chat-response').textContent = '';
-    setLoading('chat-btn', true);
-    const t0 = Date.now();
+async function runImage() {
+  const url = document.getElementById('img-url').textContent;
+  document.getElementById('img-result').style.display = 'block';
+  setStatus('img-status','loading','Génération... (10-40s)'); setLoading('img-btn',true);
+  document.getElementById('img-container').innerHTML = '<div class="image-placeholder">⏳<span>Génération en cours...</span></div>';
+  const t0 = Date.now();
+  try {
+    const r = await fetch(url);
+    if (!r.ok) throw new Error(`Erreur ${r.status}`);
+    const blob = await r.blob(); const el = ((Date.now()-t0)/1000).toFixed(2);
+    const obj = URL.createObjectURL(blob);
+    const img = document.createElement('img'); img.src = obj; img.className = 'image-result';
+    document.getElementById('img-container').innerHTML = ''; document.getElementById('img-container').appendChild(img);
+    setStatus('img-status','success',`Image générée en ${el}s`);
+    document.getElementById('img-timing').textContent = `⏱️ ${el}s`;
+    document.getElementById('img-dl').href = obj;
+  } catch(e) {
+    setStatus('img-status','error',e.message);
+    document.getElementById('img-container').innerHTML = `<div class="image-placeholder">❌<span>${e.message}</span></div>`;
+  } finally { setLoading('img-btn',false); }
+}
 
-    try {
-      const res = await fetch(url);
-      const data = await res.json();
-      const elapsed = ((Date.now() - t0) / 1000).toFixed(2);
-
-      if (data.status) {
-        setStatus('chat-status', 'success', `Réponse de ${data.model}`);
-        document.getElementById('chat-response').textContent = data.response;
-        document.getElementById('chat-timing').textContent = `⏱️ ${elapsed}s`;
-      } else {
-        setStatus('chat-status', 'error', data.error || 'Erreur inconnue');
-      }
-    } catch (err) {
-      setStatus('chat-status', 'error', err.message);
-    } finally {
-      setLoading('chat-btn', false);
-    }
-  }
-
-  // ── IMAGE GENERATE ──
-  function updateImgUrl() {
-    const prompt = document.getElementById('img-prompt').value || 'A cat';
-    const model = document.getElementById('img-model').value;
-    const size = document.getElementById('img-size').value.split('x');
-    const enhance = document.getElementById('img-enhance').checked;
-    const seed = document.getElementById('img-seed').value;
-    let url = `${BASE}/api/image?prompt=${encodeURIComponent(prompt)}&model=${model}&width=${size[0]}&height=${size[1]}`;
-    if (enhance) url += '&enhance=true';
-    if (seed) url += `&seed=${seed}`;
-    document.getElementById('img-url-display').textContent = url;
-  }
-
-  document.getElementById('img-prompt').addEventListener('input', updateImgUrl);
-  document.getElementById('img-model').addEventListener('change', updateImgUrl);
-  document.getElementById('img-size').addEventListener('change', updateImgUrl);
-  document.getElementById('img-enhance').addEventListener('change', updateImgUrl);
-  document.getElementById('img-seed').addEventListener('input', updateImgUrl);
-  updateImgUrl();
-
-  async function runImage() {
-    const prompt = document.getElementById('img-prompt').value.trim();
-    if (!prompt) return alert('Entrez un prompt !');
-
-    const url = document.getElementById('img-url-display').textContent;
-    document.getElementById('img-result').style.display = 'block';
-    setStatus('img-status', 'loading', 'Génération en cours... (peut prendre 10-30s)');
-    document.getElementById('img-container').innerHTML = '<div class="image-placeholder">⏳<span>Génération...</span></div>';
-    setLoading('img-btn', true);
-    const t0 = Date.now();
-
-    try {
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`Erreur ${res.status}`);
-      const blob = await res.blob();
-      const elapsed = ((Date.now() - t0) / 1000).toFixed(2);
-      const objUrl = URL.createObjectURL(blob);
-
-      const img = document.createElement('img');
-      img.src = objUrl;
-      img.className = 'image-result';
-      img.alt = 'Image générée';
-
-      document.getElementById('img-container').innerHTML = '';
-      document.getElementById('img-container').appendChild(img);
-      setStatus('img-status', 'success', `Image générée en ${elapsed}s`);
-      document.getElementById('img-timing').textContent = `⏱️ ${elapsed}s`;
-      document.getElementById('img-download').href = objUrl;
-      document.getElementById('img-actions').style.display = 'flex';
-    } catch (err) {
-      setStatus('img-status', 'error', err.message);
-      document.getElementById('img-container').innerHTML = '<div class="image-placeholder">❌<span>' + err.message + '</span></div>';
-    } finally {
-      setLoading('img-btn', false);
-    }
-  }
-
-  // ── IMAGE EDIT ──
-  function updateEditUrl() {
-    const prompt = document.getElementById('edit-prompt').value || 'Transform this image';
-    const model = document.getElementById('edit-model').value;
-    const size = document.getElementById('edit-size').value.split('x');
-    const imgurl = document.getElementById('edit-imgurl').value;
-    let url = `${BASE}/api/image?prompt=${encodeURIComponent(prompt)}&model=${model}&width=${size[0]}&height=${size[1]}`;
-    if (imgurl) url += `&imgurl=${encodeURIComponent(imgurl)}`;
-    document.getElementById('edit-url-display').textContent = url;
-  }
-
-  document.getElementById('edit-prompt').addEventListener('input', updateEditUrl);
-  document.getElementById('edit-model').addEventListener('change', updateEditUrl);
-  document.getElementById('edit-imgurl').addEventListener('input', () => {
-    const imgurl = document.getElementById('edit-imgurl').value;
-    if (imgurl) document.getElementById('edit-source-preview').src = imgurl;
-    updateEditUrl();
-  });
-  document.getElementById('edit-size').addEventListener('change', updateEditUrl);
+// ── IMAGE EDIT ──
+function updateEditUrl() {
+  const p = document.getElementById('edit-prompt').value || 'Edit this image';
+  const m = document.getElementById('edit-model').value;
+  const [w,h] = document.getElementById('edit-size').value.split('x');
+  const imgurl = document.getElementById('edit-imgurl').value;
+  let url = `${BASE}/api/image?prompt=${encodeURIComponent(p)}&model=${m}&width=${w}&height=${h}`;
+  if (imgurl) url += `&imgurl=${encodeURIComponent(imgurl)}`;
+  document.getElementById('edit-url').textContent = url;
+}
+document.getElementById('edit-prompt').addEventListener('input', updateEditUrl);
+document.getElementById('edit-model').addEventListener('change', updateEditUrl);
+document.getElementById('edit-size').addEventListener('change', updateEditUrl);
+document.getElementById('edit-imgurl').addEventListener('input', () => {
+  const v = document.getElementById('edit-imgurl').value;
+  if (v) document.getElementById('edit-src').src = v;
   updateEditUrl();
+});
+updateEditUrl();
 
-  async function runEdit() {
-    const imgurl = document.getElementById('edit-imgurl').value.trim();
-    const prompt = document.getElementById('edit-prompt').value.trim();
-    if (!prompt) return alert('Entrez un prompt d\'édition !');
-    if (!imgurl) return alert('Entrez une URL d\'image source !');
+async function runEdit() {
+  const imgurl = document.getElementById('edit-imgurl').value.trim();
+  if (!imgurl) return alert('Entrez une URL d\'image source !');
+  const url = document.getElementById('edit-url').textContent;
+  document.getElementById('edit-result').style.display = 'block';
+  document.getElementById('edit-src').src = imgurl;
+  setStatus('edit-status','loading','Édition... (20-60s)'); setLoading('edit-btn',true);
+  document.getElementById('edit-container').innerHTML = '<div class="image-placeholder" style="height:180px">⏳<span>Édition...</span></div>';
+  const t0 = Date.now();
+  try {
+    const r = await fetch(url);
+    if (!r.ok) throw new Error(`Erreur ${r.status}`);
+    const blob = await r.blob(); const el = ((Date.now()-t0)/1000).toFixed(2);
+    const obj = URL.createObjectURL(blob);
+    const img = document.createElement('img'); img.src = obj; img.style.cssText = 'width:100%;border-radius:8px;border:1px solid var(--border)';
+    document.getElementById('edit-container').innerHTML = ''; document.getElementById('edit-container').appendChild(img);
+    setStatus('edit-status','success',`Éditée en ${el}s`);
+    document.getElementById('edit-timing').textContent = `⏱️ ${el}s`;
+  } catch(e) {
+    setStatus('edit-status','error',e.message);
+    document.getElementById('edit-container').innerHTML = `<div class="image-placeholder" style="height:180px">❌<span>${e.message}</span></div>`;
+  } finally { setLoading('edit-btn',false); }
+}
 
-    const url = document.getElementById('edit-url-display').textContent;
-    document.getElementById('edit-result').style.display = 'block';
-    setStatus('edit-status', 'loading', 'Édition en cours... (peut prendre 20-60s)');
-    document.getElementById('edit-container').innerHTML = '<div class="image-placeholder" style="height:200px">⏳<span>Édition...</span></div>';
-    document.getElementById('edit-source-preview').src = imgurl;
-    setLoading('edit-btn', true);
-    const t0 = Date.now();
+// ── SEARCH ──
+function updateSearchUrl() {
+  const q = document.getElementById('search-query').value || 'Latest news';
+  const m = document.getElementById('search-model').value;
+  document.getElementById('search-url').textContent = `${BASE}/api/search?query=${encodeURIComponent(q)}&model=${m}`;
+}
+document.getElementById('search-query').addEventListener('input', updateSearchUrl);
+document.getElementById('search-model').addEventListener('change', updateSearchUrl);
+updateSearchUrl();
 
-    try {
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`Erreur ${res.status}`);
-      const blob = await res.blob();
-      const elapsed = ((Date.now() - t0) / 1000).toFixed(2);
-      const objUrl = URL.createObjectURL(blob);
+async function runSearch() {
+  const q = document.getElementById('search-query').value.trim();
+  const m = document.getElementById('search-model').value;
+  if (!q) return alert('Entrez une requête !');
+  const url = `${BASE}/api/search?query=${encodeURIComponent(q)}&model=${m}`;
+  document.getElementById('search-url').textContent = url;
+  document.getElementById('search-result').style.display = 'block';
+  setStatus('search-status','loading','Recherche en cours...'); setLoading('search-btn',true);
+  const t0 = Date.now();
+  try {
+    const r = await fetch(url); const d = await r.json();
+    const el = ((Date.now()-t0)/1000).toFixed(2);
+    if (d.status) { setStatus('search-status','success',`Résultats via ${d.model} — ${el}s`); document.getElementById('search-response').textContent = d.response; }
+    else setStatus('search-status','error',d.error);
+    document.getElementById('search-timing').textContent = `⏱️ ${el}s`;
+  } catch(e) { setStatus('search-status','error',e.message); }
+  finally { setLoading('search-btn',false); }
+}
 
-      const img = document.createElement('img');
-      img.src = objUrl;
-      img.style.width = '100%';
-      img.style.borderRadius = '8px';
-      img.style.border = '1px solid var(--border)';
+// ── VISION ──
+function updateVisUrl() {
+  const q = document.getElementById('vis-query').value || 'Describe this image';
+  const m = document.getElementById('vis-model').value;
+  const imgurl = document.getElementById('vis-imgurl').value;
+  document.getElementById('vis-url').textContent = `${BASE}/api/openai?query=${encodeURIComponent(q)}&model=${m}&uid=1&imgurl=${encodeURIComponent(imgurl)}`;
+}
+document.getElementById('vis-query').addEventListener('input', updateVisUrl);
+document.getElementById('vis-model').addEventListener('change', updateVisUrl);
+document.getElementById('vis-imgurl').addEventListener('input', () => {
+  const v = document.getElementById('vis-imgurl').value;
+  const prev = document.getElementById('vis-img-preview');
+  if (v) prev.innerHTML = `<img src="${v}" style="max-height:150px;border-radius:8px;border:1px solid var(--border);margin-bottom:8px">`;
+  updateVisUrl();
+});
+updateVisUrl();
 
-      document.getElementById('edit-container').innerHTML = '';
-      document.getElementById('edit-container').appendChild(img);
-      setStatus('edit-status', 'success', `Image éditée en ${elapsed}s`);
-      document.getElementById('edit-timing').textContent = `⏱️ ${elapsed}s`;
-    } catch (err) {
-      setStatus('edit-status', 'error', err.message);
-      document.getElementById('edit-container').innerHTML = '<div class="image-placeholder" style="height:200px">❌<span>' + err.message + '</span></div>';
-    } finally {
-      setLoading('edit-btn', false);
-    }
-  }
+async function runVision() {
+  const imgurl = document.getElementById('vis-imgurl').value.trim();
+  if (!imgurl) return alert('Entrez une URL d\'image !');
+  const url = document.getElementById('vis-url').textContent;
+  document.getElementById('vis-result').style.display = 'block';
+  setStatus('vis-status','loading','Analyse en cours...'); setLoading('vis-btn',true);
+  const t0 = Date.now();
+  try {
+    const r = await fetch(url); const d = await r.json();
+    const el = ((Date.now()-t0)/1000).toFixed(2);
+    if (d.status) { setStatus('vis-status','success',`${d.model_used} — ${el}s`); document.getElementById('vis-response').textContent = d.response; }
+    else setStatus('vis-status','error',d.error);
+    document.getElementById('vis-timing').textContent = `⏱️ ${el}s`;
+  } catch(e) { setStatus('vis-status','error',e.message); }
+  finally { setLoading('vis-btn',false); }
+}
 
-  // ── SEARCH ──
-  function updateSearchUrl() {
-    const q = document.getElementById('search-query').value || 'Latest news';
-    const m = document.getElementById('search-model').value;
-    document.getElementById('search-url-display').textContent = `${BASE}/api/search?query=${encodeURIComponent(q)}&model=${m}`;
-  }
+// ── OPENAI COMPAT ──
+function updateOaUrl() {
+  const q = document.getElementById('oa-query').value || 'Hello';
+  const uid = document.getElementById('oa-uid').value || '1';
+  const m = document.getElementById('oa-model').value;
+  const img = document.getElementById('oa-imgurl').value;
+  let url = `${BASE}/api/openai?query=${encodeURIComponent(q)}&uid=${uid}&model=${m}`;
+  if (img) url += `&imgurl=${encodeURIComponent(img)}`;
+  document.getElementById('oa-url').textContent = url;
+}
+['oa-query','oa-uid','oa-imgurl'].forEach(id => document.getElementById(id).addEventListener('input', updateOaUrl));
+document.getElementById('oa-model').addEventListener('change', updateOaUrl);
+updateOaUrl();
 
-  document.getElementById('search-query').addEventListener('input', updateSearchUrl);
-  document.getElementById('search-model').addEventListener('change', updateSearchUrl);
-  updateSearchUrl();
-
-  async function runSearch() {
-    const query = document.getElementById('search-query').value.trim();
-    const model = document.getElementById('search-model').value;
-    if (!query) return alert('Entrez une requête !');
-
-    const url = `${BASE}/api/search?query=${encodeURIComponent(query)}&model=${model}`;
-    document.getElementById('search-url-display').textContent = url;
-    document.getElementById('search-result').style.display = 'block';
-    setStatus('search-status', 'loading', 'Recherche en cours...');
-    document.getElementById('search-response').textContent = '';
-    setLoading('search-btn', true);
-    const t0 = Date.now();
-
-    try {
-      const res = await fetch(url);
-      const data = await res.json();
-      const elapsed = ((Date.now() - t0) / 1000).toFixed(2);
-
-      if (data.status) {
-        setStatus('search-status', 'success', `Résultats via ${data.model}`);
-        document.getElementById('search-response').textContent = data.response;
-        document.getElementById('search-timing').textContent = `⏱️ ${elapsed}s`;
-      } else {
-        setStatus('search-status', 'error', data.error || 'Erreur inconnue');
-      }
-    } catch (err) {
-      setStatus('search-status', 'error', err.message);
-    } finally {
-      setLoading('search-btn', false);
-    }
-  }
-
-  // ── OPENAI COMPAT ──
-  function updateOaUrl() {
-    const q = document.getElementById('oa-query').value || 'Hello';
-    const uid = document.getElementById('oa-uid').value || '1';
-    const model = document.getElementById('oa-model').value;
-    const imgurl = document.getElementById('oa-imgurl').value;
-    let url = `${BASE}/api/openai?query=${encodeURIComponent(q)}&uid=${uid}&model=${model}`;
-    if (imgurl) url += `&imgurl=${encodeURIComponent(imgurl)}`;
-    document.getElementById('oa-url-display').textContent = url;
-  }
-
-  document.getElementById('oa-query').addEventListener('input', updateOaUrl);
-  document.getElementById('oa-uid').addEventListener('input', updateOaUrl);
-  document.getElementById('oa-model').addEventListener('change', updateOaUrl);
-  document.getElementById('oa-imgurl').addEventListener('input', updateOaUrl);
-  updateOaUrl();
-
-  async function runOpenAI() {
-    const url = document.getElementById('oa-url-display').textContent;
-    document.getElementById('oa-result').style.display = 'block';
-    setStatus('oa-status', 'loading', 'Requête en cours...');
-    document.getElementById('oa-response').textContent = '';
-    setLoading('oa-btn', true);
-    const t0 = Date.now();
-
-    try {
-      const res = await fetch(url);
-      const data = await res.json();
-      const elapsed = ((Date.now() - t0) / 1000).toFixed(2);
-
-      if (data.status) {
-        setStatus('oa-status', 'success', `Réponse reçue en ${elapsed}s`);
-        document.getElementById('oa-response').textContent = JSON.stringify(data, null, 2);
-        document.getElementById('oa-timing').textContent = `⏱️ ${elapsed}s`;
-      } else {
-        setStatus('oa-status', 'error', data.error || 'Erreur');
-        document.getElementById('oa-response').textContent = JSON.stringify(data, null, 2);
-      }
-    } catch (err) {
-      setStatus('oa-status', 'error', err.message);
-    } finally {
-      setLoading('oa-btn', false);
-    }
-  }
+async function runOpenAI() {
+  const url = document.getElementById('oa-url').textContent;
+  document.getElementById('oa-result').style.display = 'block';
+  setStatus('oa-status','loading','En cours...'); setLoading('oa-btn',true);
+  const t0 = Date.now();
+  try {
+    const r = await fetch(url); const d = await r.json();
+    const el = ((Date.now()-t0)/1000).toFixed(2);
+    if (d.status) setStatus('oa-status','success',`${d.model_used}${d.vision_mode?' 👁️ Vision':''} — ${el}s`);
+    else setStatus('oa-status','error',d.error);
+    document.getElementById('oa-response').textContent = JSON.stringify(d, null, 2);
+    document.getElementById('oa-timing').textContent = `⏱️ ${el}s`;
+  } catch(e) { setStatus('oa-status','error',e.message); }
+  finally { setLoading('oa-btn',false); }
+}
 </script>
 </body>
 </html>
