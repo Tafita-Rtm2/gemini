@@ -1,265 +1,260 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const puppeteer = require("puppeteer");
+const fetch = require("node-fetch");
+const multer = require("multer");
+const rateLimit = require("express-rate-limit");
+const { v4: uuidv4 } = require("uuid");
+const path = require("path");
+const fs = require("fs");
 
 const app = express();
+const PORT = process.env.PORT || 3000;
+
+// ─── Middleware ────────────────────────────────────────────────────────────────
 app.use(cors());
-app.use(express.json({ limit: "50mb" }));
+app.use(express.json({ limit: "20mb" }));
+app.use(express.urlencoded({ extended: true, limit: "20mb" }));
+app.use(express.static(path.join(__dirname, "public")));
 
-// ══════════════════════════════════════════════════════════════════════════════
-//  BROWSER POOL — un seul navigateur réutilisé
-// ══════════════════════════════════════════════════════════════════════════════
-let browser = null;
+// ─── Rate limiting ─────────────────────────────────────────────────────────────
+const limiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 30,
+  message: { error: "Too many requests. Please wait a moment.", status: 429 },
+});
+app.use("/api", limiter);
 
-async function getBrowser() {
-  if (!browser || !browser.isConnected()) {
-    browser = await puppeteer.launch({
-      headless: "new",
-      args: [
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-        "--disable-dev-shm-usage",
-        "--disable-gpu",
-        "--no-first-run",
-        "--no-zygote",
-        "--single-process",
-      ],
+// ─── API Keys (simple hardcoded + env) ────────────────────────────────────────
+const VALID_API_KEYS = new Set([
+  process.env.MASTER_API_KEY || "zk-7c7fa3ac023a0bfa135afd96839344c43a52ccc28f0c530cdc051d7a8c0bef79",
+  // Add more keys here or load from DB
+]);
+
+function validateApiKey(req, res, next) {
+  const apikey = req.query.apikey || req.headers["x-api-key"];
+  if (!apikey || !VALID_API_KEYS.has(apikey)) {
+    return res.status(401).json({
+      error: "Invalid or missing API key",
+      hint: "Pass ?apikey=YOUR_KEY or header X-Api-Key",
+      status: 401,
     });
-    console.log("🌐 Browser lancé");
   }
-  return browser;
+  next();
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-//  EDIT IMAGE — via Puppeteer qui exécute le vrai WASM de easemate
-// ══════════════════════════════════════════════════════════════════════════════
-async function editImage(imageUrl, prompt, ratio = "Auto") {
-  const br = await getBrowser();
-  const page = await br.newPage();
+// ─── Available Models ─────────────────────────────────────────────────────────
+const MODELS = [
+  { id: "gpt-5-2", name: "GPT-5.2", provider: "OpenAI", vision: true },
+  { id: "claude-sonnet", name: "Claude Sonnet", provider: "Anthropic", vision: true },
+  { id: "claude-opus", name: "Claude Opus", provider: "Anthropic", vision: true },
+  { id: "gemini-3-pro", name: "Gemini 3 Pro", provider: "Google", vision: true },
+  { id: "deepseek-r1", name: "DeepSeek R1", provider: "DeepSeek", vision: false },
+  { id: "auto", name: "Auto (Best Available)", provider: "Mixed", vision: true },
+];
+
+// ─── Helper: call aifreeforever API ───────────────────────────────────────────
+async function callAIFreeForever(question, conversationHistory = [], imageBase64 = null) {
+  const payload = {
+    question,
+    tone: "friendly",
+    format: "paragraph",
+    file: imageBase64 || null,
+    conversationHistory,
+  };
+
+  const headers = {
+    "User-Agent": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Mobile Safari/537.36",
+    "Accept-Encoding": "gzip, deflate, br, zstd",
+    "Content-Type": "application/json",
+    "sec-ch-ua-platform": '"Android"',
+    "sec-ch-ua": '"Not(A:Brand";v="8", "Chromium";v="144", "Google Chrome";v="144"',
+    "sec-ch-ua-mobile": "?1",
+    origin: "https://aifreeforever.com",
+    "sec-fetch-site": "same-origin",
+    "sec-fetch-mode": "cors",
+    "sec-fetch-dest": "empty",
+    referer: "https://aifreeforever.com/tools/free-chatgpt-no-login",
+    "accept-language": "en-US,en;q=0.9",
+    priority: "u=1, i",
+  };
+
+  const response = await fetch("https://aifreeforever.com/api/generate-ai-answer", {
+    method: "POST",
+    headers,
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Upstream API error: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data;
+}
+
+// ─── Helper: fetch image URL and convert to base64 ───────────────────────────
+async function fetchImageAsBase64(imgUrl) {
+  try {
+    const res = await fetch(imgUrl);
+    if (!res.ok) throw new Error("Could not fetch image");
+    const buffer = await res.buffer();
+    const contentType = res.headers.get("content-type") || "image/jpeg";
+    return `data:${contentType};base64,${buffer.toString("base64")}`;
+  } catch (e) {
+    throw new Error(`Image fetch failed: ${e.message}`);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PUBLIC API ENDPOINT
+// GET /api/openai?query=...&uid=1&img_url=...&apikey=...
+// ─────────────────────────────────────────────────────────────────────────────
+app.get("/api/openai", validateApiKey, async (req, res) => {
+  const { query, uid, img_url, model } = req.query;
+
+  if (!query) {
+    return res.status(400).json({
+      error: "Missing required parameter: query",
+      usage: "/api/openai?query=Hello&uid=1&apikey=YOUR_KEY",
+      status: 400,
+    });
+  }
 
   try {
-    // Résultat capturé via interception
-    let resolveResult, rejectResult;
-    const resultPromise = new Promise((res, rej) => {
-      resolveResult = res;
-      rejectResult = rej;
-      setTimeout(() => rej(new Error("Timeout 120s")), 120000);
-    });
-
-    // Intercepter les réponses de query_generate_image
-    page.on("response", async (response) => {
-      const url = response.url();
-      if (url.includes("query_generate_image")) {
-        try {
-          const json = await response.json();
-          if (json?.data?.status === "SUCCESS" && json?.data?.url) {
-            resolveResult({
-              imageUrl: json.data.url,
-              thumbnailUrl: json.data.thumbnail_url,
-              taskId: json.data.taskId,
-            });
-          }
-          if (json?.data?.status === "FAILED") {
-            rejectResult(new Error("Génération échouée: " + (json.data.msg || "")));
-          }
-        } catch (e) {}
-      }
-    });
-
-    // Aller sur la page
-    await page.goto("https://www.easemate.ai/nano-banana-ai-image-generator", {
-      waitUntil: "networkidle2",
-      timeout: 30000,
-    });
-
-    // Fermer le popup de connexion s'il existe
-    await page.evaluate(() => {
-      const btns = [...document.querySelectorAll("button, [class*='close'], [class*='modal']")];
-      btns.forEach(b => {
-        if (b.textContent.includes("×") || b.textContent.includes("Close") || 
-            b.getAttribute("aria-label")?.includes("close")) {
-          b.click();
-        }
-      });
-    });
-
-    await page.waitForTimeout(1000);
-
-    // Injecter l'image via URL dans le champ approprié et exécuter via l'API interne
-    const result = await page.evaluate(async ({ imageUrl, prompt, ratio }) => {
-      // Utiliser directement les fonctions internes de easemate
-      // qui ont déjà le WASM chargé et les vrais headers/sign
-      
-      // Étape 1: obtenir l'URL d'upload S3
-      const uploadRes = await fetch("https://api.easemate.ai/api2/async/query_upload_url", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ file_type: "jpg", source: "image_generation" })
-      }).then(r => r.json()).catch(() => null);
-
-      if (!uploadRes?.data?.upload_url) {
-        // Essayer directement avec l'URL externe
-        return { step: "upload_failed", raw: uploadRes };
-      }
-
-      // Étape 2: upload l'image
-      const imgResponse = await fetch(imageUrl);
-      const imgBlob = await imgResponse.blob();
-      
-      await fetch(uploadRes.data.upload_url, {
-        method: "PUT",
-        body: imgBlob,
-        headers: { "Content-Type": "image/jpeg" }
-      });
-
-      const s3Key = uploadRes.data.s3_key;
-
-      // Étape 3: créer la tâche
-      const createRes = await fetch("https://api.easemate.ai/api2/async/create_generate_image", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model_id: 10041,
-          operation_info: { id: 419, operation: "IMAGE_GENERATION" },
-          object_info: [{ img_info: { s3_name: s3Key } }],
-          parameters: JSON.stringify({ prompt, aspectRatio: ratio, outputFormat: "jpeg" })
-        })
-      }).then(r => r.json()).catch(e => ({ error: e.message }));
-
-      return { step: "created", taskId: createRes?.data?.taskId, raw: createRes };
-    }, { imageUrl, prompt, ratio });
-
-    console.log("[puppeteer] step result:", JSON.stringify(result));
-
-    if (result?.step === "created" && result?.taskId) {
-      // Attendre la réponse via l'intercepteur
-      return await resultPromise;
-    } else {
-      throw new Error("Échec: " + JSON.stringify(result));
+    let imageBase64 = null;
+    if (img_url) {
+      imageBase64 = await fetchImageAsBase64(decodeURIComponent(img_url));
     }
 
-  } finally {
-    await page.close();
-  }
-}
+    const question = imageBase64
+      ? `[Image attached] ${query}`
+      : query;
 
-// ══════════════════════════════════════════════════════════════════════════════
-//  ENDPOINT /api/img
-// ══════════════════════════════════════════════════════════════════════════════
-app.all("/api/img", async (req, res) => {
-  try {
-    const p = req.method === "GET" ? req.query : req.body;
-    const { url: imageUrl, prompt, ratio = "Auto" } = p;
+    const aiResponse = await callAIFreeForever(question, [], imageBase64);
 
-    if (!prompt) return res.status(400).json({ error: "Paramètre 'prompt' requis" });
-    if (!imageUrl) return res.status(400).json({ error: "Paramètre 'url' requis" });
+    const answer = aiResponse.answer || aiResponse.response || aiResponse.text || JSON.stringify(aiResponse);
 
-    console.log(`[request] prompt="${prompt}" url="${imageUrl}"`);
-    const result = await editImage(imageUrl, prompt, ratio);
-
-    return res.json({ success: true, ...result });
-
+    return res.json({
+      status: 200,
+      uid: uid || "anonymous",
+      query: query,
+      model_used: model || "auto",
+      has_image: !!img_url,
+      response: answer,
+      available_models: MODELS,
+      timestamp: new Date().toISOString(),
+    });
   } catch (err) {
-    console.error("[error]", err.message);
+    console.error("[API Error]", err.message);
+    return res.status(500).json({
+      error: err.message,
+      status: 500,
+    });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// POST /api/openai - same but POST with body
+// ─────────────────────────────────────────────────────────────────────────────
+app.post("/api/openai", validateApiKey, async (req, res) => {
+  const { query, uid, img_url, model, history } = req.body;
+
+  if (!query) {
+    return res.status(400).json({ error: "Missing required field: query", status: 400 });
+  }
+
+  try {
+    let imageBase64 = null;
+    if (img_url) {
+      imageBase64 = await fetchImageAsBase64(img_url);
+    }
+    if (req.body.img_base64) {
+      imageBase64 = req.body.img_base64;
+    }
+
+    const question = imageBase64 ? `[Image attached] ${query}` : query;
+    const conversationHistory = history || [];
+
+    const aiResponse = await callAIFreeForever(question, conversationHistory, imageBase64);
+    const answer = aiResponse.answer || aiResponse.response || aiResponse.text || JSON.stringify(aiResponse);
+
+    return res.json({
+      status: 200,
+      uid: uid || "anonymous",
+      query,
+      model_used: model || "auto",
+      has_image: !!imageBase64,
+      response: answer,
+      available_models: MODELS,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err) {
+    console.error("[API Error]", err.message);
+    return res.status(500).json({ error: err.message, status: 500 });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CHAT ENDPOINT (used by the frontend chatbot, no API key required for UI)
+// POST /api/chat
+// ─────────────────────────────────────────────────────────────────────────────
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
+
+app.post("/api/chat", upload.single("file"), async (req, res) => {
+  const { message, history, model } = req.body;
+
+  if (!message) {
+    return res.status(400).json({ error: "Missing message" });
+  }
+
+  try {
+    let imageBase64 = null;
+
+    // File uploaded from UI
+    if (req.file) {
+      const mime = req.file.mimetype;
+      imageBase64 = `data:${mime};base64,${req.file.buffer.toString("base64")}`;
+    }
+
+    // Image URL from request body
+    if (req.body.img_url) {
+      imageBase64 = await fetchImageAsBase64(req.body.img_url);
+    }
+
+    let conversationHistory = [];
+    try {
+      conversationHistory = JSON.parse(history || "[]");
+    } catch (_) {}
+
+    const question = imageBase64 ? `[Image attached] ${message}` : message;
+    const aiResponse = await callAIFreeForever(question, conversationHistory, imageBase64);
+    const answer = aiResponse.answer || aiResponse.response || aiResponse.text || JSON.stringify(aiResponse);
+
+    return res.json({ response: answer, model_used: model || "auto" });
+  } catch (err) {
+    console.error("[Chat Error]", err.message);
     return res.status(500).json({ error: err.message });
   }
 });
 
-// ══════════════════════════════════════════════════════════════════════════════
-//  INTERFACE DE TEST
-// ══════════════════════════════════════════════════════════════════════════════
-app.get("/", (req, res) => {
-  const host = req.headers.host || "localhost";
-  res.send(`<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Nano Banana Image Editor</title>
-<style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:system-ui,sans-serif;background:#0f0f0f;color:#eee;padding:20px}
-  h1{text-align:center;font-size:1.8rem;margin-bottom:4px}
-  .sub{text-align:center;color:#888;margin-bottom:28px;font-size:.9rem}
-  .card{background:#1a1a1a;border-radius:14px;padding:22px;max-width:700px;margin:0 auto 20px}
-  label{display:block;margin-bottom:5px;color:#bbb;font-size:.82rem;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
-  input,textarea,select{width:100%;padding:10px 13px;border-radius:8px;border:1px solid #2a2a2a;background:#111;color:#eee;font-size:.93rem;margin-bottom:14px;outline:none}
-  input:focus,textarea:focus{border-color:#f5c518}
-  textarea{resize:vertical;min-height:75px}
-  button{width:100%;padding:13px;border-radius:9px;border:none;background:linear-gradient(135deg,#f5c518,#d4a017);color:#000;font-size:1rem;font-weight:700;cursor:pointer}
-  button:disabled{opacity:.45;cursor:not-allowed}
-  .loading{text-align:center;color:#f5c518;margin-top:14px;display:none}
-  .result img{width:100%;border-radius:10px;margin-top:16px;border:2px solid #2a2a2a}
-  .dl{display:block;margin-top:10px;text-align:center;color:#f5c518;font-weight:600;text-decoration:none}
-  .error{color:#ff6b6b;background:#1e0808;padding:12px;border-radius:8px;margin-top:12px;font-size:.88rem;word-break:break-all}
-  .code{background:#111;border:1px solid #2a2a2a;border-radius:8px;padding:13px;font-family:monospace;font-size:.78rem;color:#7ec8e3;word-break:break-all;margin-bottom:12px;line-height:1.7;white-space:pre-wrap}
-  .tag{font-size:.75rem;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
-</style>
-</head>
-<body>
-<h1>🍌 Nano Banana</h1>
-<p class="sub">Éditeur d'images IA · Sans compte · Sans clé API</p>
-<div class="card">
-  <p class="tag">🖼 Tester</p>
-  <label>URL image source</label>
-  <input id="imgUrl" type="url" value="https://iili.io/BAHlZTx.jpg">
-  <label>Prompt</label>
-  <textarea id="prompt">change the background to a sunny beach, keep the subject intact</textarea>
-  <label>Ratio</label>
-  <select id="ratio">
-    <option value="Auto">Auto</option>
-    <option value="1:1">1:1</option>
-    <option value="16:9">16:9</option>
-    <option value="9:16">9:16</option>
-    <option value="3:2">3:2</option>
-  </select>
-  <button id="btn" onclick="generate()">⚡ Éditer l'image</button>
-  <div class="loading" id="loading">⏳ En cours... (15–90s)</div>
-  <div id="result"></div>
-</div>
-<div class="card">
-  <p class="tag">📡 API</p>
-  <label>GET</label>
-  <div class="code">GET https://${host}/api/img?url=https://image.jpg&prompt=change background&ratio=Auto</div>
-  <label>POST</label>
-  <div class="code">POST https://${host}/api/img
-{"url":"https://image.jpg","prompt":"change background","ratio":"Auto"}</div>
-  <label>Réponse</label>
-  <div class="code">{"success":true,"imageUrl":"https://d1ptb5b3fy36g3.cloudfront.net/..."}</div>
-</div>
-<script>
-async function generate(){
-  const url=document.getElementById('imgUrl').value.trim();
-  const prompt=document.getElementById('prompt').value.trim();
-  const ratio=document.getElementById('ratio').value;
-  const btn=document.getElementById('btn');
-  const loading=document.getElementById('loading');
-  const result=document.getElementById('result');
-  if(!url||!prompt){alert('URL et prompt requis!');return;}
-  btn.disabled=true;loading.style.display='block';result.innerHTML='';
-  try{
-    const r=await fetch('/api/img',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url,prompt,ratio})});
-    const data=await r.json();
-    if(data.success&&data.imageUrl){
-      result.innerHTML='<img src="'+data.imageUrl+'"><a class="dl" href="'+data.imageUrl+'" target="_blank">⬇ Télécharger</a>';
-    }else{
-      result.innerHTML='<div class="error">❌ '+(data.error||JSON.stringify(data))+'</div>';
-    }
-  }catch(e){result.innerHTML='<div class="error">❌ '+e.message+'</div>';}
-  finally{btn.disabled=false;loading.style.display='none';}
-}
-</script>
-</body>
-</html>`);
+// ─── Models list ──────────────────────────────────────────────────────────────
+app.get("/api/models", (req, res) => {
+  res.json({ models: MODELS, count: MODELS.length });
 });
 
-// Initialiser le browser au démarrage
-getBrowser().then(() => {
-  const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => console.log("🍌 Nano Banana API — port " + PORT));
-}).catch(err => {
-  console.error("Erreur lancement browser:", err);
-  process.exit(1);
+// ─── Health check ─────────────────────────────────────────────────────────────
+app.get("/health", (req, res) => {
+  res.json({ status: "ok", uptime: process.uptime(), timestamp: new Date().toISOString() });
+});
+
+// ─── Catch-all → index.html ───────────────────────────────────────────────────
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+// ─── Start ────────────────────────────────────────────────────────────────────
+app.listen(PORT, () => {
+  console.log(`✅ Server running on http://localhost:${PORT}`);
+  console.log(`📡 API endpoint: http://localhost:${PORT}/api/openai?query=Hello&apikey=...`);
 });
