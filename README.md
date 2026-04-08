@@ -29,8 +29,8 @@ Open `http://localhost:3000`
 ### GET /api/openai
 
 ```
-GET /api/openai?query=Hello&uid=1&apikey=YOUR_KEY
-GET /api/openai?query=What+game+is+this&uid=1&img_url=https://example.com/game.jpg&apikey=YOUR_KEY
+GET /api/openai?query=Hello&uid=1
+GET /api/openai?query=What+game+is+this&uid=1&img_url=https://example.com/game.jpg
 ```
 
 **Parameters:**
@@ -38,7 +38,7 @@ GET /api/openai?query=What+game+is+this&uid=1&img_url=https://example.com/game.j
 | Param | Required | Description |
 |-------|----------|-------------|
 | `query` | ✅ | The message/question |
-| `apikey` | ✅ | Your API key |
+| `apikey` | ❌ | Not required — open access |
 | `uid` | ❌ | User identifier |
 | `img_url` | ❌ | Public image URL |
 | `model` | ❌ | Model ID (default: auto) |
@@ -67,12 +67,11 @@ GET /api/openai?query=What+game+is+this&uid=1&img_url=https://example.com/game.j
 4. Set:
    - **Build Command**: `npm install`
    - **Start Command**: `node server.js`
-   - **Environment Variable**: `MASTER_API_KEY=your-secret-key`
-5. Deploy!
+   5. Deploy!
 
 Your API will be live at:
 ```
-https://your-app.onrender.com/api/openai?query=Hello&apikey=YOUR_KEY
+https://your-app.onrender.com/api/openai?query=Hello
 ```
 
 ---
