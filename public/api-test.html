@@ -354,12 +354,7 @@
         <label>Domaine <span class="required">*</span></label>
         <input type="text" id="f-domain" placeholder="votre-app.onrender.com" oninput="buildUrl()"/>
       </div>
-      <div class="field">
-        <label>API Key <span class="required">*</span></label>
-        <input type="text" id="f-apikey" placeholder="zk-7c7fa3ac..." oninput="buildUrl()"
-               value="zk-7c7fa3ac023a0bfa135afd96839344c43a52ccc28f0c530cdc051d7a8c0bef79"/>
-      </div>
-    </div>
+</div>
 
     <div class="field">
       <label>Query (message) <span class="required">*</span></label>
@@ -417,10 +412,7 @@
 
     <div class="code-block" id="code-curl">
       <button class="copy-btn" onclick="copyCode('code-curl')">Copier</button>
-curl "https://votre-app.onrender.com/api/openai\
-?query=Bonjour\
-&uid=1\
-&apikey=zk-7c7fa3ac023a0bfa135afd96839344c43a52ccc28f0c530cdc051d7a8c0bef79"</div>
+curl "https://votre-app.onrender.com/api/openai?query=Bonjour&uid=1"</div>
 
     <div class="code-block" id="code-python" style="display:none">
       <button class="copy-btn" onclick="copyCode('code-python')">Copier</button>
@@ -431,7 +423,6 @@ params = {
     "query": "Quelle jeux il s'agit ?",
     "uid": "1",
     "img_url": "https://exemple.com/image.jpg",  # optionnel
-    "apikey": "zk-7c7fa3ac023a0bfa135afd96839344c43a52ccc28f0c530cdc051d7a8c0bef79"
 }
 
 response = requests.get(url, params=params)
@@ -447,7 +438,7 @@ const params = new URLSearchParams({
   query: "Quelle jeux il s'agit ?",
   uid: "1",
   img_url: "https://exemple.com/image.jpg", // optionnel
-  apikey: "zk-7c7fa3ac023a0bfa135afd96839344c43a52ccc28f0c530cdc051d7a8c0bef79"
+
 });
 
 const res = await fetch(
@@ -465,7 +456,7 @@ $params = http_build_query([
   'query'   => 'Bonjour, qui es-tu ?',
   'uid'     => '1',
   'img_url' => 'https://exemple.com/img.jpg', // optionnel
-  'apikey'  => 'zk-7c7fa3ac023a0bfa135afd96839344c43a52ccc28f0c530cdc051d7a8c0bef79'
+
 ]);
 
 $url = "https://votre-app.onrender.com/api/openai?" . $params;
@@ -528,7 +519,7 @@ echo $data['response'];
         <tr><td>Rate limit</td><td>30 req/min</td><td>Par IP</td></tr>
         <tr><td>Taille image</td><td>Max 10MB</td><td>Via upload</td></tr>
         <tr><td>img_url</td><td>Optionnel</td><td>URL publique accessible</td></tr>
-        <tr><td>apikey</td><td>Requis</td><td>Query param ou header X-Api-Key</td></tr>
+        <tr><td>apikey</td><td>❌ Non requis</td><td>Accès libre, aucune clé nécessaire</td></tr>
         <tr><td>uid</td><td>Optionnel</td><td>Identifiant utilisateur libre</td></tr>
         <tr><td>model</td><td>Optionnel</td><td>Défaut: auto</td></tr>
       </tbody>
@@ -542,11 +533,11 @@ echo $data['response'];
     const domain = document.getElementById('f-domain').value.trim() || 'votre-app.onrender.com';
     const query = encodeURIComponent(document.getElementById('f-query').value.trim() || 'Bonjour');
     const uid = document.getElementById('f-uid').value.trim() || '1';
-    const apikey = document.getElementById('f-apikey').value.trim() || 'YOUR_API_KEY';
+    
     const model = document.getElementById('f-model').value;
     const imgUrl = document.getElementById('f-imgurl').value.trim();
 
-    let url = `https://${domain}/api/openai?query=${query}&uid=${uid}&apikey=${apikey}`;
+    let url = `https://${domain}/api/openai?query=${query}&uid=${uid}`;
     if (model) url += `&model=${model}`;
     if (imgUrl) url += `&img_url=${encodeURIComponent(imgUrl)}`;
 
@@ -566,12 +557,11 @@ echo $data['response'];
     const domain = window.location.host; // use current host for live demo
     const query = document.getElementById('f-query').value.trim();
     const uid = document.getElementById('f-uid').value.trim() || '1';
-    const apikey = document.getElementById('f-apikey').value.trim();
     const model = document.getElementById('f-model').value;
     const imgUrl = document.getElementById('f-imgurl').value.trim();
 
     if (!query) return alert('Champ query requis');
-    if (!apikey) return alert('API key requise');
+    
 
     const section = document.getElementById('response-section');
     const box = document.getElementById('response-box');
@@ -586,7 +576,7 @@ echo $data['response'];
     const start = Date.now();
 
     try {
-      let url = `/api/openai?query=${encodeURIComponent(query)}&uid=${encodeURIComponent(uid)}&apikey=${encodeURIComponent(apikey)}`;
+      let url = `/api/openai?query=${encodeURIComponent(query)}&uid=${encodeURIComponent(uid)}`;
       if (model) url += `&model=${model}`;
       if (imgUrl) url += `&img_url=${encodeURIComponent(imgUrl)}`;
 
