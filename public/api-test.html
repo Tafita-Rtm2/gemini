@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NexusAI — API Tester</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #070710;
+    --surface: #0f0f1a;
+    --surface2: #181826;
+    --border: #252538;
+    --accent: #7c6fff;
+    --accent2: #ff6b9d;
+    --accent3: #00e5c9;
+    --green: #39d98a;
+    --red: #ff5e5e;
+    --text: #e0e0f0;
+    --text-dim: #6666a0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* Radial glow */
+  body::after {
+    content: '';
+    position: fixed;
+    top: -200px; left: 50%;
+    transform: translateX(-50%);
+    width: 800px; height: 400px;
+    background: radial-gradient(ellipse, rgba(124,111,255,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* ── Nav ── */
+  nav {
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    position: sticky; top: 0; z-index: 10;
+  }
+
+  .logo-small {
+    width: 30px; height: 30px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; color: #fff; font-size: 14px;
+  }
+
+  nav h1 {
+    font-size: 16px; font-weight: 800;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+
+  nav a {
+    margin-left: auto;
+    color: var(--text-dim);
+    text-decoration: none;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    transition: all 0.2s;
+  }
+  nav a:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── Layout ── */
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 32px 20px 60px;
+  }
+
+  .page-header {
+    margin-bottom: 32px;
+    border-left: 3px solid var(--accent);
+    padding-left: 16px;
+  }
+  .page-header h2 { font-size: 24px; font-weight: 800; margin-bottom: 6px; }
+  .page-header p { color: var(--text-dim); font-size: 13px; font-family: 'Space Mono', monospace; line-height: 1.6; }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  .card h3 {
+    font-size: 14px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1px;
+    color: var(--accent);
+    margin-bottom: 16px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* ── URL builder ── */
+  .url-display {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--accent3);
+    word-break: break-all;
+    margin-bottom: 16px;
+    position: relative;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .url-display:hover { border-color: var(--accent3); }
+
+  .copy-hint {
+    position: absolute; right: 10px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 10px; color: var(--text-dim);
+  }
+
+  /* ── Fields ── */
+  .field { margin-bottom: 14px; }
+
+  label {
+    display: block;
+    font-size: 11px;
+    font-family: 'Space Mono', monospace;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+
+  label .required { color: var(--accent2); margin-left: 4px; }
+  label .optional { color: var(--text-dim); margin-left: 4px; opacity: 0.6; }
+
+  input[type="text"], textarea, select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input[type="text"]:focus, textarea:focus, select:focus { border-color: var(--accent); }
+
+  textarea { resize: vertical; min-height: 60px; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 600px) { .grid2 { grid-template-columns: 1fr; } }
+
+  /* ── Buttons ── */
+  .btn-row { display: flex; gap: 10px; margin-top: 4px; flex-wrap: wrap; }
+
+  .btn {
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px; font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(124,111,255,0.3); }
+
+  .btn-secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+  }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── Response ── */
+  #response-section { display: none; }
+
+  .status-bar {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+
+  .status-pill {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .status-pill.ok { background: rgba(57,217,138,0.15); color: var(--green); border: 1px solid rgba(57,217,138,0.3); }
+  .status-pill.err { background: rgba(255,94,94,0.15); color: var(--red); border: 1px solid rgba(255,94,94,0.3); }
+
+  .time-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  .response-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-all;
+    max-height: 400px;
+    overflow-y: auto;
+    color: var(--text);
+  }
+
+  .response-box::-webkit-scrollbar { width: 4px; }
+  .response-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* ── Models table ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  th {
+    text-align: left;
+    padding: 8px 12px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase; letter-spacing: 1px;
+    color: var(--text-dim);
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+  }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  .badge {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .badge.yes { background: rgba(57,217,138,0.15); color: var(--green); }
+  .badge.no  { background: rgba(255,94,94,0.1); color: var(--red); }
+
+  /* ── Code snippet ── */
+  .code-tabs { display: flex; gap: 4px; margin-bottom: 0; }
+  .tab {
+    padding: 6px 14px;
+    border-radius: 8px 8px 0 0;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    cursor: pointer;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-bottom: none;
+    color: var(--text-dim);
+    transition: all 0.2s;
+  }
+  .tab.active { background: var(--surface); color: var(--accent); border-color: var(--accent); }
+
+  .code-block {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 0 10px 10px 10px;
+    padding: 16px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    line-height: 1.7;
+    white-space: pre;
+    overflow-x: auto;
+    color: var(--accent3);
+    position: relative;
+  }
+
+  .copy-btn {
+    position: absolute; top: 10px; right: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── Spinner ── */
+  .spinner {
+    display: inline-block;
+    width: 14px; height: 14px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo-small">N</div>
+  <h1>NexusAI — API Docs</h1>
+  <a href="/">← Chatbot</a>
+</nav>
+
+<div class="container">
+
+  <div class="page-header">
+    <h2>API Publique</h2>
+    <p>Endpoint REST gratuit. Supporte GET et POST. Images optionnelles via URL ou base64.<br/>
+    Retourne JSON avec réponse de tous les modèles disponibles.</p>
+  </div>
+
+  <!-- ── URL Builder ── -->
+  <div class="card">
+    <h3>🔧 Constructeur de Requête</h3>
+
+    <div class="url-display" id="url-display" onclick="copyUrl()">
+      <span id="url-text">https://votre-domaine.onrender.com/api/openai?query=Hello&amp;uid=1&amp;apikey=zk-...</span>
+      <span class="copy-hint">Cliquer pour copier</span>
+    </div>
+
+    <div class="grid2">
+      <div class="field">
+        <label>Domaine <span class="required">*</span></label>
+        <input type="text" id="f-domain" placeholder="votre-app.onrender.com" oninput="buildUrl()"/>
+      </div>
+      <div class="field">
+        <label>API Key <span class="required">*</span></label>
+        <input type="text" id="f-apikey" placeholder="zk-7c7fa3ac..." oninput="buildUrl()"
+               value="zk-7c7fa3ac023a0bfa135afd96839344c43a52ccc28f0c530cdc051d7a8c0bef79"/>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Query (message) <span class="required">*</span></label>
+      <input type="text" id="f-query" placeholder="Quelle jeux il s'agit ?" oninput="buildUrl()" value="Bonjour, qui es-tu ?"/>
+    </div>
+
+    <div class="grid2">
+      <div class="field">
+        <label>UID <span class="optional">(optionnel)</span></label>
+        <input type="text" id="f-uid" placeholder="1" oninput="buildUrl()" value="1"/>
+      </div>
+      <div class="field">
+        <label>Modèle <span class="optional">(optionnel)</span></label>
+        <select id="f-model" onchange="buildUrl()">
+          <option value="">auto</option>
+          <option value="gpt-5-2">GPT-5.2</option>
+          <option value="claude-sonnet">Claude Sonnet</option>
+          <option value="claude-opus">Claude Opus</option>
+          <option value="gemini-3-pro">Gemini 3 Pro</option>
+          <option value="deepseek-r1">DeepSeek R1</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Image URL <span class="optional">(optionnel)</span></label>
+      <input type="text" id="f-imgurl" placeholder="https://exemple.com/image.jpg" oninput="buildUrl()"/>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="sendRequest()">▶ Envoyer la requête</button>
+      <button class="btn btn-secondary" onclick="clearResponse()">Réinitialiser</button>
+    </div>
+  </div>
+
+  <!-- ── Response ── -->
+  <div class="card" id="response-section">
+    <h3>📡 Réponse</h3>
+    <div class="status-bar">
+      <span class="status-pill" id="status-pill">...</span>
+      <span class="time-badge" id="time-badge"></span>
+    </div>
+    <div class="response-box" id="response-box"></div>
+  </div>
+
+  <!-- ── Code snippets ── -->
+  <div class="card">
+    <h3>💻 Exemples de code</h3>
+    <div class="code-tabs">
+      <div class="tab active" onclick="showTab('curl')">cURL</div>
+      <div class="tab" onclick="showTab('python')">Python</div>
+      <div class="tab" onclick="showTab('js')">JavaScript</div>
+      <div class="tab" onclick="showTab('php')">PHP</div>
+    </div>
+
+    <div class="code-block" id="code-curl">
+      <button class="copy-btn" onclick="copyCode('code-curl')">Copier</button>
+curl "https://votre-app.onrender.com/api/openai\
+?query=Bonjour\
+&uid=1\
+&apikey=zk-7c7fa3ac023a0bfa135afd96839344c43a52ccc28f0c530cdc051d7a8c0bef79"</div>
+
+    <div class="code-block" id="code-python" style="display:none">
+      <button class="copy-btn" onclick="copyCode('code-python')">Copier</button>
+import requests
+
+url = "https://votre-app.onrender.com/api/openai"
+params = {
+    "query": "Quelle jeux il s'agit ?",
+    "uid": "1",
+    "img_url": "https://exemple.com/image.jpg",  # optionnel
+    "apikey": "zk-7c7fa3ac023a0bfa135afd96839344c43a52ccc28f0c530cdc051d7a8c0bef79"
+}
+
+response = requests.get(url, params=params)
+data = response.json()
+
+print(data["response"])
+print(data["model_used"])
+print(data["available_models"])</div>
+
+    <div class="code-block" id="code-js" style="display:none">
+      <button class="copy-btn" onclick="copyCode('code-js')">Copier</button>
+const params = new URLSearchParams({
+  query: "Quelle jeux il s'agit ?",
+  uid: "1",
+  img_url: "https://exemple.com/image.jpg", // optionnel
+  apikey: "zk-7c7fa3ac023a0bfa135afd96839344c43a52ccc28f0c530cdc051d7a8c0bef79"
+});
+
+const res = await fetch(
+  `https://votre-app.onrender.com/api/openai?${params}`
+);
+const data = await res.json();
+
+console.log(data.response);
+console.log(data.available_models);</div>
+
+    <div class="code-block" id="code-php" style="display:none">
+      <button class="copy-btn" onclick="copyCode('code-php')">Copier</button>
+&lt;?php
+$params = http_build_query([
+  'query'   => 'Bonjour, qui es-tu ?',
+  'uid'     => '1',
+  'img_url' => 'https://exemple.com/img.jpg', // optionnel
+  'apikey'  => 'zk-7c7fa3ac023a0bfa135afd96839344c43a52ccc28f0c530cdc051d7a8c0bef79'
+]);
+
+$url = "https://votre-app.onrender.com/api/openai?" . $params;
+$response = file_get_contents($url);
+$data = json_decode($response, true);
+
+echo $data['response'];
+?&gt;</div>
+  </div>
+
+  <!-- ── Response schema ── -->
+  <div class="card">
+    <h3>📄 Format de réponse JSON</h3>
+    <div class="code-block" style="color: var(--text);">
+{
+  <span style="color:var(--accent)">"status"</span>: <span style="color:var(--green)">200</span>,
+  <span style="color:var(--accent)">"uid"</span>: <span style="color:var(--accent3)">"1"</span>,
+  <span style="color:var(--accent)">"query"</span>: <span style="color:var(--accent3)">"Quelle jeux il s'agit ?"</span>,
+  <span style="color:var(--accent)">"model_used"</span>: <span style="color:var(--accent3)">"auto"</span>,
+  <span style="color:var(--accent)">"has_image"</span>: <span style="color:var(--green)">true</span>,
+  <span style="color:var(--accent)">"response"</span>: <span style="color:var(--accent3)">"Il s'agit de Minecraft..."</span>,
+  <span style="color:var(--accent)">"available_models"</span>: [
+    { <span style="color:var(--accent)">"id"</span>: <span style="color:var(--accent3)">"gpt-5-2"</span>, <span style="color:var(--accent)">"name"</span>: <span style="color:var(--accent3)">"GPT-5.2"</span>, <span style="color:var(--accent)">"vision"</span>: <span style="color:var(--green)">true</span> },
+    { <span style="color:var(--accent)">"id"</span>: <span style="color:var(--accent3)">"claude-sonnet"</span>, <span style="color:var(--accent)">"name"</span>: <span style="color:var(--accent3)">"Claude Sonnet"</span>, <span style="color:var(--accent)">"vision"</span>: <span style="color:var(--green)">true</span> },
+    <span style="color:var(--text-dim)">// ... tous les modèles</span>
+  ],
+  <span style="color:var(--accent)">"timestamp"</span>: <span style="color:var(--accent3)">"2026-04-08T10:54:35.000Z"</span>
+}</div>
+  </div>
+
+  <!-- ── Models ── -->
+  <div class="card">
+    <h3>🤖 Modèles disponibles</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nom</th>
+          <th>Provider</th>
+          <th>Vision</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>auto</td><td>Auto (Meilleur disponible)</td><td>Mixed</td><td><span class="badge yes">✓ OUI</span></td></tr>
+        <tr><td>gpt-5-2</td><td>GPT-5.2</td><td>OpenAI</td><td><span class="badge yes">✓ OUI</span></td></tr>
+        <tr><td>claude-sonnet</td><td>Claude Sonnet</td><td>Anthropic</td><td><span class="badge yes">✓ OUI</span></td></tr>
+        <tr><td>claude-opus</td><td>Claude Opus</td><td>Anthropic</td><td><span class="badge yes">✓ OUI</span></td></tr>
+        <tr><td>gemini-3-pro</td><td>Gemini 3 Pro</td><td>Google</td><td><span class="badge yes">✓ OUI</span></td></tr>
+        <tr><td>deepseek-r1</td><td>DeepSeek R1</td><td>DeepSeek</td><td><span class="badge no">✗ NON</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ── Rate limits ── -->
+  <div class="card">
+    <h3>⚡ Limites & Notes</h3>
+    <table>
+      <thead><tr><th>Paramètre</th><th>Valeur</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td>Rate limit</td><td>30 req/min</td><td>Par IP</td></tr>
+        <tr><td>Taille image</td><td>Max 10MB</td><td>Via upload</td></tr>
+        <tr><td>img_url</td><td>Optionnel</td><td>URL publique accessible</td></tr>
+        <tr><td>apikey</td><td>Requis</td><td>Query param ou header X-Api-Key</td></tr>
+        <tr><td>uid</td><td>Optionnel</td><td>Identifiant utilisateur libre</td></tr>
+        <tr><td>model</td><td>Optionnel</td><td>Défaut: auto</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+  function buildUrl() {
+    const domain = document.getElementById('f-domain').value.trim() || 'votre-app.onrender.com';
+    const query = encodeURIComponent(document.getElementById('f-query').value.trim() || 'Bonjour');
+    const uid = document.getElementById('f-uid').value.trim() || '1';
+    const apikey = document.getElementById('f-apikey').value.trim() || 'YOUR_API_KEY';
+    const model = document.getElementById('f-model').value;
+    const imgUrl = document.getElementById('f-imgurl').value.trim();
+
+    let url = `https://${domain}/api/openai?query=${query}&uid=${uid}&apikey=${apikey}`;
+    if (model) url += `&model=${model}`;
+    if (imgUrl) url += `&img_url=${encodeURIComponent(imgUrl)}`;
+
+    document.getElementById('url-text').textContent = url;
+  }
+
+  function copyUrl() {
+    const text = document.getElementById('url-text').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const el = document.getElementById('url-display');
+      el.style.borderColor = 'var(--green)';
+      setTimeout(() => el.style.borderColor = '', 1000);
+    });
+  }
+
+  async function sendRequest() {
+    const domain = window.location.host; // use current host for live demo
+    const query = document.getElementById('f-query').value.trim();
+    const uid = document.getElementById('f-uid').value.trim() || '1';
+    const apikey = document.getElementById('f-apikey').value.trim();
+    const model = document.getElementById('f-model').value;
+    const imgUrl = document.getElementById('f-imgurl').value.trim();
+
+    if (!query) return alert('Champ query requis');
+    if (!apikey) return alert('API key requise');
+
+    const section = document.getElementById('response-section');
+    const box = document.getElementById('response-box');
+    const pill = document.getElementById('status-pill');
+    const timeBadge = document.getElementById('time-badge');
+
+    section.style.display = 'block';
+    box.innerHTML = '<span class="spinner"></span> Envoi en cours...';
+    pill.className = 'status-pill';
+    pill.textContent = '...';
+
+    const start = Date.now();
+
+    try {
+      let url = `/api/openai?query=${encodeURIComponent(query)}&uid=${encodeURIComponent(uid)}&apikey=${encodeURIComponent(apikey)}`;
+      if (model) url += `&model=${model}`;
+      if (imgUrl) url += `&img_url=${encodeURIComponent(imgUrl)}`;
+
+      const res = await fetch(url);
+      const data = await res.json();
+      const elapsed = Date.now() - start;
+
+      timeBadge.textContent = `${elapsed}ms`;
+
+      if (res.ok) {
+        pill.className = 'status-pill ok';
+        pill.textContent = '200 OK';
+      } else {
+        pill.className = 'status-pill err';
+        pill.textContent = `${res.status} Erreur`;
+      }
+
+      box.textContent = JSON.stringify(data, null, 2);
+    } catch (err) {
+      const elapsed = Date.now() - start;
+      timeBadge.textContent = `${elapsed}ms`;
+      pill.className = 'status-pill err';
+      pill.textContent = 'Erreur réseau';
+      box.textContent = err.message;
+    }
+  }
+
+  function clearResponse() {
+    document.getElementById('response-section').style.display = 'none';
+  }
+
+  const codeIds = ['code-curl', 'code-python', 'code-js', 'code-php'];
+  const tabNames = ['curl', 'python', 'js', 'php'];
+
+  function showTab(name) {
+    codeIds.forEach((id, i) => {
+      document.getElementById(id).style.display = tabNames[i] === name ? 'block' : 'none';
+    });
+    document.querySelectorAll('.tab').forEach((t, i) => {
+      t.classList.toggle('active', tabNames[i] === name);
+    });
+  }
+
+  function copyCode(id) {
+    const el = document.getElementById(id);
+    // get text, strip button text
+    const text = el.innerText.replace(/^Copier\n/, '');
+    navigator.clipboard.writeText(text.trim());
+    const btn = el.querySelector('.copy-btn');
+    btn.textContent = 'Copié!';
+    setTimeout(() => btn.textContent = 'Copier', 1500);
+  }
+
+  buildUrl();
+</script>
+</body>
+</html>
