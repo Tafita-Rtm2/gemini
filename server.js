@@ -1,192 +1,442 @@
-require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
-const fetch = require("node-fetch");
-const multer = require("multer");
-const rateLimit = require("express-rate-limit");
-const path = require("path");
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║        FREE AI API SERVER v3.0 — Pollinations.ai               ║
+// ║  Chat · Image · Image Edit · Web Search · Vision · Audio TTS   ║
+// ║  Fournisseur : Pollinations.ai — 100% Gratuit, sans clé API    ║
+// ╚══════════════════════════════════════════════════════════════════╝
+
+import express from "express";
+import cors from "cors";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ─── Trust proxy (REQUIRED on Render/Railway/Heroku) ──────────────────────────
-app.set("trust proxy", 1);
-
-// ─── Middleware ────────────────────────────────────────────────────────────────
 app.use(cors());
-app.use(express.json({ limit: "20mb" }));
-app.use(express.urlencoded({ extended: true, limit: "20mb" }));
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
-// ─── Rate limiting ─────────────────────────────────────────────────────────────
-const limiter = rateLimit({
-  windowMs: 60 * 1000,
-  max: 60,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: "Too many requests. Please wait.", status: 429 },
-});
-app.use("/api", limiter);
+// ═══════════════════════════════════════════════════════════════════
+// POLLINATIONS.AI — Fournisseur d'IA gratuit
+// Base URL : https://text.pollinations.ai  /  https://image.pollinations.ai
+// Docs     : https://enter.pollinations.ai/api/docs
+// ═══════════════════════════════════════════════════════════════════
 
-// ─── Available Models ─────────────────────────────────────────────────────────
-const MODELS = [
-  { id: "gpt-5-2",       name: "GPT-5.2",              provider: "OpenAI",    vision: true  },
-  { id: "claude-sonnet", name: "Claude Sonnet",         provider: "Anthropic", vision: true  },
-  { id: "claude-opus",   name: "Claude Opus",           provider: "Anthropic", vision: true  },
-  { id: "gemini-3-pro",  name: "Gemini 3 Pro",          provider: "Google",    vision: true  },
-  { id: "deepseek-r1",   name: "DeepSeek R1",           provider: "DeepSeek",  vision: false },
-  { id: "auto",          name: "Auto (Best Available)", provider: "Mixed",     vision: true  },
+const TEXT_API  = "https://text.pollinations.ai";
+const IMAGE_API = "https://image.pollinations.ai";
+
+// ── MODÈLES TEXTE ────────────────────────────────────────────────
+// ✅ = 100% gratuit, sans clé API
+// 💰 = nécessite clé Pollen (payant)
+const ALL_TEXT_MODELS = [
+  // ── Gratuits ──
+  { id:"openai",               name:"OpenAI GPT-5.4 Nano",                free:true,  vision:false, search:false, tags:["tools"] },
+  { id:"openai-fast",          name:"OpenAI GPT-5 Nano — Ultra Fast",      free:true,  vision:false, search:false, tags:["tools"] },
+  { id:"openai-large",         name:"OpenAI GPT-5.4 — Most Powerful",      free:true,  vision:false, search:false, tags:["tools","reasoning"] },
+  { id:"gemini-fast",          name:"Google Gemini 2.5 Flash Lite",        free:true,  vision:true,  search:true,  tags:["tools","search","code-exec"] },
+  { id:"gemini-search",        name:"Google Gemini 2.5 Flash Lite + Search",free:true, vision:true,  search:true,  tags:["search","code-exec"] },
+  { id:"deepseek",             name:"DeepSeek V3.2",                       free:true,  vision:false, search:false, tags:["tools","reasoning"] },
+  { id:"deepseek-reasoning",   name:"DeepSeek R1 — Chain of Thought",      free:true,  vision:false, search:false, tags:["reasoning"] },
+  { id:"mistral",              name:"Mistral Small 3.2",                   free:true,  vision:false, search:false, tags:["tools"] },
+  { id:"qwen-coder",           name:"Qwen3 Coder 30B — Code Specialist",   free:true,  vision:false, search:false, tags:["tools"] },
+  { id:"claude-fast",          name:"Anthropic Claude Haiku 4.5",          free:true,  vision:true,  search:false, tags:["tools"] },
+  { id:"perplexity-fast",      name:"Perplexity Sonar — Web Search",       free:true,  vision:false, search:true,  tags:["search"] },
+  { id:"perplexity-reasoning", name:"Perplexity Sonar Reasoning",          free:true,  vision:false, search:true,  tags:["reasoning","search"] },
+  { id:"kimi",                 name:"Moonshot Kimi K2.5 — Vision+Agents",  free:true,  vision:true,  search:false, tags:["tools","reasoning"] },
+  { id:"nova-fast",            name:"Amazon Nova Micro — Ultra Fast",       free:true,  vision:false, search:false, tags:["tools"] },
+  { id:"nova",                 name:"Amazon Nova 2 Lite — 1M Context",     free:true,  vision:false, search:false, tags:["tools","reasoning"] },
+  { id:"glm",                  name:"Z.ai GLM-5 — 744B MoE Long Context",  free:true,  vision:false, search:false, tags:["tools","reasoning"] },
+  { id:"minimax",              name:"MiniMax M2.5 — Multi-Language",       free:true,  vision:false, search:false, tags:["tools","reasoning"] },
+  { id:"mistral-large",        name:"Mistral Large 3 — Premium Reasoning", free:true,  vision:false, search:false, tags:["tools","reasoning"] },
+  { id:"qwen-coder-large",     name:"Qwen3 Coder Next — Advanced Code",    free:true,  vision:false, search:false, tags:["tools"] },
+  { id:"qwen-large",           name:"Qwen3.5 Plus — Alibaba Frontier MoE", free:true,  vision:false, search:false, tags:["tools","reasoning"] },
+  { id:"qwen-vision",          name:"Qwen3 VL Plus — Vision+Language",     free:true,  vision:true,  search:false, tags:["tools","reasoning"] },
+  { id:"qwen-safety",          name:"Qwen3Guard 8B — Content Safety",      free:true,  vision:false, search:false, tags:[] },
+  { id:"midijourney",          name:"MIDIjourney — AI Music Composition",  free:true,  vision:false, search:false, tags:["tools"] },
+  { id:"polly",                name:"Polly — Pollinations AI Assistant",   free:true,  vision:false, search:true,  tags:["tools","reasoning","search"] },
+  // ── Payants (💰) ──
+  { id:"gemini",               name:"Google Gemini 3 Flash",               free:false, vision:true,  search:true,  tags:["tools","search"] },
+  { id:"gemini-flash-lite-3.1",name:"Google Gemini 3.1 Flash Lite",        free:false, vision:true,  search:true,  tags:["tools","search"] },
+  { id:"gemini-large",         name:"Google Gemini 3.1 Pro — 1M Context",  free:false, vision:true,  search:true,  tags:["tools","reasoning","search"] },
+  { id:"claude",               name:"Anthropic Claude Sonnet 4.6",         free:false, vision:true,  search:false, tags:["tools"] },
+  { id:"claude-large",         name:"Anthropic Claude Opus 4.6",           free:false, vision:true,  search:false, tags:["tools"] },
+  { id:"grok",                 name:"xAI Grok 4.1 Fast",                   free:false, vision:false, search:false, tags:["tools"] },
+  { id:"grok-large",           name:"xAI Grok 4.20 Reasoning",             free:false, vision:false, search:false, tags:["tools","reasoning"] },
+  { id:"midijourney-large",    name:"MIDIjourney Large — Premium Music",   free:false, vision:false, search:false, tags:["tools"] },
 ];
 
-// ─── Helper: call aifreeforever ───────────────────────────────────────────────
-async function callAIFreeForever(question, conversationHistory = [], imageBase64 = null) {
-  const payload = {
-    question,
-    tone: "friendly",
-    format: "paragraph",
-    file: imageBase64 || null,
-    conversationHistory,
-  };
+// ── MODÈLES IMAGE ────────────────────────────────────────────────
+const ALL_IMAGE_MODELS = [
+  // ✅ Gratuits — génération texte→image
+  { id:"flux",          name:"Flux Schnell — Fast High-Quality",           free:true,  edit:false },
+  { id:"zimage",        name:"Z-Image Turbo — Fast 6B Flux + 2x Upscale", free:true,  edit:false },
+  // 💰 Payants ou nécessitent clé
+  { id:"kontext",       name:"FLUX.1 Kontext — In-context Editing",        free:false, edit:true  },
+  { id:"nanobanana",    name:"NanoBanana — Gemini 2.5 Flash Image",        free:false, edit:true  },
+  { id:"nanobanana-2",  name:"NanoBanana 2 — Gemini 3.1 Flash Image",      free:false, edit:true  },
+  { id:"nanobanana-pro",name:"NanoBanana Pro — Gemini 3 Pro Image (4K)",   free:false, edit:true  },
+  { id:"seedream5",     name:"Seedream 5.0 Lite — ByteDance",              free:false, edit:true  },
+  { id:"gptimage",      name:"GPT Image 1 Mini — OpenAI",                  free:false, edit:true  },
+  { id:"gptimage-large",name:"GPT Image 1.5 — OpenAI Advanced",            free:false, edit:true  },
+  { id:"wan-image",     name:"Wan 2.7 Image — Alibaba (up to 2K)",         free:false, edit:true  },
+  { id:"wan-image-pro", name:"Wan 2.7 Image Pro — Alibaba (4K)",           free:false, edit:true  },
+  { id:"qwen-image",    name:"Qwen Image Plus — Alibaba",                  free:false, edit:true  },
+  { id:"grok-imagine",  name:"Grok Imagine — xAI Official",                free:false, edit:false },
+  { id:"klein",         name:"FLUX.2 Klein 4B — Fast Gen+Edit",            free:false, edit:true  },
+  { id:"nova-canvas",   name:"Amazon Nova Canvas — Bedrock",               free:false, edit:true  },
+];
 
-  const headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-    "Accept": "application/json, text/plain, */*",
-    "Accept-Encoding": "gzip, deflate, br",
-    "Accept-Language": "en-US,en;q=0.9",
-    "Content-Type": "application/json",
-    "Origin": "https://aifreeforever.com",
-    "Referer": "https://aifreeforever.com/tools/free-chatgpt-no-login",
-    "Sec-Fetch-Dest": "empty",
-    "Sec-Fetch-Mode": "cors",
-    "Sec-Fetch-Site": "same-origin",
-    "sec-ch-ua": '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
-    "sec-ch-ua-mobile": "?0",
-    "sec-ch-ua-platform": '"Windows"',
-    "Cache-Control": "no-cache",
-  };
+// Modèles vision (analyse image) gratuits
+const FREE_VISION_MODELS = ALL_TEXT_MODELS.filter(m => m.free && m.vision).map(m => m.id);
+// Modèles search gratuits
+const FREE_SEARCH_MODELS = ALL_TEXT_MODELS.filter(m => m.free && m.search).map(m => m.id);
+// Modèles texte gratuits
+const FREE_TEXT_IDS = ALL_TEXT_MODELS.filter(m => m.free).map(m => m.id);
+// Modèles image gratuits
+const FREE_IMAGE_IDS = ALL_IMAGE_MODELS.filter(m => m.free).map(m => m.id);
 
-  const response = await fetch("https://aifreeforever.com/api/generate-ai-answer", {
-    method: "POST",
-    headers,
-    body: JSON.stringify(payload),
-  });
+// ═══════════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════════
 
-  const text = await response.text();
-
-  if (!response.ok) {
-    console.error(`[upstream] ${response.status} — ${text.slice(0, 300)}`);
-    throw new Error(`Upstream error ${response.status}`);
-  }
-
+async function doFetch(url, options = {}, timeoutMs = 120000) {
+  const ctrl = new AbortController();
+  const id = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
-    return JSON.parse(text);
-  } catch {
-    return { answer: text };
+    const { default: fetch } = await import("node-fetch");
+    return await fetch(url, { ...options, signal: ctrl.signal });
+  } finally {
+    clearTimeout(id);
   }
 }
 
-// ─── Helper: fetch image URL → base64 ────────────────────────────────────────
-async function fetchImageAsBase64(imgUrl) {
-  const res = await fetch(decodeURIComponent(imgUrl));
-  if (!res.ok) throw new Error(`Cannot fetch image: ${res.status}`);
-  const buffer = await res.buffer();
-  const ct = res.headers.get("content-type") || "image/jpeg";
-  return `data:${ct};base64,${buffer.toString("base64")}`;
-}
-
-function extractAnswer(data) {
-  return data.answer ?? data.response ?? data.text ?? data.result ?? data.message ?? JSON.stringify(data);
-}
-
-// =============================================================================
-// PUBLIC API — NO key required
-// GET  /api/openai?query=...&uid=...&img_url=...&model=...
-// POST /api/openai  body: { query, uid, img_url, img_base64, model, history }
-// =============================================================================
-
-async function handleApiRequest(query, opts = {}) {
-  const { uid, img_url, img_base64, model, history } = opts;
-  let imageBase64 = null;
-
-  if (img_url) imageBase64 = await fetchImageAsBase64(img_url);
-  else if (img_base64) imageBase64 = img_base64;
-
-  const question = imageBase64 ? `[Image attached] ${query}` : query;
-  const raw = await callAIFreeForever(question, Array.isArray(history) ? history : [], imageBase64);
-
+function buildInfo() {
   return {
-    status: 200,
-    uid: uid || "anonymous",
-    query,
-    model_used: model || "auto",
-    has_image: !!imageBase64,
-    response: extractAnswer(raw),
-    available_models: MODELS,
-    timestamp: new Date().toISOString(),
+    status: true,
+    server: "Free AI API Server v3.0",
+    provider: "Pollinations.ai",
+    provider_url: "https://pollinations.ai",
+    provider_docs: "https://enter.pollinations.ai/api/docs",
+    note: "Fournisseur : Pollinations.ai — Plateforme open-source 100% gratuite, sans inscription, sans clé API pour les modèles gratuits.",
+    free_models: {
+      text: FREE_TEXT_IDS,
+      image: FREE_IMAGE_IDS,
+      vision: FREE_VISION_MODELS,
+      search: FREE_SEARCH_MODELS,
+    },
+    all_models: {
+      text: ALL_TEXT_MODELS,
+      image: ALL_IMAGE_MODELS,
+    },
+    endpoints: {
+      chat:       "GET /api/chat?query=Hello&model=openai",
+      image:      "GET /api/image?prompt=A+cat&model=flux",
+      image_edit: "GET /api/image?prompt=Edit+this&model=nanobanana-pro&imgurl=https://...",
+      search:     "GET /api/search?query=Latest+news&model=searchgpt",
+      vision:     "GET /api/openai?query=What+is+this?&imgurl=https://...&model=gemini-fast",
+      openai:     "GET /api/openai?query=Hello&uid=1&model=openai&imgurl=(optional)",
+      models:     "GET /api/models",
+      test_ui:    "GET /test",
+    },
   };
 }
 
-app.get("/api/openai", async (req, res) => {
-  const { query, uid, img_url, model } = req.query;
-  if (!query) return res.status(400).json({ error: "Missing: query", example: "/api/openai?query=Hello" });
-  try {
-    res.json(await handleApiRequest(query, { uid, img_url, model }));
-  } catch (err) {
-    console.error("[GET /api/openai]", err.message);
-    res.status(500).json({ error: err.message, status: 500 });
-  }
-});
+// ═══════════════════════════════════════════════════════════════════
+// ROUTES
+// ═══════════════════════════════════════════════════════════════════
 
-app.post("/api/openai", async (req, res) => {
-  const { query, uid, img_url, img_base64, model, history } = req.body;
-  if (!query) return res.status(400).json({ error: "Missing: query" });
-  try {
-    res.json(await handleApiRequest(query, { uid, img_url, img_base64, model, history }));
-  } catch (err) {
-    console.error("[POST /api/openai]", err.message);
-    res.status(500).json({ error: err.message, status: 500 });
-  }
-});
+app.get("/", (req, res) => res.json(buildInfo()));
 
-// =============================================================================
-// CHAT — frontend use (multipart)
-// =============================================================================
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
+// ─────────────────────────────────────────────────────────────────
+// 1. CHAT  GET /api/chat?query=...&model=openai&system=...
+// ─────────────────────────────────────────────────────────────────
+app.get("/api/chat", async (req, res) => {
+  const { query, model = "openai", system = "You are a helpful AI assistant.", seed } = req.query;
+  if (!query) return res.status(400).json({ status: false, error: "Missing 'query'" });
 
-app.post("/api/chat", upload.single("file"), async (req, res) => {
-  const { message, history, model, img_url } = req.body;
-  if (!message) return res.status(400).json({ error: "Missing message" });
+  const modelInfo = ALL_TEXT_MODELS.find(m => m.id === model);
 
   try {
-    let imageBase64 = null;
-    if (req.file) {
-      imageBase64 = `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`;
-    } else if (img_url) {
-      imageBase64 = await fetchImageAsBase64(img_url);
+    const body = {
+      messages: [{ role: "user", content: query }],
+      model,
+      system,
+      ...(seed && { seed: parseInt(seed) }),
+    };
+
+    const r = await doFetch(`${TEXT_API}/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+
+    if (!r.ok) {
+      const t = await r.text();
+      throw new Error(`Upstream ${r.status}: ${t.substring(0, 300)}`);
     }
 
-    let hist = [];
-    try { hist = JSON.parse(history || "[]"); } catch (_) {}
-
-    const question = imageBase64 ? `[Image attached] ${message}` : message;
-    const raw = await callAIFreeForever(question, hist.slice(-10), imageBase64);
-
-    res.json({ response: extractAnswer(raw), model_used: model || "auto" });
+    const text = await r.text();
+    return res.json({
+      status: true,
+      provider: "Pollinations.ai",
+      model,
+      model_info: modelInfo || null,
+      free: modelInfo ? modelInfo.free : null,
+      response: text,
+      model_type: "chat",
+      free_models: FREE_TEXT_IDS,
+    });
   } catch (err) {
-    console.error("[POST /api/chat]", err.message);
-    res.status(500).json({ error: err.message });
+    console.error("[CHAT]", err.message);
+    return res.status(500).json({ status: false, error: err.message });
   }
 });
 
-app.get("/api/models", (_req, res) => res.json({ models: MODELS, count: MODELS.length }));
+// ─────────────────────────────────────────────────────────────────
+// 2. IMAGE GENERATE / EDIT
+//    GET /api/image?prompt=...&model=flux
+//    GET /api/image?prompt=...&model=nanobanana-pro&imgurl=https://...
+//    → Retourne l'image DIRECTEMENT en binaire (image/jpeg)
+// ─────────────────────────────────────────────────────────────────
+app.get("/api/image", async (req, res) => {
+  const {
+    prompt,
+    model   = "flux",
+    width   = 1024,
+    height  = 1024,
+    seed,
+    enhance = "false",
+    safe    = "false",
+    imgurl,
+    negative_prompt,
+    quality,
+  } = req.query;
 
-app.get("/health", (_req, res) =>
-  res.json({ status: "ok", uptime: process.uptime(), timestamp: new Date().toISOString() })
-);
+  if (!prompt) return res.status(400).json({ status: false, error: "Missing 'prompt'" });
 
-app.get("*", (_req, res) => res.sendFile(path.join(__dirname, "public", "index.html")));
+  try {
+    let useModel = model;
+    // Si édition demandée mais modèle ne supporte pas → auto-fallback
+    if (imgurl) {
+      const imgModel = ALL_IMAGE_MODELS.find(m => m.id === model);
+      if (!imgModel || !imgModel.edit) useModel = "nanobanana-pro";
+    }
 
+    const params = new URLSearchParams({
+      model:  useModel,
+      width:  String(width),
+      height: String(height),
+      nologo: "true",
+    });
+    if (seed)             params.set("seed",            String(seed));
+    if (enhance==="true") params.set("enhance",         "true");
+    if (safe==="true")    params.set("safe",            "true");
+    if (imgurl)           params.set("image",           imgurl);
+    if (negative_prompt)  params.set("negative_prompt", negative_prompt);
+    if (quality)          params.set("quality",         quality);
+
+    const url = `${IMAGE_API}/prompt/${encodeURIComponent(prompt)}?${params}`;
+    console.log(`[IMG ${imgurl?"EDIT":"GEN"}] model=${useModel}`);
+
+    const r = await doFetch(url, {}, 180000);
+    if (!r.ok) {
+      const t = await r.text();
+      throw new Error(`Image API ${r.status}: ${t.substring(0, 300)}`);
+    }
+
+    const ct  = r.headers.get("content-type") || "image/jpeg";
+    const buf = await r.buffer();
+    res.set("Content-Type",  ct);
+    res.set("Cache-Control", "public, max-age=3600");
+    res.set("X-Model-Used",  useModel);
+    res.set("X-Mode",        imgurl ? "edit" : "generate");
+    res.set("X-Provider",    "Pollinations.ai");
+    return res.send(buf);
+  } catch (err) {
+    console.error("[IMAGE]", err.message);
+    return res.status(500).json({ status: false, error: err.message });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────
+// 3. WEB SEARCH  GET /api/search?query=...&model=searchgpt
+// ─────────────────────────────────────────────────────────────────
+app.get("/api/search", async (req, res) => {
+  const { query, model = "perplexity-fast" } = req.query;
+  if (!query) return res.status(400).json({ status: false, error: "Missing 'query'" });
+
+  const useModel = FREE_SEARCH_MODELS.includes(model) ? model : "perplexity-fast";
+
+  try {
+    const r = await doFetch(`${TEXT_API}/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        messages: [{ role: "user", content: `Search the web and answer: ${query}\nInclude sources and links where possible.` }],
+        model: useModel,
+        system: "You are a web search assistant. Provide comprehensive, up-to-date answers with sources and links.",
+      }),
+    }, 60000);
+
+    if (!r.ok) {
+      const t = await r.text();
+      throw new Error(`Upstream ${r.status}: ${t.substring(0, 300)}`);
+    }
+
+    const text = await r.text();
+    return res.json({
+      status: true,
+      provider: "Pollinations.ai",
+      model: useModel,
+      query,
+      response: text,
+      model_type: "websearch",
+      free_search_models: FREE_SEARCH_MODELS,
+    });
+  } catch (err) {
+    console.error("[SEARCH]", err.message);
+    return res.status(500).json({ status: false, error: err.message });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────
+// 4. OPENAI-COMPATIBLE UNIFIED  /api/openai (format reixz)
+//    GET /api/openai?query=Hello&uid=3&model=openai&imgurl=(opt)
+//    VISION : Le serveur récupère l'image → base64 → envoi inline
+// ─────────────────────────────────────────────────────────────────
+app.get("/api/openai", async (req, res) => {
+  const {
+    query,
+    uid    = "anonymous",
+    model  = "openai",
+    imgurl,
+    system = "You are a helpful AI assistant.",
+  } = req.query;
+
+  if (!query) return res.status(400).json({ status: false, error: "Missing 'query'" });
+
+  try {
+    let messages;
+    let useModel = model;
+    let visionMode = false;
+
+    if (imgurl) {
+      visionMode = true;
+      // Force vision-capable model
+      if (!FREE_VISION_MODELS.includes(model)) useModel = "gemini-fast";
+
+      // Récupère image côté serveur → base64 (méthode la plus fiable)
+      let imgPart;
+      try {
+        const { default: fetch } = await import("node-fetch");
+        const ir = await fetch(imgurl, { timeout: 30000 });
+        if (ir.ok) {
+          const buf  = await ir.buffer();
+          const mime = ir.headers.get("content-type") || "image/jpeg";
+          imgPart = { type: "image_url", image_url: { url: `data:${mime};base64,${buf.toString("base64")}` } };
+        } else throw new Error("img fetch failed");
+      } catch (_) {
+        imgPart = { type: "image_url", image_url: { url: imgurl } };
+      }
+
+      messages = [{ role: "user", content: [{ type: "text", text: query }, imgPart] }];
+    } else {
+      messages = [{ role: "user", content: query }];
+    }
+
+    const r = await doFetch(`${TEXT_API}/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages, model: useModel, system }),
+    });
+
+    if (!r.ok) {
+      const t = await r.text();
+      throw new Error(`Upstream ${r.status}: ${t.substring(0, 300)}`);
+    }
+
+    const text = await r.text();
+    return res.json({
+      status: true,
+      provider: "Pollinations.ai",
+      maintainer: "Free AI API Server v3.0",
+      uid,
+      response: text,
+      model_used: useModel,
+      vision_mode: visionMode,
+      model_type: visionMode ? "vision" : "chat",
+      free_models: {
+        text:   FREE_TEXT_IDS,
+        image:  FREE_IMAGE_IDS,
+        vision: FREE_VISION_MODELS,
+        search: FREE_SEARCH_MODELS,
+      },
+    });
+  } catch (err) {
+    console.error("[OPENAI]", err.message);
+    return res.status(500).json({ status: false, error: err.message });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────
+// 5. MODELS  GET /api/models
+// ─────────────────────────────────────────────────────────────────
+app.get("/api/models", (req, res) => {
+  res.json({
+    status: true,
+    provider: "Pollinations.ai",
+    provider_url: "https://pollinations.ai",
+    updated: "April 2026",
+    summary: {
+      total_text_models:       ALL_TEXT_MODELS.length,
+      free_text_models:        FREE_TEXT_IDS.length,
+      total_image_models:      ALL_IMAGE_MODELS.length,
+      free_image_models:       FREE_IMAGE_IDS.length,
+      free_vision_models:      FREE_VISION_MODELS.length,
+      free_search_models:      FREE_SEARCH_MODELS.length,
+    },
+    free_text_models:   FREE_TEXT_IDS,
+    free_image_models:  FREE_IMAGE_IDS,
+    free_vision_models: FREE_VISION_MODELS,
+    free_search_models: FREE_SEARCH_MODELS,
+    all_text_models:    ALL_TEXT_MODELS,
+    all_image_models:   ALL_IMAGE_MODELS,
+    tips: {
+      best_chat_free:       "openai (GPT-5.4 Nano) ou gemini-fast",
+      best_vision_free:     "gemini-fast ou claude-fast",
+      best_search_free:     "perplexity-fast ou gemini-search",
+      best_image_free:      "flux ou zimage",
+      best_image_edit_paid: "nanobanana-pro (Gemini 3 Pro) ou kontext",
+      note:                 "Les modèles 💰 fonctionnent mais nécessitent une clé Pollen via enter.pollinations.ai",
+    },
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────
+// STATIC & ERRORS
+// ─────────────────────────────────────────────────────────────────
+app.get("/test", (req, res) => res.sendFile(join(__dirname, "public", "index.html")));
+app.use(express.static(join(__dirname, "public")));
+app.use((req, res) => res.status(404).json({ status: false, error: "Not found", available: ["/api/chat","/api/image","/api/search","/api/openai","/api/models","/test"] }));
+app.use((err, req, res, _next) => { console.error(err.stack); res.status(500).json({ status: false, error: "Server error" }); });
+
+// ═══════════════════════════════════════════════════════════════════
 app.listen(PORT, () => {
-  console.log(`✅  Server on http://localhost:${PORT}`);
-  console.log(`📡  API: http://localhost:${PORT}/api/openai?query=Hello`);
+  console.log(`
+╔══════════════════════════════════════════════════════════════╗
+║      🌸 FREE AI API SERVER v3.0 — Pollinations.ai           ║
+║  Port     : ${PORT}                                            ║
+║  Test UI  : http://localhost:${PORT}/test                       ║
+║  Fournisseur : Pollinations.ai (open-source, gratuit !)     ║
+╠══════════════════════════════════════════════════════════════╣
+║  ✅ ${FREE_TEXT_IDS.length} modèles texte GRATUITS                            ║
+║  ✅ ${FREE_IMAGE_IDS.length} modèles image GRATUITS                           ║
+║  ✅ ${FREE_VISION_MODELS.length} modèles vision GRATUITS                         ║
+║  ✅ ${FREE_SEARCH_MODELS.length} modèles web search GRATUITS                    ║
+║  💰 Modèles payants aussi disponibles (avec clé Pollen)     ║
+╚══════════════════════════════════════════════════════════════╝
+  `);
 });
