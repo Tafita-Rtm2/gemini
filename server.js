@@ -1,7 +1,7 @@
 // ╔══════════════════════════════════════════════════════════════════╗
-// ║        FREE AI API SERVER v3.0 — Pollinations.ai               ║
-// ║  Chat · Image · Image Edit · Web Search · Vision · Audio TTS   ║
-// ║  Fournisseur : Pollinations.ai — 100% Gratuit, sans clé API    ║
+// ║   FREE AI API SERVER v5.0 — Pollinations.ai (gen.pollinations.ai)║
+// ║   Chat · Image · Video · Audio · Music · Search · Vision        ║
+// ║   100% GRATUIT — SANS CLÉ API — Deploy on Render                ║
 // ╚══════════════════════════════════════════════════════════════════╝
 
 import express from "express";
@@ -20,240 +20,213 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
 // ═══════════════════════════════════════════════════════════════════
-// POLLINATIONS.AI — Fournisseur d'IA gratuit
-// Base URL : https://text.pollinations.ai  /  https://image.pollinations.ai
-// Docs     : https://enter.pollinations.ai/api/docs
+// CONFIG — Pollinations.ai endpoints (Avril 2026)
 // ═══════════════════════════════════════════════════════════════════
 
-const TEXT_API  = "https://text.pollinations.ai";
-const IMAGE_API = "https://image.pollinations.ai";
+const GEN_API   = "https://gen.pollinations.ai";   // OpenAI-compatible (chat + image)
+const IMAGE_API = "https://image.pollinations.ai"; // Image directe (legacy, toujours ok)
 
-// ── MODÈLES TEXTE ────────────────────────────────────────────────
-// ✅ = 100% gratuit, sans clé API
-// 💰 = nécessite clé Pollen (payant)
-const ALL_TEXT_MODELS = [
-  // ── Gratuits ──
-  { id:"openai",               name:"OpenAI GPT-5.4 Nano",                free:true,  vision:false, search:false, tags:["tools"] },
-  { id:"openai-fast",          name:"OpenAI GPT-5 Nano — Ultra Fast",      free:true,  vision:false, search:false, tags:["tools"] },
-  { id:"openai-large",         name:"OpenAI GPT-5.4 — Most Powerful",      free:true,  vision:false, search:false, tags:["tools","reasoning"] },
-  { id:"gemini-fast",          name:"Google Gemini 2.5 Flash Lite",        free:true,  vision:true,  search:true,  tags:["tools","search","code-exec"] },
-  { id:"gemini-search",        name:"Google Gemini 2.5 Flash Lite + Search",free:true, vision:true,  search:true,  tags:["search","code-exec"] },
-  { id:"deepseek",             name:"DeepSeek V3.2",                       free:true,  vision:false, search:false, tags:["tools","reasoning"] },
-  { id:"deepseek-reasoning",   name:"DeepSeek R1 — Chain of Thought",      free:true,  vision:false, search:false, tags:["reasoning"] },
-  { id:"mistral",              name:"Mistral Small 3.2",                   free:true,  vision:false, search:false, tags:["tools"] },
-  { id:"qwen-coder",           name:"Qwen3 Coder 30B — Code Specialist",   free:true,  vision:false, search:false, tags:["tools"] },
-  { id:"claude-fast",          name:"Anthropic Claude Haiku 4.5",          free:true,  vision:true,  search:false, tags:["tools"] },
-  { id:"perplexity-fast",      name:"Perplexity Sonar — Web Search",       free:true,  vision:false, search:true,  tags:["search"] },
-  { id:"perplexity-reasoning", name:"Perplexity Sonar Reasoning",          free:true,  vision:false, search:true,  tags:["reasoning","search"] },
-  { id:"kimi",                 name:"Moonshot Kimi K2.5 — Vision+Agents",  free:true,  vision:true,  search:false, tags:["tools","reasoning"] },
-  { id:"nova-fast",            name:"Amazon Nova Micro — Ultra Fast",       free:true,  vision:false, search:false, tags:["tools"] },
-  { id:"nova",                 name:"Amazon Nova 2 Lite — 1M Context",     free:true,  vision:false, search:false, tags:["tools","reasoning"] },
-  { id:"glm",                  name:"Z.ai GLM-5 — 744B MoE Long Context",  free:true,  vision:false, search:false, tags:["tools","reasoning"] },
-  { id:"minimax",              name:"MiniMax M2.5 — Multi-Language",       free:true,  vision:false, search:false, tags:["tools","reasoning"] },
-  { id:"mistral-large",        name:"Mistral Large 3 — Premium Reasoning", free:true,  vision:false, search:false, tags:["tools","reasoning"] },
-  { id:"qwen-coder-large",     name:"Qwen3 Coder Next — Advanced Code",    free:true,  vision:false, search:false, tags:["tools"] },
-  { id:"qwen-large",           name:"Qwen3.5 Plus — Alibaba Frontier MoE", free:true,  vision:false, search:false, tags:["tools","reasoning"] },
-  { id:"qwen-vision",          name:"Qwen3 VL Plus — Vision+Language",     free:true,  vision:true,  search:false, tags:["tools","reasoning"] },
-  { id:"qwen-safety",          name:"Qwen3Guard 8B — Content Safety",      free:true,  vision:false, search:false, tags:[] },
-  { id:"midijourney",          name:"MIDIjourney — AI Music Composition",  free:true,  vision:false, search:false, tags:["tools"] },
-  { id:"polly",                name:"Polly — Pollinations AI Assistant",   free:true,  vision:false, search:true,  tags:["tools","reasoning","search"] },
-  // ── Payants (💰) ──
-  { id:"gemini",               name:"Google Gemini 3 Flash",               free:false, vision:true,  search:true,  tags:["tools","search"] },
-  { id:"gemini-flash-lite-3.1",name:"Google Gemini 3.1 Flash Lite",        free:false, vision:true,  search:true,  tags:["tools","search"] },
-  { id:"gemini-large",         name:"Google Gemini 3.1 Pro — 1M Context",  free:false, vision:true,  search:true,  tags:["tools","reasoning","search"] },
-  { id:"claude",               name:"Anthropic Claude Sonnet 4.6",         free:false, vision:true,  search:false, tags:["tools"] },
-  { id:"claude-large",         name:"Anthropic Claude Opus 4.6",           free:false, vision:true,  search:false, tags:["tools"] },
-  { id:"grok",                 name:"xAI Grok 4.1 Fast",                   free:false, vision:false, search:false, tags:["tools"] },
-  { id:"grok-large",           name:"xAI Grok 4.20 Reasoning",             free:false, vision:false, search:false, tags:["tools","reasoning"] },
-  { id:"midijourney-large",    name:"MIDIjourney Large — Premium Music",   free:false, vision:false, search:false, tags:["tools"] },
+// Clé Pollen OPTIONNELLE — fonctionne sans pour tous les modèles gratuits
+// Pour débloquer les modèles payants, créer une clé GRATUITE sur https://enter.pollinations.ai
+const POLLEN_KEY = process.env.POLLEN_KEY || "";
+
+function authHeaders(extra = {}) {
+  const h = { "Content-Type": "application/json", ...extra };
+  if (POLLEN_KEY) h["Authorization"] = `Bearer ${POLLEN_KEY}`;
+  return h;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// MODÈLES
+// ═══════════════════════════════════════════════════════════════════
+
+const TEXT_MODELS = [
+  // ✅ GRATUITS sans clé
+  { id:"openai",                label:"OpenAI GPT-5.4 Nano",               free:true,  vision:false, search:false },
+  { id:"openai-fast",           label:"OpenAI GPT-5 Nano Ultra Fast",      free:true,  vision:false, search:false },
+  { id:"openai-large",          label:"OpenAI GPT-5.4 Most Powerful",      free:true,  vision:false, search:false },
+  { id:"gemini-fast",           label:"Google Gemini 2.5 Flash Lite",      free:true,  vision:true,  search:true  },
+  { id:"gemini-search",         label:"Google Gemini 2.5 + Google Search", free:true,  vision:true,  search:true  },
+  { id:"deepseek",              label:"DeepSeek V3.2",                     free:true,  vision:false, search:false },
+  { id:"deepseek-reasoning",    label:"DeepSeek R1 Reasoning",             free:true,  vision:false, search:false },
+  { id:"mistral",               label:"Mistral Small 3.2",                 free:true,  vision:false, search:false },
+  { id:"mistral-large",         label:"Mistral Large 3",                   free:true,  vision:false, search:false },
+  { id:"qwen-coder",            label:"Qwen3 Coder 30B",                   free:true,  vision:false, search:false },
+  { id:"qwen-coder-large",      label:"Qwen3 Coder Next",                  free:true,  vision:false, search:false },
+  { id:"qwen-large",            label:"Qwen3.5 Plus MoE",                  free:true,  vision:false, search:false },
+  { id:"qwen-vision",           label:"Qwen3 VL Plus Vision",              free:true,  vision:true,  search:false },
+  { id:"qwen-safety",           label:"Qwen3Guard 8B Safety",              free:true,  vision:false, search:false },
+  { id:"claude-fast",           label:"Claude Haiku 4.5",                  free:true,  vision:true,  search:false },
+  { id:"kimi",                  label:"Moonshot Kimi K2.5",                free:true,  vision:true,  search:false },
+  { id:"perplexity-fast",       label:"Perplexity Sonar Web",              free:true,  vision:false, search:true  },
+  { id:"perplexity-reasoning",  label:"Perplexity Sonar R1",               free:true,  vision:false, search:true  },
+  { id:"nova-fast",             label:"Amazon Nova Micro",                 free:true,  vision:false, search:false },
+  { id:"nova",                  label:"Amazon Nova 2 Lite 1M",             free:true,  vision:false, search:false },
+  { id:"glm",                   label:"Z.ai GLM-5 744B MoE",               free:true,  vision:false, search:false },
+  { id:"minimax",               label:"MiniMax M2.5",                      free:true,  vision:false, search:false },
+  { id:"grok",                  label:"xAI Grok 4.1 Fast",                 free:true,  vision:false, search:false },
+  { id:"midijourney",           label:"MIDIjourney Music AI",              free:true,  vision:false, search:false },
+  { id:"polly",                 label:"Polly AI Search",                   free:true,  vision:false, search:true  },
+  // 💰 Pollen (clé GRATUITE sur enter.pollinations.ai)
+  { id:"gemini",                label:"Google Gemini 3 Flash",             free:false, vision:true,  search:true  },
+  { id:"gemini-flash-lite-3.1", label:"Google Gemini 3.1 Flash Lite",      free:false, vision:true,  search:true  },
+  { id:"gemini-large",          label:"Google Gemini 3.1 Pro 1M",          free:false, vision:true,  search:true  },
+  { id:"claude",                label:"Anthropic Claude Sonnet 4.6",       free:false, vision:true,  search:false },
+  { id:"claude-large",          label:"Anthropic Claude Opus 4.6",         free:false, vision:true,  search:false },
+  { id:"grok-large",            label:"xAI Grok 4.20 Reasoning",           free:false, vision:false, search:false },
+  { id:"midijourney-large",     label:"MIDIjourney Large Premium",         free:false, vision:false, search:false },
 ];
 
-// ── MODÈLES IMAGE ────────────────────────────────────────────────
-const ALL_IMAGE_MODELS = [
-  // ✅ Gratuits — génération texte→image
-  { id:"flux",          name:"Flux Schnell — Fast High-Quality",           free:true,  edit:false },
-  { id:"zimage",        name:"Z-Image Turbo — Fast 6B Flux + 2x Upscale", free:true,  edit:false },
-  // 💰 Payants ou nécessitent clé
-  { id:"kontext",       name:"FLUX.1 Kontext — In-context Editing",        free:false, edit:true  },
-  { id:"nanobanana",    name:"NanoBanana — Gemini 2.5 Flash Image",        free:false, edit:true  },
-  { id:"nanobanana-2",  name:"NanoBanana 2 — Gemini 3.1 Flash Image",      free:false, edit:true  },
-  { id:"nanobanana-pro",name:"NanoBanana Pro — Gemini 3 Pro Image (4K)",   free:false, edit:true  },
-  { id:"seedream5",     name:"Seedream 5.0 Lite — ByteDance",              free:false, edit:true  },
-  { id:"gptimage",      name:"GPT Image 1 Mini — OpenAI",                  free:false, edit:true  },
-  { id:"gptimage-large",name:"GPT Image 1.5 — OpenAI Advanced",            free:false, edit:true  },
-  { id:"wan-image",     name:"Wan 2.7 Image — Alibaba (up to 2K)",         free:false, edit:true  },
-  { id:"wan-image-pro", name:"Wan 2.7 Image Pro — Alibaba (4K)",           free:false, edit:true  },
-  { id:"qwen-image",    name:"Qwen Image Plus — Alibaba",                  free:false, edit:true  },
-  { id:"grok-imagine",  name:"Grok Imagine — xAI Official",                free:false, edit:false },
-  { id:"klein",         name:"FLUX.2 Klein 4B — Fast Gen+Edit",            free:false, edit:true  },
-  { id:"nova-canvas",   name:"Amazon Nova Canvas — Bedrock",               free:false, edit:true  },
+const IMAGE_MODELS = [
+  // ✅ GRATUITS
+  { id:"flux",           label:"Flux Schnell — Ultra Rapide",            free:true,  edit:false, video:false },
+  { id:"zimage",         label:"Z-Image Turbo + 2x Upscale",            free:true,  edit:false, video:false },
+  { id:"kontext",        label:"FLUX.1 Kontext — Édition image",         free:true,  edit:true,  video:false },
+  { id:"gptimage",       label:"GPT Image 1 Mini — OpenAI",              free:true,  edit:true,  video:false },
+  { id:"gptimage-large", label:"GPT Image 1.5 — OpenAI Avancé",          free:true,  edit:true,  video:false },
+  { id:"klein",          label:"FLUX.2 Klein 4B — Édition",              free:true,  edit:true,  video:false },
+  { id:"qwen-image",     label:"Qwen Image Plus — Alibaba",              free:true,  edit:true,  video:false },
+  { id:"wan-image",      label:"Wan 2.7 Alibaba (2K)",                   free:true,  edit:true,  video:false },
+  // 💰 Pollen
+  { id:"nanobanana",     label:"NanoBanana — Gemini 2.5 Flash",          free:false, edit:true,  video:false },
+  { id:"nanobanana-2",   label:"NanoBanana 2 — Gemini 3.1 Flash",        free:false, edit:true,  video:false },
+  { id:"nanobanana-pro", label:"NanoBanana Pro — Gemini 3 Pro (4K)",      free:false, edit:true,  video:false },
+  { id:"seedream5",      label:"Seedream 5.0 — ByteDance",               free:false, edit:true,  video:false },
+  { id:"wan-image-pro",  label:"Wan 2.7 Pro (4K) — Alibaba",             free:false, edit:true,  video:false },
+  { id:"nova-canvas",    label:"Amazon Nova Canvas",                     free:false, edit:true,  video:false },
+  { id:"grok-imagine",   label:"Grok Imagine — xAI",                     free:false, edit:false, video:false },
+  { id:"grok-imagine-pro",label:"Grok Imagine Pro — Aurora xAI",         free:false, edit:false, video:false },
+  { id:"p-image",        label:"Pruna p-image — Text-to-Image",          free:false, edit:false, video:false },
+  { id:"p-image-edit",   label:"Pruna p-image-edit — Image Editing",     free:false, edit:true,  video:false },
 ];
 
-// Modèles vision (analyse image) gratuits
-const FREE_VISION_MODELS = ALL_TEXT_MODELS.filter(m => m.free && m.vision).map(m => m.id);
-// Modèles search gratuits
-const FREE_SEARCH_MODELS = ALL_TEXT_MODELS.filter(m => m.free && m.search).map(m => m.id);
-// Modèles texte gratuits
-const FREE_TEXT_IDS = ALL_TEXT_MODELS.filter(m => m.free).map(m => m.id);
-// Modèles image gratuits
-const FREE_IMAGE_IDS = ALL_IMAGE_MODELS.filter(m => m.free).map(m => m.id);
+const VIDEO_MODELS = [
+  // ✅ GRATUITS
+  { id:"ltx-2",          label:"LTX-2.3 — Fast Text-to-Video + Upscaler", free:true  },
+  { id:"nova-reel",      label:"Amazon Nova Reel — 6-60s 720p",           free:true  },
+  // 💰 Pollen
+  { id:"veo",            label:"Google Veo 3.1 Fast (Preview)",           free:false },
+  { id:"seedance",       label:"Seedance Lite — BytePlus Vidéo",          free:false },
+  { id:"seedance-pro",   label:"Seedance Pro-Fast — BytePlus",            free:false },
+  { id:"wan",            label:"Wan 2.6 — Alibaba Text/Image-to-Video",   free:false },
+  { id:"wan-fast",       label:"Wan 2.2 — Fast Cheap Video (480P)",       free:false },
+  { id:"grok-video-pro", label:"Grok Video Pro — xAI (720p, 1-15s)",      free:false },
+  { id:"p-video",        label:"Pruna p-video — Text/Image-to-Video",     free:false },
+];
+
+const AUDIO_MODELS = [
+  // TTS — tous gratuits via endpoint direct GET
+  { id:"elevenlabs",  label:"ElevenLabs v3 TTS",         type:"tts",   free:true  },
+  { id:"alloy",       label:"OpenAI Alloy",               type:"tts",   free:true  },
+  { id:"echo",        label:"OpenAI Echo",                type:"tts",   free:true  },
+  { id:"nova",        label:"OpenAI Nova",                type:"tts",   free:true  },
+  { id:"shimmer",     label:"OpenAI Shimmer",             type:"tts",   free:true  },
+  // Musique
+  { id:"elevenmusic", label:"ElevenLabs Music Generator", type:"music", free:true  },
+  { id:"acestep",     label:"ACE-Step 1.5 Turbo Music",   type:"music", free:true  },
+  // STT
+  { id:"whisper",     label:"Whisper Large V3 — STT",     type:"stt",   free:true  },
+  { id:"scribe",      label:"ElevenLabs Scribe v2 — STT", type:"stt",   free:true  },
+];
+
+const FREE_TEXT   = TEXT_MODELS.filter(m=>m.free).map(m=>m.id);
+const FREE_IMAGE  = IMAGE_MODELS.filter(m=>m.free).map(m=>m.id);
+const FREE_VISION = TEXT_MODELS.filter(m=>m.free&&m.vision).map(m=>m.id);
+const FREE_SEARCH = TEXT_MODELS.filter(m=>m.free&&m.search).map(m=>m.id);
+const EDIT_MODELS = IMAGE_MODELS.filter(m=>m.edit).map(m=>m.id);
 
 // ═══════════════════════════════════════════════════════════════════
 // HELPERS
 // ═══════════════════════════════════════════════════════════════════
 
-async function doFetch(url, options = {}, timeoutMs = 120000) {
+async function doFetch(url, opts = {}, ms = 180000) {
   const ctrl = new AbortController();
-  const id = setTimeout(() => ctrl.abort(), timeoutMs);
+  const id = setTimeout(() => ctrl.abort(), ms);
   try {
     const { default: fetch } = await import("node-fetch");
-    return await fetch(url, { ...options, signal: ctrl.signal });
-  } finally {
-    clearTimeout(id);
-  }
+    return await fetch(url, { ...opts, signal: ctrl.signal });
+  } finally { clearTimeout(id); }
 }
 
-function buildInfo() {
-  return {
-    status: true,
-    server: "Free AI API Server v3.0",
-    provider: "Pollinations.ai",
-    provider_url: "https://pollinations.ai",
-    provider_docs: "https://enter.pollinations.ai/api/docs",
-    note: "Fournisseur : Pollinations.ai — Plateforme open-source 100% gratuite, sans inscription, sans clé API pour les modèles gratuits.",
-    free_models: {
-      text: FREE_TEXT_IDS,
-      image: FREE_IMAGE_IDS,
-      vision: FREE_VISION_MODELS,
-      search: FREE_SEARCH_MODELS,
-    },
-    all_models: {
-      text: ALL_TEXT_MODELS,
-      image: ALL_IMAGE_MODELS,
-    },
-    endpoints: {
-      chat:       "GET /api/chat?query=Hello&model=openai",
-      image:      "GET /api/image?prompt=A+cat&model=flux",
-      image_edit: "GET /api/image?prompt=Edit+this&model=nanobanana-pro&imgurl=https://...",
-      search:     "GET /api/search?query=Latest+news&model=searchgpt",
-      vision:     "GET /api/openai?query=What+is+this?&imgurl=https://...&model=gemini-fast",
-      openai:     "GET /api/openai?query=Hello&uid=1&model=openai&imgurl=(optional)",
-      models:     "GET /api/models",
-      test_ui:    "GET /test",
-    },
+async function chatCompletion(messages, model, system, opts = {}) {
+  const body = {
+    model,
+    messages: system ? [{ role: "system", content: system }, ...messages] : messages,
+    ...opts,
   };
+  const r = await doFetch(`${GEN_API}/v1/chat/completions`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify(body),
+  });
+  if (!r.ok) {
+    const t = await r.text();
+    throw new Error(`Upstream ${r.status}: ${t.substring(0, 400)}`);
+  }
+  const data = await r.json();
+  return data.choices?.[0]?.message?.content ?? "";
 }
 
 // ═══════════════════════════════════════════════════════════════════
 // ROUTES
 // ═══════════════════════════════════════════════════════════════════
 
-app.get("/", (req, res) => res.json(buildInfo()));
+// ─── ROOT
+app.get("/", (req, res) => res.json({
+  status: true,
+  server: "Free AI API Server v5.0 — 100% Gratuit Sans Clé",
+  provider: "Pollinations.ai",
+  provider_url: "https://pollinations.ai",
+  api: `${GEN_API} (OpenAI-compatible)`,
+  pollen_key_configured: !!POLLEN_KEY,
+  endpoints: ["/api/chat", "/api/image", "/api/video", "/api/audio", "/api/music", "/api/search", "/api/openai", "/api/models"],
+  free_models: { text: FREE_TEXT.length, image: FREE_IMAGE.length, vision: FREE_VISION.length, search: FREE_SEARCH.length },
+}));
 
-// ─────────────────────────────────────────────────────────────────
-// 1. CHAT  GET /api/chat?query=...&model=openai&system=...
-// ─────────────────────────────────────────────────────────────────
+// ─── 1. CHAT  GET /api/chat?query=...&model=openai
 app.get("/api/chat", async (req, res) => {
-  const { query, model = "openai", system = "You are a helpful AI assistant.", seed } = req.query;
+  const { query, model = "openai", system = "You are a helpful AI assistant." } = req.query;
   if (!query) return res.status(400).json({ status: false, error: "Missing 'query'" });
-
-  const modelInfo = ALL_TEXT_MODELS.find(m => m.id === model);
-
+  const info = TEXT_MODELS.find(m => m.id === model);
   try {
-    const body = {
-      messages: [{ role: "user", content: query }],
-      model,
-      system,
-      ...(seed && { seed: parseInt(seed) }),
-    };
-
-    const r = await doFetch(`${TEXT_API}/`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-
-    if (!r.ok) {
-      const t = await r.text();
-      throw new Error(`Upstream ${r.status}: ${t.substring(0, 300)}`);
-    }
-
-    const text = await r.text();
-    return res.json({
-      status: true,
-      provider: "Pollinations.ai",
-      model,
-      model_info: modelInfo || null,
-      free: modelInfo ? modelInfo.free : null,
-      response: text,
-      model_type: "chat",
-      free_models: FREE_TEXT_IDS,
-    });
+    const text = await chatCompletion([{ role: "user", content: query }], model, system);
+    return res.json({ status: true, provider: "Pollinations.ai", model, model_info: info, response: text, model_type: "chat" });
   } catch (err) {
     console.error("[CHAT]", err.message);
     return res.status(500).json({ status: false, error: err.message });
   }
 });
 
-// ─────────────────────────────────────────────────────────────────
-// 2. IMAGE GENERATE / EDIT
-//    GET /api/image?prompt=...&model=flux
-//    GET /api/image?prompt=...&model=nanobanana-pro&imgurl=https://...
-//    → Retourne l'image DIRECTEMENT en binaire (image/jpeg)
-// ─────────────────────────────────────────────────────────────────
+// ─── 2. IMAGE  GET /api/image?prompt=...&model=flux[&imgurl=...]
 app.get("/api/image", async (req, res) => {
-  const {
-    prompt,
-    model   = "flux",
-    width   = 1024,
-    height  = 1024,
-    seed,
-    enhance = "false",
-    safe    = "false",
-    imgurl,
-    negative_prompt,
-    quality,
-  } = req.query;
-
+  const { prompt, model = "flux", width = 1024, height = 1024, seed, enhance = "false", safe = "false", imgurl, negative_prompt, quality } = req.query;
   if (!prompt) return res.status(400).json({ status: false, error: "Missing 'prompt'" });
 
   try {
     let useModel = model;
-    // Si édition demandée mais modèle ne supporte pas → auto-fallback
-    if (imgurl) {
-      const imgModel = ALL_IMAGE_MODELS.find(m => m.id === model);
-      if (!imgModel || !imgModel.edit) useModel = "nanobanana-pro";
-    }
+    if (imgurl && !EDIT_MODELS.includes(model)) useModel = "kontext";
 
-    const params = new URLSearchParams({
-      model:  useModel,
-      width:  String(width),
-      height: String(height),
-      nologo: "true",
-    });
+    const params = new URLSearchParams({ model: useModel, width: String(width), height: String(height), nologo: "true" });
     if (seed)             params.set("seed",            String(seed));
-    if (enhance==="true") params.set("enhance",         "true");
-    if (safe==="true")    params.set("safe",            "true");
-    if (imgurl)           params.set("image",           imgurl);
-    if (negative_prompt)  params.set("negative_prompt", negative_prompt);
-    if (quality)          params.set("quality",         quality);
+    if (enhance === "true") params.set("enhance",        "true");
+    if (safe === "true")  params.set("safe",             "true");
+    if (imgurl)           params.set("image",            imgurl);
+    if (negative_prompt)  params.set("negative_prompt",  negative_prompt);
+    if (quality)          params.set("quality",          quality);
+    if (POLLEN_KEY)       params.set("key",              POLLEN_KEY);
 
     const url = `${IMAGE_API}/prompt/${encodeURIComponent(prompt)}?${params}`;
-    console.log(`[IMG ${imgurl?"EDIT":"GEN"}] model=${useModel}`);
+    console.log(`[IMG ${imgurl ? "EDIT" : "GEN"}] model=${useModel}`);
 
     const r = await doFetch(url, {}, 180000);
-    if (!r.ok) {
-      const t = await r.text();
-      throw new Error(`Image API ${r.status}: ${t.substring(0, 300)}`);
-    }
+    if (!r.ok) { const t = await r.text(); throw new Error(`Image ${r.status}: ${t.substring(0, 300)}`); }
 
     const ct  = r.headers.get("content-type") || "image/jpeg";
     const buf = await r.buffer();
-    res.set("Content-Type",  ct);
+    res.set("Content-Type", ct);
     res.set("Cache-Control", "public, max-age=3600");
-    res.set("X-Model-Used",  useModel);
-    res.set("X-Mode",        imgurl ? "edit" : "generate");
-    res.set("X-Provider",    "Pollinations.ai");
+    res.set("X-Model-Used", useModel);
+    res.set("Access-Control-Allow-Origin", "*");
     return res.send(buf);
   } catch (err) {
     console.error("[IMAGE]", err.message);
@@ -261,74 +234,131 @@ app.get("/api/image", async (req, res) => {
   }
 });
 
-// ─────────────────────────────────────────────────────────────────
-// 3. WEB SEARCH  GET /api/search?query=...&model=searchgpt
-// ─────────────────────────────────────────────────────────────────
+// ─── 3. VIDEO  GET /api/video?prompt=...&model=ltx-2
+// Utilise l'endpoint image de Pollinations avec des modèles vidéo (retourne video/mp4)
+app.get("/api/video", async (req, res) => {
+  const { prompt, model = "ltx-2", width = 1280, height = 720, duration = 5, seed, aspectRatio = "16:9" } = req.query;
+  if (!prompt) return res.status(400).json({ status: false, error: "Missing 'prompt'" });
+
+  try {
+    const params = new URLSearchParams({ model, width: String(width), height: String(height), nologo: "true" });
+    if (seed)        params.set("seed",        String(seed));
+    if (duration)    params.set("duration",    String(duration));
+    if (aspectRatio) params.set("aspectRatio", aspectRatio);
+    if (POLLEN_KEY)  params.set("key",         POLLEN_KEY);
+
+    const url = `${IMAGE_API}/prompt/${encodeURIComponent(prompt)}?${params}`;
+    console.log(`[VIDEO] model=${model} duration=${duration}s`);
+
+    const r = await doFetch(url, {}, 300000); // 5min timeout pour vidéo
+    if (!r.ok) { const t = await r.text(); throw new Error(`Video ${r.status}: ${t.substring(0, 300)}`); }
+
+    const ct  = r.headers.get("content-type") || "video/mp4";
+    const buf = await r.buffer();
+    res.set("Content-Type", ct);
+    res.set("Cache-Control", "public, max-age=3600");
+    res.set("X-Model-Used", model);
+    res.set("Access-Control-Allow-Origin", "*");
+    return res.send(buf);
+  } catch (err) {
+    console.error("[VIDEO]", err.message);
+    return res.status(500).json({ status: false, error: err.message });
+  }
+});
+
+// ─── 4. AUDIO TTS  GET /api/audio?text=...&voice=nova&model=elevenlabs
+// Retourne audio/mpeg directement (prêt pour <audio src>)
+app.get("/api/audio", async (req, res) => {
+  const { text, voice = "nova", model = "elevenlabs", duration } = req.query;
+  if (!text) return res.status(400).json({ status: false, error: "Missing 'text'" });
+
+  try {
+    const params = new URLSearchParams({ voice });
+    if (model && model !== "elevenlabs") params.set("model", model);
+    if (duration) params.set("duration", String(duration));
+    if (POLLEN_KEY) params.set("key", POLLEN_KEY);
+
+    const url = `${GEN_API}/audio/${encodeURIComponent(text)}?${params}`;
+    console.log(`[AUDIO TTS] voice=${voice} model=${model}`);
+
+    const r = await doFetch(url, {
+      headers: POLLEN_KEY ? { "Authorization": `Bearer ${POLLEN_KEY}` } : {}
+    }, 60000);
+    if (!r.ok) { const t = await r.text(); throw new Error(`Audio ${r.status}: ${t.substring(0, 300)}`); }
+
+    const ct  = r.headers.get("content-type") || "audio/mpeg";
+    const buf = await r.buffer();
+    res.set("Content-Type", ct);
+    res.set("Cache-Control", "public, max-age=3600");
+    res.set("Access-Control-Allow-Origin", "*");
+    return res.send(buf);
+  } catch (err) {
+    console.error("[AUDIO]", err.message);
+    return res.status(500).json({ status: false, error: err.message });
+  }
+});
+
+// ─── 5. MUSIC  GET /api/music?prompt=...&model=elevenmusic
+// Génération musicale via ElevenLabs Music ou ACE-Step
+app.get("/api/music", async (req, res) => {
+  const { prompt, model = "elevenmusic", duration = 30 } = req.query;
+  if (!prompt) return res.status(400).json({ status: false, error: "Missing 'prompt'" });
+
+  try {
+    const params = new URLSearchParams({ model, duration: String(duration) });
+    if (POLLEN_KEY) params.set("key", POLLEN_KEY);
+
+    // elevenmusic et acestep utilisent l'endpoint audio avec model param
+    const url = `${GEN_API}/audio/${encodeURIComponent(prompt)}?${params}`;
+    console.log(`[MUSIC] model=${model} duration=${duration}s`);
+
+    const r = await doFetch(url, {
+      headers: POLLEN_KEY ? { "Authorization": `Bearer ${POLLEN_KEY}` } : {}
+    }, 120000);
+    if (!r.ok) { const t = await r.text(); throw new Error(`Music ${r.status}: ${t.substring(0, 300)}`); }
+
+    const ct  = r.headers.get("content-type") || "audio/mpeg";
+    const buf = await r.buffer();
+    res.set("Content-Type", ct);
+    res.set("Cache-Control", "public, max-age=3600");
+    res.set("Access-Control-Allow-Origin", "*");
+    return res.send(buf);
+  } catch (err) {
+    console.error("[MUSIC]", err.message);
+    return res.status(500).json({ status: false, error: err.message });
+  }
+});
+
+// ─── 6. WEB SEARCH  GET /api/search?query=...&model=perplexity-fast
 app.get("/api/search", async (req, res) => {
   const { query, model = "perplexity-fast" } = req.query;
   if (!query) return res.status(400).json({ status: false, error: "Missing 'query'" });
-
-  const useModel = FREE_SEARCH_MODELS.includes(model) ? model : "perplexity-fast";
-
+  const useModel = FREE_SEARCH.includes(model) ? model : "perplexity-fast";
   try {
-    const r = await doFetch(`${TEXT_API}/`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        messages: [{ role: "user", content: `Search the web and answer: ${query}\nInclude sources and links where possible.` }],
-        model: useModel,
-        system: "You are a web search assistant. Provide comprehensive, up-to-date answers with sources and links.",
-      }),
-    }, 60000);
-
-    if (!r.ok) {
-      const t = await r.text();
-      throw new Error(`Upstream ${r.status}: ${t.substring(0, 300)}`);
-    }
-
-    const text = await r.text();
-    return res.json({
-      status: true,
-      provider: "Pollinations.ai",
-      model: useModel,
-      query,
-      response: text,
-      model_type: "websearch",
-      free_search_models: FREE_SEARCH_MODELS,
-    });
+    const text = await chatCompletion(
+      [{ role: "user", content: `Search the web and answer: ${query}\nInclude sources and links where possible.` }],
+      useModel,
+      "You are a web search assistant. Provide comprehensive, up-to-date answers with sources and links."
+    );
+    return res.json({ status: true, provider: "Pollinations.ai", model: useModel, query, response: text, model_type: "websearch", free_search_models: FREE_SEARCH });
   } catch (err) {
     console.error("[SEARCH]", err.message);
     return res.status(500).json({ status: false, error: err.message });
   }
 });
 
-// ─────────────────────────────────────────────────────────────────
-// 4. OPENAI-COMPATIBLE UNIFIED  /api/openai (format reixz)
-//    GET /api/openai?query=Hello&uid=3&model=openai&imgurl=(opt)
-//    VISION : Le serveur récupère l'image → base64 → envoi inline
-// ─────────────────────────────────────────────────────────────────
+// ─── 7. OPENAI-COMPAT UNIFIÉ  GET /api/openai?query=...&imgurl=...
 app.get("/api/openai", async (req, res) => {
-  const {
-    query,
-    uid    = "anonymous",
-    model  = "openai",
-    imgurl,
-    system = "You are a helpful AI assistant.",
-  } = req.query;
-
+  const { query, uid = "anonymous", model = "openai", imgurl, system = "You are a helpful AI assistant." } = req.query;
   if (!query) return res.status(400).json({ status: false, error: "Missing 'query'" });
 
   try {
-    let messages;
-    let useModel = model;
-    let visionMode = false;
+    let messages, useModel = model, visionMode = false;
 
     if (imgurl) {
       visionMode = true;
-      // Force vision-capable model
-      if (!FREE_VISION_MODELS.includes(model)) useModel = "gemini-fast";
+      if (!FREE_VISION.includes(model) && !TEXT_MODELS.find(m => m.id === model && m.vision)) useModel = "gemini-fast";
 
-      // Récupère image côté serveur → base64 (méthode la plus fiable)
       let imgPart;
       try {
         const { default: fetch } = await import("node-fetch");
@@ -337,43 +367,22 @@ app.get("/api/openai", async (req, res) => {
           const buf  = await ir.buffer();
           const mime = ir.headers.get("content-type") || "image/jpeg";
           imgPart = { type: "image_url", image_url: { url: `data:${mime};base64,${buf.toString("base64")}` } };
-        } else throw new Error("img fetch failed");
+        } else throw new Error("fetch failed");
       } catch (_) {
         imgPart = { type: "image_url", image_url: { url: imgurl } };
       }
-
       messages = [{ role: "user", content: [{ type: "text", text: query }, imgPart] }];
     } else {
       messages = [{ role: "user", content: query }];
     }
 
-    const r = await doFetch(`${TEXT_API}/`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages, model: useModel, system }),
-    });
-
-    if (!r.ok) {
-      const t = await r.text();
-      throw new Error(`Upstream ${r.status}: ${t.substring(0, 300)}`);
-    }
-
-    const text = await r.text();
+    const text = await chatCompletion(messages, useModel, system);
     return res.json({
-      status: true,
-      provider: "Pollinations.ai",
-      maintainer: "Free AI API Server v3.0",
-      uid,
-      response: text,
-      model_used: useModel,
-      vision_mode: visionMode,
+      status: true, provider: "Pollinations.ai", maintainer: "Free AI API Server v5.0",
+      uid, response: text, model_used: useModel, vision_mode: visionMode,
       model_type: visionMode ? "vision" : "chat",
-      free_models: {
-        text:   FREE_TEXT_IDS,
-        image:  FREE_IMAGE_IDS,
-        vision: FREE_VISION_MODELS,
-        search: FREE_SEARCH_MODELS,
-      },
+      pollen_key_active: !!POLLEN_KEY,
+      available_models: { text: FREE_TEXT, image: FREE_IMAGE, vision: FREE_VISION, search: FREE_SEARCH },
     });
   } catch (err) {
     console.error("[OPENAI]", err.message);
@@ -381,62 +390,47 @@ app.get("/api/openai", async (req, res) => {
   }
 });
 
-// ─────────────────────────────────────────────────────────────────
-// 5. MODELS  GET /api/models
-// ─────────────────────────────────────────────────────────────────
-app.get("/api/models", (req, res) => {
-  res.json({
-    status: true,
-    provider: "Pollinations.ai",
-    provider_url: "https://pollinations.ai",
-    updated: "April 2026",
-    summary: {
-      total_text_models:       ALL_TEXT_MODELS.length,
-      free_text_models:        FREE_TEXT_IDS.length,
-      total_image_models:      ALL_IMAGE_MODELS.length,
-      free_image_models:       FREE_IMAGE_IDS.length,
-      free_vision_models:      FREE_VISION_MODELS.length,
-      free_search_models:      FREE_SEARCH_MODELS.length,
-    },
-    free_text_models:   FREE_TEXT_IDS,
-    free_image_models:  FREE_IMAGE_IDS,
-    free_vision_models: FREE_VISION_MODELS,
-    free_search_models: FREE_SEARCH_MODELS,
-    all_text_models:    ALL_TEXT_MODELS,
-    all_image_models:   ALL_IMAGE_MODELS,
-    tips: {
-      best_chat_free:       "openai (GPT-5.4 Nano) ou gemini-fast",
-      best_vision_free:     "gemini-fast ou claude-fast",
-      best_search_free:     "perplexity-fast ou gemini-search",
-      best_image_free:      "flux ou zimage",
-      best_image_edit_paid: "nanobanana-pro (Gemini 3 Pro) ou kontext",
-      note:                 "Les modèles 💰 fonctionnent mais nécessitent une clé Pollen via enter.pollinations.ai",
-    },
-  });
-});
+// ─── 8. MODELS  GET /api/models
+app.get("/api/models", (req, res) => res.json({
+  status: true, provider: "Pollinations.ai", updated: "10 Avril 2026",
+  api: `${GEN_API} (OpenAI-compatible)`,
+  pollen_key_active: !!POLLEN_KEY,
+  summary: {
+    free_text: FREE_TEXT.length,
+    free_image: FREE_IMAGE.length,
+    free_vision: FREE_VISION.length,
+    free_search: FREE_SEARCH.length,
+    total_video: VIDEO_MODELS.length,
+    total_audio: AUDIO_MODELS.length,
+  },
+  all_text_models:  TEXT_MODELS,
+  all_image_models: IMAGE_MODELS,
+  all_video_models: VIDEO_MODELS,
+  all_audio_models: AUDIO_MODELS,
+}));
 
-// ─────────────────────────────────────────────────────────────────
-// STATIC & ERRORS
-// ─────────────────────────────────────────────────────────────────
-app.get("/test", (req, res) => res.sendFile(join(__dirname, "public", "index.html")));
+// ─── STATIC & ERRORS
 app.use(express.static(join(__dirname, "public")));
-app.use((req, res) => res.status(404).json({ status: false, error: "Not found", available: ["/api/chat","/api/image","/api/search","/api/openai","/api/models","/test"] }));
+app.use((req, res) => res.status(404).json({
+  status: false, error: "Not found",
+  endpoints: ["/api/chat", "/api/image", "/api/video", "/api/audio", "/api/music", "/api/search", "/api/openai", "/api/models"]
+}));
 app.use((err, req, res, _next) => { console.error(err.stack); res.status(500).json({ status: false, error: "Server error" }); });
 
 // ═══════════════════════════════════════════════════════════════════
 app.listen(PORT, () => {
   console.log(`
-╔══════════════════════════════════════════════════════════════╗
-║      🌸 FREE AI API SERVER v3.0 — Pollinations.ai           ║
-║  Port     : ${PORT}                                            ║
-║  Test UI  : http://localhost:${PORT}/test                       ║
-║  Fournisseur : Pollinations.ai (open-source, gratuit !)     ║
-╠══════════════════════════════════════════════════════════════╣
-║  ✅ ${FREE_TEXT_IDS.length} modèles texte GRATUITS                            ║
-║  ✅ ${FREE_IMAGE_IDS.length} modèles image GRATUITS                           ║
-║  ✅ ${FREE_VISION_MODELS.length} modèles vision GRATUITS                         ║
-║  ✅ ${FREE_SEARCH_MODELS.length} modèles web search GRATUITS                    ║
-║  💰 Modèles payants aussi disponibles (avec clé Pollen)     ║
-╚══════════════════════════════════════════════════════════════╝
+╔════════════════════════════════════════════════════════════════╗
+║   🌸 FREE AI API SERVER v5.0 — Pollinations.ai                 ║
+║   Port       : ${PORT}                                            ║
+║   API Gen    : ${GEN_API}            ║
+╠════════════════════════════════════════════════════════════════╣
+║   ✅ ${FREE_TEXT.length} modèles texte GRATUITS                               ║
+║   ✅ ${FREE_IMAGE.length} modèles image GRATUITS                               ║
+║   ✅ ${VIDEO_MODELS.length} modèles vidéo (ltx-2, nova-reel gratuits)           ║
+║   ✅ ${AUDIO_MODELS.length} modèles audio/musique (ElevenLabs, ACE-Step...)     ║
+║   ✅ Vision base64 — 100% fonctionnel                          ║
+║   ${POLLEN_KEY ? "🔑 Clé Pollen configurée — TOUS modèles débloqués !" : "🆓 Mode anonyme — modèles gratuits actifs"}  ║
+╚════════════════════════════════════════════════════════════════╝
   `);
 });
