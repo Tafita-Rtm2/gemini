@@ -1,6 +1,6 @@
 {
   "name": "ai-chatbot-proxy",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Free AI Chatbot with API endpoint - powered by aifreeforever.com",
   "main": "server.js",
   "scripts": {
