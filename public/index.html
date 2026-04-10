@@ -3,112 +3,90 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🌸 Free AI API — Pollinations.ai</title>
+<title>🌸 Free AI API v5.0 — Pollinations.ai</title>
 <style>
-:root{--bg:#080b12;--s:#0f1219;--card:#151b26;--b:#1e2738;--a:#6366f1;--a2:#22d3ee;--a3:#10b981;--a4:#f59e0b;--a5:#ec4899;--t:#e2e8f0;--mu:#64748b;--ok:#10b981;--err:#ef4444;--warn:#f59e0b}
+:root{--bg:#07090f;--s:#0d1117;--card:#111827;--b:#1f2937;--a:#818cf8;--c:#22d3ee;--g:#34d399;--y:#fbbf24;--pk:#f472b6;--r:#f87171;--t:#f1f5f9;--mu:#6b7280}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--t);min-height:100vh}
-header{background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 50%,#0c1a2e 100%);border-bottom:1px solid var(--b);padding:14px 20px;display:flex;align-items:center;gap:12px}
-.logo{font-size:1.6rem}
-.htxt h1{font-size:1.2rem;font-weight:800}
-.htxt h1 span{background:linear-gradient(90deg,var(--a2),var(--a5));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.htxt small{font-size:.72rem;color:var(--mu)}
-.hbadges{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
-.badge{padding:3px 10px;border-radius:20px;font-size:.68rem;font-weight:700}
-.badge-green{background:rgba(16,185,129,.15);border:1px solid var(--ok);color:var(--ok)}
-.badge-blue{background:rgba(99,102,241,.15);border:1px solid var(--a);color:var(--a)}
-.badge-pink{background:rgba(236,72,153,.15);border:1px solid var(--a5);color:var(--a5)}
-
-/* PROVIDER BANNER */
-.provider-banner{background:linear-gradient(135deg,rgba(34,211,238,.08),rgba(99,102,241,.08));border:1px solid rgba(34,211,238,.25);margin:16px 20px 0;border-radius:10px;padding:10px 16px;display:flex;align-items:center;gap:12px;font-size:.82rem}
-.provider-banner .picon{font-size:1.4rem}
-.provider-banner a{color:var(--a2);text-decoration:none}
-.provider-banner a:hover{text-decoration:underline}
-
-/* TABS */
-.tabs{display:flex;gap:3px;padding:12px 20px 0;background:var(--s);border-bottom:1px solid var(--b);overflow-x:auto}
-.tab{padding:9px 16px;border-radius:8px 8px 0 0;cursor:pointer;font-weight:600;font-size:.8rem;color:var(--mu);transition:all .2s;border:none;background:transparent;white-space:nowrap;display:flex;align-items:center;gap:5px}
-.tab:hover{color:var(--t);background:rgba(255,255,255,.05)}
-.tab.active{color:var(--a2);background:var(--card);border:1px solid var(--b);border-bottom:1px solid var(--card);margin-bottom:-1px}
-
-/* LAYOUT */
-.wrap{max-width:1080px;margin:0 auto;padding:20px}
+a{color:var(--c);text-decoration:none}a:hover{text-decoration:underline}
+header{background:linear-gradient(135deg,#0f172a,#1e1b4b 60%,#0c1a2e);border-bottom:1px solid var(--b);padding:14px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{font-size:1.8rem}
+.htxt h1{font-size:1.25rem;font-weight:800;letter-spacing:-.5px}
+.htxt h1 span{background:linear-gradient(90deg,var(--c),var(--pk));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.htxt p{font-size:.73rem;color:var(--mu);margin-top:2px}
+.hbadges{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.badge{padding:3px 11px;border-radius:20px;font-size:.69rem;font-weight:700;white-space:nowrap}
+.b-g{background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.4);color:var(--g)}
+.b-c{background:rgba(34,211,238,.12);border:1px solid rgba(34,211,238,.35);color:var(--c)}
+.b-a{background:rgba(129,140,248,.12);border:1px solid rgba(129,140,248,.35);color:var(--a)}
+.ann{background:linear-gradient(135deg,rgba(251,191,36,.08),rgba(244,114,182,.08));border:1px solid rgba(251,191,36,.3);margin:14px 18px;border-radius:10px;padding:10px 16px;font-size:.8rem;line-height:1.7}
+.ann strong{color:var(--y)}
+.ann .new{display:inline-block;background:rgba(251,191,36,.2);border:1px solid rgba(251,191,36,.5);color:var(--y);border-radius:4px;padding:0 6px;font-size:.65rem;font-weight:700;margin-right:4px;vertical-align:middle}
+.tabs{display:flex;gap:3px;padding:12px 18px 0;background:var(--s);border-bottom:1px solid var(--b);overflow-x:auto;scrollbar-width:none}
+.tab{padding:9px 15px;border-radius:8px 8px 0 0;cursor:pointer;font-weight:600;font-size:.79rem;color:var(--mu);transition:all .2s;border:none;background:transparent;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.tab:hover{color:var(--t);background:rgba(255,255,255,.04)}
+.tab.active{color:var(--c);background:var(--card);border:1px solid var(--b);border-bottom:1px solid var(--card);margin-bottom:-1px}
+.wrap{max-width:1080px;margin:0 auto;padding:18px}
 .panel{display:none}.panel.active{display:block}
 .card{background:var(--card);border:1px solid var(--b);border-radius:12px;padding:18px;margin-bottom:14px}
-.card-title{font-size:.9rem;font-weight:700;color:var(--a2);margin-bottom:12px;display:flex;align-items:center;gap:7px}
-.form-group{margin-bottom:12px}
-label{display:block;font-size:.78rem;color:var(--mu);margin-bottom:5px;font-weight:500}
-input,select,textarea{width:100%;padding:9px 12px;background:var(--s);border:1px solid var(--b);border-radius:8px;color:var(--t);font-size:.88rem;outline:none;transition:border-color .2s;font-family:inherit}
-input:focus,select:focus,textarea:focus{border-color:var(--a2)}
-textarea{resize:vertical;min-height:65px}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:580px){.g2{grid-template-columns:1fr}}
-
-/* BUTTONS */
-.btn{padding:9px 20px;border:none;border-radius:8px;font-weight:700;font-size:.88rem;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
-.btn:hover{opacity:.88;transform:translateY(-1px)}.btn:active{transform:none}
+.ctitle{font-size:.9rem;font-weight:700;color:var(--c);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.fg{margin-bottom:11px}
+label{display:block;font-size:.76rem;color:var(--mu);margin-bottom:5px;font-weight:500}
+input,select,textarea{width:100%;padding:9px 12px;background:var(--s);border:1px solid var(--b);border-radius:8px;color:var(--t);font-size:.87rem;outline:none;transition:border-color .2s;font-family:inherit}
+input:focus,select:focus,textarea:focus{border-color:var(--c)}
+textarea{resize:vertical;min-height:64px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+@media(max-width:640px){.g2{grid-template-columns:1fr}}
+.btn{padding:9px 20px;border:none;border-radius:8px;font-weight:700;font-size:.87rem;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{opacity:.87;transform:translateY(-1px)}.btn:active{transform:none}
 button:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
-.btn-sm{padding:5px 11px;font-size:.76rem}
-.btn-p{background:linear-gradient(135deg,var(--a),#8b5cf6);color:#fff}
-.btn-c{background:linear-gradient(135deg,var(--a2),#0891b2);color:#000}
-.btn-g{background:linear-gradient(135deg,var(--a3),#059669);color:#fff}
-.btn-y{background:linear-gradient(135deg,var(--a4),#d97706);color:#fff}
-.btn-pk{background:linear-gradient(135deg,var(--a5),#db2777);color:#fff}
-.btn-o{background:transparent;border:1px solid var(--b);color:var(--mu)}
-.btn-o:hover{border-color:var(--a2);color:var(--a2)}
-
-/* URL BOX */
-.url-box{background:var(--s);border:1px solid var(--b);border-radius:8px;padding:8px 11px;font-family:monospace;font-size:.72rem;color:var(--a2);word-break:break-all;margin:10px 0;display:flex;align-items:center;gap:8px}
-.url-box span{flex:1}
-.cp{background:transparent;border:none;color:var(--mu);cursor:pointer;padding:1px 6px;border-radius:4px;font-size:.8rem}
-.cp:hover{color:var(--a2)}
-
-/* RESPONSE */
-.rb{background:var(--s);border:1px solid var(--b);border-radius:8px;padding:13px;min-height:90px;font-size:.85rem;line-height:1.7;white-space:pre-wrap;word-break:break-word}
-.rb.code{font-family:monospace;font-size:.74rem}
-
-/* STATUS */
-.st{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:700;margin-bottom:7px}
-.st.ok{background:rgba(16,185,129,.15);color:var(--ok);border:1px solid var(--ok)}
-.st.err{background:rgba(239,68,68,.15);color:var(--err);border:1px solid var(--err)}
-.st.ld{background:rgba(99,102,241,.15);color:var(--a);border:1px solid var(--a)}
-.spin{width:13px;height:13px;border:2px solid rgba(99,102,241,.3);border-top-color:var(--a);border-radius:50%;animation:spin .8s linear infinite;display:inline-block;flex-shrink:0}
+.bsm{padding:5px 11px;font-size:.75rem}
+.bp{background:linear-gradient(135deg,var(--a),#7c3aed);color:#fff}
+.bc{background:linear-gradient(135deg,var(--c),#0891b2);color:#000}
+.bg{background:linear-gradient(135deg,var(--g),#059669);color:#fff}
+.by{background:linear-gradient(135deg,var(--y),#d97706);color:#000}
+.bpk{background:linear-gradient(135deg,var(--pk),#db2777);color:#fff}
+.bor{background:linear-gradient(135deg,#fb923c,#ea580c);color:#fff}
+.bpu{background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff}
+.bo{background:transparent;border:1px solid var(--b);color:var(--mu)}
+.bo:hover{border-color:var(--c);color:var(--c)}
+.ubox{background:var(--s);border:1px solid var(--b);border-radius:8px;padding:8px 11px;font-family:monospace;font-size:.71rem;color:var(--c);word-break:break-all;margin:9px 0;display:flex;align-items:center;gap:8px}
+.ubox span{flex:1}
+.cpb{background:transparent;border:none;color:var(--mu);cursor:pointer;padding:1px 6px;border-radius:4px;font-size:.8rem}
+.cpb:hover{color:var(--c)}
+.rb{background:var(--s);border:1px solid var(--b);border-radius:8px;padding:13px;min-height:85px;font-size:.84rem;line-height:1.75;white-space:pre-wrap;word-break:break-word}
+.rbc{font-family:'Courier New',monospace;font-size:.72rem}
+.st{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:.69rem;font-weight:700;margin-bottom:7px}
+.stok{background:rgba(52,211,153,.12);color:var(--g);border:1px solid rgba(52,211,153,.4)}
+.sterr{background:rgba(248,113,113,.12);color:var(--r);border:1px solid rgba(248,113,113,.4)}
+.stld{background:rgba(129,140,248,.12);color:var(--a);border:1px solid rgba(129,140,248,.4)}
+.spin{width:13px;height:13px;border:2px solid rgba(129,140,248,.3);border-top-color:var(--a);border-radius:50%;animation:spin .8s linear infinite;display:inline-block;flex-shrink:0}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-/* IMAGE */
-.img-res{border-radius:10px;max-width:100%;border:2px solid var(--b);margin-top:10px;display:block}
-.img-ph{background:var(--s);border:2px dashed var(--b);border-radius:10px;height:240px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:var(--mu);font-size:.85rem;margin-top:10px}
-.timing{font-size:.7rem;color:var(--mu);text-align:right;margin-top:5px}
-
-/* INFO BOXES */
-.info{background:rgba(34,211,238,.07);border:1px solid rgba(34,211,238,.25);border-radius:8px;padding:10px 13px;font-size:.8rem;color:var(--a2);margin-bottom:12px;line-height:1.6}
-.warn{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.25);border-radius:8px;padding:10px 13px;font-size:.8rem;color:var(--warn);margin-bottom:12px;line-height:1.6}
-.ok-box{background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.25);border-radius:8px;padding:10px 13px;font-size:.8rem;color:var(--ok);margin-bottom:12px;line-height:1.6}
-
-/* MODEL CHIPS */
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.chip{padding:4px 11px;border-radius:20px;font-size:.72rem;font-family:monospace;cursor:default}
-.chip-free{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.4);color:var(--ok)}
-.chip-paid{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);color:var(--err);opacity:.7}
-.chip-search{background:rgba(34,211,238,.12);border:1px solid rgba(34,211,238,.4);color:var(--a2)}
-.chip-vision{background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.4);color:#a5b4fc}
-
-/* MODEL TABLE */
-.tbl{width:100%;border-collapse:collapse;font-size:.78rem;margin-top:10px}
-.tbl th{background:var(--s);color:var(--mu);padding:7px 10px;text-align:left;border-bottom:1px solid var(--b);font-weight:600}
-.tbl td{padding:7px 10px;border-bottom:1px solid rgba(30,39,56,.6)}
-.tbl tr:hover td{background:rgba(255,255,255,.02)}
-.tag{display:inline-block;padding:1px 7px;border-radius:10px;font-size:.65rem;margin:1px;font-weight:600}
-.tag-free{background:rgba(16,185,129,.2);color:var(--ok)}
-.tag-paid{background:rgba(239,68,68,.2);color:var(--err)}
-.tag-vis{background:rgba(99,102,241,.2);color:#a5b4fc}
-.tag-srch{background:rgba(34,211,238,.2);color:var(--a2)}
-.tag-edit{background:rgba(245,158,11,.2);color:var(--warn)}
-
-/* ENDPOINT CARDS */
-.ep{background:var(--s);border:1px solid var(--b);border-radius:8px;padding:11px 13px;margin-bottom:8px;font-family:monospace;font-size:.77rem}
-.mth{display:inline-block;background:rgba(16,185,129,.15);color:var(--ok);border:1px solid rgba(16,185,129,.3);padding:1px 7px;border-radius:4px;font-size:.65rem;font-weight:700;margin-right:6px}
-.ep-d{font-family:sans-serif;font-size:.76rem;color:var(--mu);margin-top:5px}
+.imgres{border-radius:10px;max-width:100%;border:2px solid var(--b);margin-top:10px;display:block}
+.imgph{background:var(--s);border:2px dashed var(--b);border-radius:10px;height:200px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:var(--mu);font-size:.84rem;margin-top:10px}
+.timing{font-size:.69rem;color:var(--mu);text-align:right;margin-top:5px}
+.info{background:rgba(34,211,238,.06);border:1px solid rgba(34,211,238,.22);border-radius:8px;padding:10px 13px;font-size:.79rem;color:var(--c);margin-bottom:11px;line-height:1.65}
+.warn{background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.22);border-radius:8px;padding:10px 13px;font-size:.79rem;color:var(--y);margin-bottom:11px;line-height:1.65}
+.okb{background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.22);border-radius:8px;padding:10px 13px;font-size:.79rem;color:var(--g);margin-bottom:11px;line-height:1.65}
+.tbl{width:100%;border-collapse:collapse;font-size:.76rem;margin-top:10px}
+.tbl th{background:var(--s);color:var(--mu);padding:7px 10px;text-align:left;border-bottom:1px solid var(--b);font-weight:600;white-space:nowrap}
+.tbl td{padding:7px 10px;border-bottom:1px solid rgba(31,41,55,.7);vertical-align:middle}
+.tbl tr:hover td{background:rgba(255,255,255,.015)}
+.tag{display:inline-block;padding:1px 7px;border-radius:10px;font-size:.63rem;margin:1px;font-weight:600;white-space:nowrap}
+.tf{background:rgba(52,211,153,.18);color:var(--g)}
+.tp{background:rgba(251,191,36,.18);color:var(--y)}
+.tv{background:rgba(129,140,248,.18);color:var(--a)}
+.ts{background:rgba(34,211,238,.18);color:var(--c)}
+.te{background:rgba(244,114,182,.18);color:var(--pk)}
+.tnew{background:rgba(251,191,36,.3);color:var(--y);border:1px solid rgba(251,191,36,.5)}
+.tvid{background:rgba(251,113,133,.18);color:#fb7185}
+.tmus{background:rgba(167,139,250,.18);color:#a78bfa}
+.ep{background:var(--s);border:1px solid var(--b);border-radius:8px;padding:11px 13px;margin-bottom:8px;font-family:monospace;font-size:.76rem}
+.mth{display:inline-block;background:rgba(52,211,153,.15);color:var(--g);border:1px solid rgba(52,211,153,.3);padding:1px 7px;border-radius:4px;font-size:.64rem;font-weight:700;margin-right:6px}
+.epd{font-family:sans-serif;font-size:.75rem;color:var(--mu);margin-top:5px}
+audio{width:100%;margin-top:10px;border-radius:8px}
+.audio-ph{background:var(--s);border:2px dashed var(--b);border-radius:10px;height:80px;display:flex;align-items:center;justify-content:center;gap:8px;color:var(--mu);font-size:.84rem;margin-top:10px}
+.video-ph{background:var(--s);border:2px dashed var(--b);border-radius:10px;height:200px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:var(--mu);font-size:.84rem;margin-top:10px}
 </style>
 </head>
 <body>
@@ -116,223 +94,210 @@ button:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
 <header>
   <div class="logo">🌸</div>
   <div class="htxt">
-    <h1>Free AI API <span>Server v3.0</span></h1>
-    <small>Fournisseur : Pollinations.ai — Open Source, Berlin 🇩🇪</small>
+    <h1>Free AI API <span>Server v5.0</span></h1>
+    <p>🌸 Pollinations.ai — Chat · Image · Vidéo · Audio · Musique · Search · Vision</p>
   </div>
   <div class="hbadges">
-    <div class="badge badge-green">✅ 100% GRATUIT</div>
-    <div class="badge badge-blue">🌸 Pollinations.ai</div>
-    <div class="badge badge-pink">v3.0</div>
+    <div class="badge b-g">✅ 100% GRATUIT</div>
+    <div class="badge b-c">🔑 SANS CLÉ</div>
+    <div class="badge b-a">v5.0 Complet</div>
   </div>
 </header>
 
-<div class="provider-banner">
-  <div class="picon">🌸</div>
-  <div>
-    <strong>Fournisseur : <a href="https://pollinations.ai" target="_blank">Pollinations.ai</a></strong> — Plateforme open-source gratuite basée à Berlin. 
-    Accès à <strong>GPT-5, Claude, Gemini, DeepSeek, Perplexity, Flux, NanoBanana</strong> et plus — sans inscription, sans clé API pour les modèles gratuits.
-    Docs : <a href="https://enter.pollinations.ai/api/docs" target="_blank">enter.pollinations.ai/api/docs</a>
-  </div>
+<div class="ann">
+  <strong>🎉 v5.0 — Avril 2026 :</strong><br>
+  <span class="new">NOUVEAU</span> <strong>🎬 Vidéo IA</strong> — LTX-2.3, Nova Reel (gratuits), Wan 2.6, Seedance, Veo 3.1 et plus !<br>
+  <span class="new">NOUVEAU</span> <strong>🔊 Audio TTS</strong> — ElevenLabs v3 expressif + 22 voix OpenAI !<br>
+  <span class="new">NOUVEAU</span> <strong>🎵 Musique IA</strong> — ElevenLabs Music (studio) + ACE-Step 1.5 (avec paroles) !<br>
+  <span class="new">GRATUIT</span> <strong>kontext, gptimage-large, GPT-5.4, Grok 4.1, Mistral Large 3</strong> — sans clé !
 </div>
 
 <div class="tabs">
   <button class="tab active" onclick="sw('chat',this)">💬 Chat</button>
-  <button class="tab" onclick="sw('image',this)">🎨 Image Gen</button>
-  <button class="tab" onclick="sw('edit',this)">✏️ Image Edit</button>
-  <button class="tab" onclick="sw('search',this)">🔍 Web Search</button>
+  <button class="tab" onclick="sw('image',this)">🎨 Image</button>
+  <button class="tab" onclick="sw('edit',this)">✏️ Edit Image</button>
+  <button class="tab" onclick="sw('video',this)">🎬 Vidéo</button>
+  <button class="tab" onclick="sw('audio',this)">🔊 Audio TTS</button>
+  <button class="tab" onclick="sw('music',this)">🎵 Musique IA</button>
+  <button class="tab" onclick="sw('search',this)">🔍 Search</button>
   <button class="tab" onclick="sw('vision',this)">👁️ Vision</button>
-  <button class="tab" onclick="sw('openai',this)">⚡ /api/openai</button>
+  <button class="tab" onclick="sw('openai',this)">⚡ API Unifiée</button>
   <button class="tab" onclick="sw('models',this)">📋 Modèles</button>
   <button class="tab" onclick="sw('docs',this)">📖 Docs</button>
 </div>
 
 <div class="wrap">
 
-<!-- ═══ CHAT ═══ -->
+<!-- CHAT -->
 <div class="panel active" id="panel-chat">
   <div class="card">
-    <div class="card-title">💬 Chat / Text Generation — <code style="font-size:.72rem">GET /api/chat</code></div>
-    <div class="ok-box">✅ <strong>24 modèles gratuits</strong> : GPT-5.4, Claude Haiku, Gemini 2.5, DeepSeek V3.2, Perplexity, Kimi, Mistral, Qwen, Amazon Nova, GLM, MiniMax et plus !</div>
-    <div class="form-group">
-      <label>Message</label>
-      <textarea id="chat-q">Bonjour ! Présente-toi et dis-moi quelles sont tes capacités.</textarea>
-    </div>
+    <div class="ctitle">💬 Chat / Text — <code style="font-size:.71rem">GET /api/chat</code></div>
+    <div class="okb">✅ <strong>25+ modèles gratuits</strong> — GPT-5.4, Claude Haiku, Gemini, DeepSeek, Grok 4.1, Qwen, Mistral Large 3, Kimi, Nova, GLM, MiniMax, Perplexity et plus !</div>
+    <div class="fg"><label>Message</label><textarea id="chat-q">Bonjour ! Présente-toi et dis-moi quelles sont tes capacités et quel modèle tu es.</textarea></div>
     <div class="g2">
-      <div class="form-group">
-        <label>Modèle (✅ = gratuit)</label>
+      <div class="fg">
+        <label>Modèle (✅=gratuit, 💰=Pollen gratuit)</label>
         <select id="chat-m">
-          <optgroup label="── OpenAI (Gratuits) ✅">
+          <optgroup label="── OpenAI ✅">
             <option value="openai">openai — GPT-5.4 Nano ⭐</option>
             <option value="openai-fast">openai-fast — GPT-5 Nano</option>
-            <option value="openai-large">openai-large — GPT-5.4</option>
+            <option value="openai-large">openai-large — GPT-5.4 ✅</option>
           </optgroup>
-          <optgroup label="── Anthropic (Gratuit) ✅">
-            <option value="claude-fast">claude-fast — Claude Haiku 4.5 ✅ Vision</option>
+          <optgroup label="── Anthropic ✅">
+            <option value="claude-fast">claude-fast — Claude Haiku 4.5 👁️</option>
           </optgroup>
-          <optgroup label="── Google Gemini (Gratuits) ✅">
-            <option value="gemini-fast">gemini-fast — Gemini 2.5 Lite ✅ Vision</option>
-            <option value="gemini-search">gemini-search — Gemini + Google 🔍</option>
+          <optgroup label="── Google ✅">
+            <option value="gemini-fast">gemini-fast — Gemini 2.5 Flash Lite 👁️🔍</option>
+            <option value="gemini-search">gemini-search — Gemini + Google Search 🔍</option>
           </optgroup>
-          <optgroup label="── DeepSeek (Gratuits) ✅">
+          <optgroup label="── DeepSeek ✅">
             <option value="deepseek">deepseek — DeepSeek V3.2</option>
             <option value="deepseek-reasoning">deepseek-reasoning — DeepSeek R1</option>
           </optgroup>
-          <optgroup label="── Perplexity (Gratuits ✅ + Search)">
+          <optgroup label="── xAI Grok ✅">
+            <option value="grok">grok — Grok 4.1 Fast ⭐ Nouveau!</option>
+          </optgroup>
+          <optgroup label="── Perplexity ✅ Search">
             <option value="perplexity-fast">perplexity-fast — Sonar Web 🔍</option>
             <option value="perplexity-reasoning">perplexity-reasoning — Sonar R1 🔍</option>
           </optgroup>
-          <optgroup label="── Moonshot (Gratuit) ✅">
-            <option value="kimi">kimi — Kimi K2.5 ✅ Vision</option>
+          <optgroup label="── Moonshot ✅">
+            <option value="kimi">kimi — Kimi K2.5 👁️</option>
           </optgroup>
-          <optgroup label="── Mistral (Gratuits) ✅">
+          <optgroup label="── Mistral ✅">
             <option value="mistral">mistral — Mistral Small 3.2</option>
-            <option value="mistral-large">mistral-large — Mistral Large 3</option>
+            <option value="mistral-large">mistral-large — Mistral Large 3 ⭐ Gratuit!</option>
           </optgroup>
-          <optgroup label="── Alibaba Qwen (Gratuits) ✅">
-            <option value="qwen-coder">qwen-coder — Qwen3 Coder 30B</option>
+          <optgroup label="── Qwen ✅">
+            <option value="qwen-coder">qwen-coder — Qwen3 Coder 30B ⭐ Gratuit!</option>
             <option value="qwen-coder-large">qwen-coder-large — Qwen3 Coder Next</option>
             <option value="qwen-large">qwen-large — Qwen3.5 Plus MoE</option>
-            <option value="qwen-vision">qwen-vision — Qwen3 VL ✅ Vision</option>
-            <option value="qwen-safety">qwen-safety — Qwen3Guard Safety</option>
+            <option value="qwen-vision">qwen-vision — Qwen3 VL 👁️</option>
+            <option value="qwen-safety">qwen-safety — Qwen3Guard</option>
           </optgroup>
-          <optgroup label="── Amazon Nova (Gratuits) ✅">
+          <optgroup label="── Amazon ✅">
             <option value="nova-fast">nova-fast — Nova Micro</option>
             <option value="nova">nova — Nova 2 Lite 1M ctx</option>
           </optgroup>
-          <optgroup label="── Z.ai / MiniMax / MIDIjourney (Gratuits) ✅">
+          <optgroup label="── Z.ai / MiniMax ✅">
             <option value="glm">glm — GLM-5 744B MoE</option>
             <option value="minimax">minimax — MiniMax M2.5</option>
-            <option value="midijourney">midijourney — AI Music</option>
           </optgroup>
-          <optgroup label="── Pollinations Special (Gratuit) ✅">
-            <option value="polly">polly — Polly AI Assistant 🔍</option>
+          <optgroup label="── Special ✅">
+            <option value="midijourney">midijourney — AI Music Composer</option>
+            <option value="polly">polly — Polly AI 🔍</option>
           </optgroup>
-          <optgroup label="── Anthropic Payants 💰">
-            <option value="claude">claude — Claude Sonnet 4.6 💰</option>
-            <option value="claude-large">claude-large — Claude Opus 4.6 💰</option>
-          </optgroup>
-          <optgroup label="── Google Payants 💰">
-            <option value="gemini">gemini — Gemini 3 Flash 💰</option>
+          <optgroup label="── Payants 💰 (Pollen GRATUIT)">
+            <option value="claude">claude — Claude Sonnet 4.6 💰 👁️</option>
+            <option value="claude-large">claude-large — Claude Opus 4.6 💰 👁️</option>
+            <option value="gemini">gemini — Gemini 3 Flash 💰 👁️</option>
             <option value="gemini-large">gemini-large — Gemini 3.1 Pro 💰</option>
-          </optgroup>
-          <optgroup label="── xAI Grok Payants 💰">
-            <option value="grok">grok — Grok 4.1 Fast 💰</option>
             <option value="grok-large">grok-large — Grok 4.20 Reasoning 💰</option>
           </optgroup>
         </select>
       </div>
-      <div class="form-group">
-        <label>System Prompt</label>
-        <input id="chat-sys" value="You are a helpful AI assistant.">
-      </div>
+      <div class="fg"><label>System Prompt</label><input id="chat-sys" value="You are a helpful AI assistant."></div>
     </div>
-    <div class="url-box"><span id="chat-url">...</span><button class="cp" onclick="cp('chat-url')">📋</button></div>
-    <button class="btn btn-p" id="chat-btn" onclick="runChat()">🚀 Envoyer</button>
+    <div class="ubox"><span id="chat-url">...</span><button class="cpb" onclick="cp('chat-url')">📋</button></div>
+    <button class="btn bp" id="chat-btn" onclick="runChat()">🚀 Envoyer</button>
   </div>
   <div class="card" id="chat-res" style="display:none">
-    <div class="card-title">📨 Réponse</div>
-    <div id="chat-st"></div>
-    <div class="rb" id="chat-r"></div>
+    <div class="ctitle">📨 Réponse</div>
+    <div id="chat-st"></div><div class="rb" id="chat-r"></div>
     <div class="timing" id="chat-t"></div>
-    <div style="margin-top:8px"><button class="btn btn-o btn-sm" onclick="cpT('chat-r')">📋 Copier</button></div>
+    <div style="margin-top:8px"><button class="btn bo bsm" onclick="cpT('chat-r')">📋 Copier</button></div>
   </div>
 </div>
 
-<!-- ═══ IMAGE GEN ═══ -->
+<!-- IMAGE GEN -->
 <div class="panel" id="panel-image">
   <div class="card">
-    <div class="card-title">🎨 Génération d'Image — <code style="font-size:.72rem">GET /api/image</code></div>
-    <div class="ok-box">🖼️ Retourne l'image <strong>directement en binaire</strong> — utilisable dans <code>&lt;img src="/api/image?..."&gt;</code></div>
-    <div class="warn">⚠️ Seuls <strong>flux</strong> et <strong>zimage</strong> sont 100% gratuits sans clé. Les autres (nanobanana, gptimage, kontext…) nécessitent une clé Pollen.</div>
-    <div class="form-group">
-      <label>Prompt</label>
-      <textarea id="img-p">A majestic dragon soaring over a cyberpunk city at night, neon reflections on wet streets, 4K photorealistic</textarea>
-    </div>
+    <div class="ctitle">🎨 Génération Image — <code style="font-size:.71rem">GET /api/image</code></div>
+    <div class="okb">🖼️ <strong>8 modèles 100% gratuits</strong> — flux, zimage, kontext, gptimage, gptimage-large, klein, qwen-image, wan-image !</div>
+    <div class="fg"><label>Prompt</label><textarea id="img-p">A majestic dragon flying over a cyberpunk city at sunset, neon lights reflecting on wet streets, 8K ultra photorealistic</textarea></div>
     <div class="g2">
-      <div class="form-group">
+      <div class="fg">
         <label>Modèle</label>
         <select id="img-m">
           <optgroup label="── 100% Gratuits ✅">
-            <option value="flux">flux — Flux Schnell ⭐ (le plus rapide)</option>
+            <option value="flux">flux — Flux Schnell ⭐ (plus rapide)</option>
             <option value="zimage">zimage — Z-Image Turbo + 2x upscale</option>
+            <option value="kontext">kontext — FLUX.1 Kontext ✅ Gratuit</option>
+            <option value="gptimage">gptimage — GPT Image 1 Mini ✅</option>
+            <option value="gptimage-large">gptimage-large — GPT Image 1.5 ✅ ⭐</option>
+            <option value="klein">klein — FLUX.2 Klein 4B ✅</option>
+            <option value="qwen-image">qwen-image — Qwen Image Plus ✅</option>
+            <option value="wan-image">wan-image — Wan 2.7 Alibaba 2K ✅</option>
           </optgroup>
-          <optgroup label="── Nécessitent clé Pollen 💰">
-            <option value="nanobanana-pro">nanobanana-pro — Gemini 3 Pro (4K) 🍌⭐</option>
-            <option value="nanobanana-2">nanobanana-2 — Gemini 3.1 Flash 🍌</option>
-            <option value="nanobanana">nanobanana — Gemini 2.5 Flash 🍌</option>
-            <option value="gptimage">gptimage — GPT Image 1 Mini</option>
-            <option value="gptimage-large">gptimage-large — GPT Image 1.5</option>
-            <option value="kontext">kontext — FLUX.1 Kontext (edit)</option>
-            <option value="klein">klein — FLUX.2 Klein 4B</option>
-            <option value="wan-image">wan-image — Wan 2.7 Alibaba (2K)</option>
-            <option value="wan-image-pro">wan-image-pro — Wan 2.7 Pro (4K)</option>
-            <option value="qwen-image">qwen-image — Qwen Image Plus</option>
-            <option value="seedream5">seedream5 — Seedream 5.0 ByteDance</option>
-            <option value="grok-imagine">grok-imagine — Grok Imagine xAI</option>
-            <option value="nova-canvas">nova-canvas — Amazon Nova Canvas</option>
+          <optgroup label="── Pollen 💰 (gratuit sur enter.pollinations.ai)">
+            <option value="nanobanana-pro">nanobanana-pro — Gemini 3 Pro 4K</option>
+            <option value="nanobanana-2">nanobanana-2 — Gemini 3.1 Flash</option>
+            <option value="nanobanana">nanobanana — Gemini 2.5 Flash</option>
+            <option value="seedream5">seedream5 — ByteDance 5.0</option>
+            <option value="wan-image-pro">wan-image-pro — Wan 2.7 Pro 4K</option>
+            <option value="nova-canvas">nova-canvas — Amazon Nova</option>
+            <option value="grok-imagine">grok-imagine — xAI Grok Imagine</option>
+            <option value="grok-imagine-pro">grok-imagine-pro — Grok Aurora</option>
           </optgroup>
         </select>
       </div>
-      <div class="form-group">
+      <div class="fg">
         <label>Résolution</label>
         <select id="img-sz">
           <option value="1024x1024">1024×1024 (Carré)</option>
-          <option value="1280x720">1280×720 (16:9 Paysage)</option>
-          <option value="720x1280">720×1280 (9:16 Portrait)</option>
+          <option value="1280x720">1280×720 (16:9)</option>
+          <option value="720x1280">720×1280 (Portrait)</option>
           <option value="768x1344">768×1344 (Portrait)</option>
           <option value="1344x768">1344×768 (Paysage)</option>
-          <option value="512x512">512×512 (Petit / Rapide)</option>
+          <option value="512x512">512×512 (Rapide)</option>
         </select>
       </div>
     </div>
     <div class="g2">
-      <div class="form-group"><label><input type="checkbox" id="img-en"> ✨ Enhance prompt (IA améliore)</label></div>
-      <div class="form-group"><label>Seed (optionnel)</label><input id="img-seed" type="number" placeholder="Ex: 42"></div>
+      <div class="fg"><label><input type="checkbox" id="img-en"> ✨ Enhance prompt</label></div>
+      <div class="fg"><label>Seed (optionnel)</label><input id="img-seed" type="number" placeholder="42"></div>
     </div>
-    <div class="form-group"><label>Negative Prompt (optionnel, flux/zimage seulement)</label><input id="img-neg" placeholder="blurry, low quality, deformed..."></div>
-    <div class="url-box"><span id="img-url">...</span><button class="cp" onclick="cp('img-url')">📋</button></div>
-    <button class="btn btn-c" id="img-btn" onclick="runImage()">🎨 Générer</button>
+    <div class="fg"><label>Negative Prompt (flux/zimage)</label><input id="img-neg" placeholder="blurry, low quality..."></div>
+    <div class="ubox"><span id="img-url">...</span><button class="cpb" onclick="cp('img-url')">📋</button></div>
+    <button class="btn bc" id="img-btn" onclick="runImage()">🎨 Générer</button>
   </div>
   <div class="card" id="img-res" style="display:none">
-    <div class="card-title">🖼️ Image Générée</div>
-    <div id="img-st"></div>
-    <div id="img-box"><div class="img-ph">🖼️<span>L'image apparaîtra ici</span></div></div>
+    <div class="ctitle">🖼️ Image Générée</div>
+    <div id="img-st"></div><div id="img-box"><div class="imgph">🖼️<span>L'image apparaîtra ici</span></div></div>
     <div class="timing" id="img-t"></div>
     <div style="margin-top:8px;display:flex;gap:7px;flex-wrap:wrap">
-      <a id="img-dl" class="btn btn-o btn-sm" download="ai-image.jpg">⬇️ Télécharger</a>
-      <button class="btn btn-o btn-sm" onclick="cp('img-url')">📋 Copier URL</button>
+      <a id="img-dl" class="btn bo bsm" download="ai-image.jpg">⬇️ Télécharger</a>
+      <button class="btn bo bsm" onclick="cp('img-url')">📋 URL</button>
     </div>
   </div>
 </div>
 
-<!-- ═══ IMAGE EDIT ═══ -->
+<!-- IMAGE EDIT -->
 <div class="panel" id="panel-edit">
   <div class="card">
-    <div class="card-title">✏️ Édition d'Image (Image-to-Image) — <code style="font-size:.72rem">GET /api/image?imgurl=...</code></div>
-    <div class="info">✏️ Fournissez une image source + une instruction. Le serveur envoie <code>?image=URL</code> à Pollinations.</div>
-    <div class="warn">⚠️ Les meilleurs modèles d'édition (nanobanana-pro, kontext, klein) nécessitent une clé Pollen. <strong>klein</strong> et <strong>nanobanana-pro</strong> sont les meilleurs pour l'édition précise.</div>
-    <div class="form-group"><label>URL de l'image source</label><input id="ed-img" type="url" placeholder="https://example.com/photo.jpg"></div>
-    <div class="form-group"><label>Instruction d'édition</label><textarea id="ed-p">Transform this image into a beautiful anime art style, keep the same composition and characters</textarea></div>
+    <div class="ctitle">✏️ Édition Image — <code style="font-size:.71rem">GET /api/image?imgurl=...</code></div>
+    <div class="okb">🎉 <strong>kontext (FLUX.1 Kontext) GRATUIT</strong> — meilleur modèle d'édition !</div>
+    <div class="fg"><label>URL de l'image source</label><input id="ed-img" type="url" placeholder="https://example.com/photo.jpg"></div>
+    <div class="fg"><label>Instruction d'édition</label><textarea id="ed-p">Transform this image into a beautiful anime art style, vivid colors, keep the same composition</textarea></div>
     <div class="g2">
-      <div class="form-group">
+      <div class="fg">
         <label>Modèle d'édition</label>
         <select id="ed-m">
-          <optgroup label="── Avec clé Pollen 💰">
-            <option value="nanobanana-pro">nanobanana-pro — Gemini 3 Pro (Meilleur) ⭐</option>
-            <option value="nanobanana-2">nanobanana-2 — Gemini 3.1 Flash</option>
-            <option value="nanobanana">nanobanana — Gemini 2.5 Flash</option>
-            <option value="kontext">kontext — FLUX.1 Kontext ⭐</option>
-            <option value="klein">klein — FLUX.2 Klein 4B</option>
+          <optgroup label="── Gratuits ✅">
+            <option value="kontext">kontext — FLUX.1 Kontext ⭐ (Meilleur)</option>
+            <option value="gptimage-large">gptimage-large — GPT Image 1.5 ⭐</option>
             <option value="gptimage">gptimage — GPT Image 1 Mini</option>
-            <option value="wan-image">wan-image — Wan 2.7 Alibaba</option>
+            <option value="klein">klein — FLUX.2 Klein 4B</option>
             <option value="qwen-image">qwen-image — Qwen Image Plus</option>
+            <option value="wan-image">wan-image — Wan 2.7 Alibaba</option>
           </optgroup>
-          <optgroup label="── Gratuits (résultats variables) ✅">
-            <option value="flux">flux — Flux Schnell (pas optimisé édition)</option>
+          <optgroup label="── Pollen 💰">
+            <option value="nanobanana-pro">nanobanana-pro — Gemini 3 Pro 4K</option>
+            <option value="nanobanana-2">nanobanana-2 — Gemini 3.1 Flash</option>
           </optgroup>
         </select>
       </div>
-      <div class="form-group">
+      <div class="fg">
         <label>Résolution</label>
         <select id="ed-sz">
           <option value="1024x1024">1024×1024</option>
@@ -341,377 +306,635 @@ button:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
         </select>
       </div>
     </div>
-    <div class="url-box"><span id="ed-url">...</span><button class="cp" onclick="cp('ed-url')">📋</button></div>
-    <button class="btn btn-p" id="ed-btn" onclick="runEdit()">✏️ Éditer l'image</button>
+    <div class="ubox"><span id="ed-url">...</span><button class="cpb" onclick="cp('ed-url')">📋</button></div>
+    <button class="btn bp" id="ed-btn" onclick="runEdit()">✏️ Éditer</button>
   </div>
   <div class="card" id="ed-res" style="display:none">
-    <div class="card-title">🖼️ Résultat de l'édition</div>
+    <div class="ctitle">🖼️ Résultat</div>
     <div id="ed-st"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div><div style="font-size:.75rem;color:var(--mu);margin-bottom:5px">📸 Source</div><img id="ed-src" style="width:100%;border-radius:8px;border:1px solid var(--b)"></div>
-      <div><div style="font-size:.75rem;color:var(--mu);margin-bottom:5px">✨ Résultat</div><div id="ed-box"><div class="img-ph" style="height:160px">✨<span>Résultat ici</span></div></div></div>
+      <div><div style="font-size:.74rem;color:var(--mu);margin-bottom:5px">📸 Source</div><img id="ed-src" style="width:100%;border-radius:8px;border:1px solid var(--b)"></div>
+      <div><div style="font-size:.74rem;color:var(--mu);margin-bottom:5px">✨ Résultat</div><div id="ed-box"><div class="imgph" style="height:160px">✨<span>Résultat ici</span></div></div></div>
     </div>
     <div class="timing" id="ed-t"></div>
   </div>
 </div>
 
-<!-- ═══ SEARCH ═══ -->
-<div class="panel" id="panel-search">
+<!-- VIDEO -->
+<div class="panel" id="panel-video">
   <div class="card">
-    <div class="card-title">🔍 Web Search — <code style="font-size:.72rem">GET /api/search</code></div>
-    <div class="ok-box">🌐 <strong>Modèles de recherche gratuits</strong> : Perplexity Sonar, Gemini Search, Polly — résultats web temps réel !</div>
-    <div class="form-group"><label>Requête de recherche</label><textarea id="sr-q">Quelles sont les dernières nouvelles en intelligence artificielle aujourd'hui ?</textarea></div>
-    <div class="form-group">
-      <label>Modèle (tous gratuits ✅ + recherche web)</label>
-      <select id="sr-m">
-        <option value="perplexity-fast">perplexity-fast — Perplexity Sonar ⭐ (web search rapide)</option>
-        <option value="perplexity-reasoning">perplexity-reasoning — Perplexity Sonar R1 (raisonnement)</option>
-        <option value="gemini-search">gemini-search — Gemini 2.5 + Google Search 🔍</option>
-        <option value="gemini-fast">gemini-fast — Gemini 2.5 Flash Lite</option>
-        <option value="polly">polly — Polly AI (GitHub + Web + Code)</option>
-      </select>
+    <div class="ctitle">🎬 Génération Vidéo — <code style="font-size:.71rem">GET /api/video</code></div>
+    <div class="okb">🎬 <strong>ltx-2 et nova-reel 100% GRATUITS</strong> ! Génère des vidéos IA depuis un prompt texte.</div>
+    <div class="warn">⏳ La génération vidéo peut prendre <strong>1 à 5 minutes</strong>. Sois patient !</div>
+    <div class="fg"><label>Prompt Vidéo</label><textarea id="vid-p">A beautiful sunset over the ocean, waves crashing on the beach, cinematic 4K quality, slow motion</textarea></div>
+    <div class="g2">
+      <div class="fg">
+        <label>Modèle Vidéo</label>
+        <select id="vid-m">
+          <optgroup label="── 100% Gratuits ✅">
+            <option value="ltx-2">ltx-2 — LTX-2.3 Fast + Upscaler ⭐</option>
+            <option value="nova-reel">nova-reel — Amazon Nova Reel (6-60s, 720p)</option>
+          </optgroup>
+          <optgroup label="── Pollen 💰">
+            <option value="veo">veo — Google Veo 3.1 Fast (Preview)</option>
+            <option value="seedance">seedance — Seedance Lite BytePlus</option>
+            <option value="seedance-pro">seedance-pro — Seedance Pro-Fast</option>
+            <option value="wan">wan — Wan 2.6 Alibaba (2-15s, 1080P)</option>
+            <option value="wan-fast">wan-fast — Wan 2.2 Fast (5s, 480P)</option>
+            <option value="grok-video-pro">grok-video-pro — Grok Video Pro (720p)</option>
+            <option value="p-video">p-video — Pruna p-video (1080p)</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Durée (secondes)</label>
+        <select id="vid-dur">
+          <option value="3">3s</option>
+          <option value="5" selected>5s</option>
+          <option value="8">8s</option>
+          <option value="10">10s</option>
+          <option value="15">15s</option>
+        </select>
+      </div>
     </div>
-    <div class="url-box"><span id="sr-url">...</span><button class="cp" onclick="cp('sr-url')">📋</button></div>
-    <button class="btn btn-g" id="sr-btn" onclick="runSearch()">🔍 Rechercher</button>
+    <div class="g2">
+      <div class="fg">
+        <label>Aspect Ratio</label>
+        <select id="vid-ar">
+          <option value="16:9">16:9 (Paysage)</option>
+          <option value="9:16">9:16 (Portrait)</option>
+        </select>
+      </div>
+      <div class="fg"><label>Seed (optionnel)</label><input id="vid-seed" type="number" placeholder="42"></div>
+    </div>
+    <div class="ubox"><span id="vid-url">...</span><button class="cpb" onclick="cp('vid-url')">📋</button></div>
+    <button class="btn bor" id="vid-btn" onclick="runVideo()">🎬 Générer Vidéo</button>
   </div>
-  <div class="card" id="sr-res" style="display:none">
-    <div class="card-title">📰 Résultats</div>
-    <div id="sr-st"></div>
-    <div class="rb" id="sr-r"></div>
-    <div class="timing" id="sr-t"></div>
-    <div style="margin-top:8px"><button class="btn btn-o btn-sm" onclick="cpT('sr-r')">📋 Copier</button></div>
+  <div class="card" id="vid-res" style="display:none">
+    <div class="ctitle">🎬 Vidéo Générée</div>
+    <div id="vid-st"></div>
+    <div id="vid-box"><div class="video-ph">🎬<span>La vidéo apparaîtra ici</span></div></div>
+    <div class="timing" id="vid-t"></div>
+    <div style="margin-top:8px"><a id="vid-dl" class="btn bo bsm" download="ai-video.mp4">⬇️ Télécharger MP4</a></div>
   </div>
 </div>
 
-<!-- ═══ VISION ═══ -->
+<!-- AUDIO TTS -->
+<div class="panel" id="panel-audio">
+  <div class="card">
+    <div class="ctitle">🔊 Synthèse Vocale TTS — <code style="font-size:.71rem">GET /api/audio</code></div>
+    <div class="okb">🎙️ <strong>22 voix disponibles</strong> — ElevenLabs v3 expressif + voix OpenAI — <strong>100% gratuit</strong> !</div>
+    <div class="fg"><label>Texte à synthétiser</label><textarea id="aud-text">Bonjour ! Je suis une voix synthétisée par l'intelligence artificielle. Je peux parler dans de nombreuses langues et avec différents styles d'expression.</textarea></div>
+    <div class="g2">
+      <div class="fg">
+        <label>Moteur TTS</label>
+        <select id="aud-model">
+          <option value="elevenlabs">ElevenLabs v3 ⭐ (expressif)</option>
+          <optgroup label="── Voix OpenAI ✅">
+            <option value="alloy">alloy</option>
+            <option value="echo">echo</option>
+            <option value="fable">fable</option>
+            <option value="onyx">onyx</option>
+            <option value="nova">nova</option>
+            <option value="shimmer">shimmer</option>
+            <option value="ash">ash</option>
+            <option value="ballad">ballad</option>
+            <option value="coral">coral</option>
+            <option value="sage">sage</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Voix ElevenLabs (si ElevenLabs sélectionné)</label>
+        <select id="aud-voice">
+          <optgroup label="── Féminines">
+            <option value="rachel">Rachel ⭐</option>
+            <option value="bella">Bella</option>
+            <option value="elli">Elli</option>
+            <option value="charlotte">Charlotte</option>
+            <option value="dorothy">Dorothy</option>
+            <option value="sarah">Sarah</option>
+            <option value="emily">Emily</option>
+            <option value="lily">Lily</option>
+            <option value="matilda">Matilda</option>
+            <option value="domi">Domi</option>
+          </optgroup>
+          <optgroup label="── Masculines">
+            <option value="adam">Adam</option>
+            <option value="antoni">Antoni</option>
+            <option value="arnold">Arnold</option>
+            <option value="josh">Josh</option>
+            <option value="sam">Sam</option>
+            <option value="daniel">Daniel</option>
+            <option value="charlie">Charlie</option>
+            <option value="james">James</option>
+            <option value="fin">Fin</option>
+            <option value="callum">Callum</option>
+            <option value="liam">Liam</option>
+            <option value="george">George</option>
+            <option value="brian">Brian</option>
+            <option value="bill">Bill</option>
+          </optgroup>
+        </select>
+      </div>
+    </div>
+    <div class="ubox"><span id="aud-url">...</span><button class="cpb" onclick="cp('aud-url')">📋</button></div>
+    <button class="btn by" id="aud-btn" onclick="runAudio()">🔊 Synthétiser</button>
+  </div>
+  <div class="card" id="aud-res" style="display:none">
+    <div class="ctitle">🎙️ Audio Synthétisé</div>
+    <div id="aud-st"></div>
+    <div id="aud-box"><div class="audio-ph">🔊<span>L'audio apparaîtra ici</span></div></div>
+    <div class="timing" id="aud-t"></div>
+    <div style="margin-top:8px"><a id="aud-dl" class="btn bo bsm" download="tts.mp3">⬇️ Télécharger MP3</a></div>
+  </div>
+</div>
+
+<!-- MUSIC -->
+<div class="panel" id="panel-music">
+  <div class="card">
+    <div class="ctitle">🎵 Génération Musicale IA — <code style="font-size:.71rem">GET /api/music</code></div>
+    <div class="okb">🎶 <strong>ElevenLabs Music</strong> (studio grade) et <strong>ACE-Step 1.5 Turbo</strong> (avec paroles) — <strong>100% gratuit</strong> !</div>
+    <div class="fg"><label>Prompt Musical (description du style ou paroles)</label><textarea id="mus-p">An uplifting electronic pop song with energetic beats, synthesizer melodies, and a catchy chorus. BPM: 128. Mood: euphoric and motivating.</textarea></div>
+    <div class="g2">
+      <div class="fg">
+        <label>Modèle Musical</label>
+        <select id="mus-m">
+          <option value="elevenmusic">ElevenLabs Music ⭐ — Studio Grade</option>
+          <option value="acestep">ACE-Step 1.5 Turbo — Open Source + Paroles</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Durée (secondes)</label>
+        <select id="mus-dur">
+          <option value="15">15s</option>
+          <option value="30" selected>30s</option>
+          <option value="45">45s</option>
+          <option value="60">60s</option>
+          <option value="90">90s</option>
+        </select>
+      </div>
+    </div>
+    <div class="ubox"><span id="mus-url">...</span><button class="cpb" onclick="cp('mus-url')">📋</button></div>
+    <button class="btn bpu" id="mus-btn" onclick="runMusic()">🎵 Générer Musique</button>
+  </div>
+  <div class="card" id="mus-res" style="display:none">
+    <div class="ctitle">🎶 Musique Générée</div>
+    <div id="mus-st"></div>
+    <div id="mus-box"><div class="audio-ph">🎵<span>La musique apparaîtra ici</span></div></div>
+    <div class="timing" id="mus-t"></div>
+    <div style="margin-top:8px"><a id="mus-dl" class="btn bo bsm" download="music.mp3">⬇️ Télécharger MP3</a></div>
+  </div>
+</div>
+
+<!-- SEARCH -->
+<div class="panel" id="panel-search">
+  <div class="card">
+    <div class="ctitle">🔍 Web Search — <code style="font-size:.71rem">GET /api/search</code></div>
+    <div class="okb">🌐 Recherche web temps réel via Perplexity, Gemini Search, Polly — tous gratuits !</div>
+    <div class="fg"><label>Requête</label><textarea id="sr-q">Quelles sont les dernières nouvelles en intelligence artificielle aujourd'hui ?</textarea></div>
+    <div class="fg">
+      <label>Modèle de recherche</label>
+      <select id="sr-m">
+        <option value="perplexity-fast">perplexity-fast — Perplexity Sonar ⭐</option>
+        <option value="perplexity-reasoning">perplexity-reasoning — Perplexity Sonar R1</option>
+        <option value="gemini-search">gemini-search — Gemini 2.5 + Google Search</option>
+        <option value="gemini-fast">gemini-fast — Gemini 2.5 Flash Lite</option>
+        <option value="polly">polly — Polly AI (GitHub + Web)</option>
+      </select>
+    </div>
+    <div class="ubox"><span id="sr-url">...</span><button class="cpb" onclick="cp('sr-url')">📋</button></div>
+    <button class="btn bg" id="sr-btn" onclick="runSearch()">🔍 Rechercher</button>
+  </div>
+  <div class="card" id="sr-res" style="display:none">
+    <div class="ctitle">📰 Résultats</div>
+    <div id="sr-st"></div><div class="rb" id="sr-r"></div>
+    <div class="timing" id="sr-t"></div>
+    <div style="margin-top:8px"><button class="btn bo bsm" onclick="cpT('sr-r')">📋 Copier</button></div>
+  </div>
+</div>
+
+<!-- VISION -->
 <div class="panel" id="panel-vision">
   <div class="card">
-    <div class="card-title">👁️ Vision — Analyse d'Image — <code style="font-size:.72rem">GET /api/openai?imgurl=...</code></div>
-    <div class="ok-box">✅ <strong>Vision fonctionnelle !</strong> Le serveur récupère l'image côté serveur → base64 → envoi inline au modèle.</div>
-    <div class="form-group"><label>URL de l'image à analyser</label><input id="vis-url-in" type="url" value="https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/320px-PNG_transparency_demonstration_1.png"></div>
+    <div class="ctitle">👁️ Vision — Analyse d'Image</div>
+    <div class="okb">✅ Vision 100% fonctionnelle ! Modèles : gemini-fast, claude-fast, kimi, qwen-vision — tous gratuits.</div>
+    <div class="fg"><label>URL de l'image</label><input id="vis-i" type="url" value="https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/320px-PNG_transparency_demonstration_1.png"></div>
     <div id="vis-prev" style="margin-bottom:10px"></div>
-    <div class="form-group"><label>Question sur l'image</label><textarea id="vis-q">Décris cette image en détail. Qu'est-ce que tu vois ? Quelles couleurs, formes et objets ?</textarea></div>
-    <div class="form-group">
-      <label>Modèle Vision (tous gratuits ✅)</label>
+    <div class="fg"><label>Question</label><textarea id="vis-q">Décris cette image en détail. Quels objets, couleurs et formes vois-tu ?</textarea></div>
+    <div class="fg">
+      <label>Modèle Vision</label>
       <select id="vis-m">
-        <option value="gemini-fast">gemini-fast — Gemini 2.5 Flash Lite ⭐ (Gratuit + Rapide)</option>
-        <option value="claude-fast">claude-fast — Claude Haiku 4.5 ✅</option>
-        <option value="kimi">kimi — Kimi K2.5 Vision ✅</option>
-        <option value="qwen-vision">qwen-vision — Qwen3 VL Plus ✅</option>
+        <option value="gemini-fast">gemini-fast — Gemini 2.5 Flash Lite ⭐</option>
+        <option value="claude-fast">claude-fast — Claude Haiku 4.5</option>
+        <option value="kimi">kimi — Kimi K2.5</option>
+        <option value="qwen-vision">qwen-vision — Qwen3 VL Plus</option>
         <option value="openai">openai — GPT-5.4 Nano</option>
         <option value="openai-large">openai-large — GPT-5.4</option>
       </select>
     </div>
-    <div class="url-box"><span id="vis-url-d">...</span><button class="cp" onclick="cp('vis-url-d')">📋</button></div>
-    <button class="btn btn-y" id="vis-btn" onclick="runVision()">👁️ Analyser l'image</button>
+    <div class="ubox"><span id="vis-url">...</span><button class="cpb" onclick="cp('vis-url')">📋</button></div>
+    <button class="btn by" id="vis-btn" onclick="runVision()">👁️ Analyser</button>
   </div>
   <div class="card" id="vis-res" style="display:none">
-    <div class="card-title">🧠 Analyse</div>
-    <div id="vis-st"></div>
-    <div class="rb" id="vis-r"></div>
+    <div class="ctitle">🧠 Analyse</div>
+    <div id="vis-st"></div><div class="rb" id="vis-r"></div>
     <div class="timing" id="vis-t"></div>
-    <div style="margin-top:8px"><button class="btn btn-o btn-sm" onclick="cpT('vis-r')">📋 Copier</button></div>
+    <div style="margin-top:8px"><button class="btn bo bsm" onclick="cpT('vis-r')">📋 Copier</button></div>
   </div>
 </div>
 
-<!-- ═══ OPENAI COMPAT ═══ -->
+<!-- OPENAI COMPAT -->
 <div class="panel" id="panel-openai">
   <div class="card">
-    <div class="card-title">⚡ Endpoint Unifié — <code style="font-size:.72rem">GET /api/openai</code> (format reixz)</div>
-    <div class="info">🔗 Compatible format reixz : <code>/api/openai?query=Hello&uid=3&model=openai&imgurl=(optionnel)</code><br>Si <code>imgurl</code> fourni → Vision activée automatiquement.</div>
-    <div class="form-group"><label>Query</label><input id="oa-q" value="Présente-toi et décris tes capacités."></div>
+    <div class="ctitle">⚡ API Unifiée — <code style="font-size:.71rem">GET /api/openai</code></div>
+    <div class="info">🔗 Format : <code>/api/openai?query=Hello&uid=3&model=openai&imgurl=(opt)</code><br>Si <code>imgurl</code> fourni → Vision activée automatiquement.</div>
+    <div class="fg"><label>Query</label><input id="oa-q" value="Présente-toi et décris tes capacités en détail."></div>
     <div class="g2">
-      <div class="form-group"><label>UID</label><input id="oa-uid" value="1"></div>
-      <div class="form-group">
+      <div class="fg"><label>UID</label><input id="oa-uid" value="1"></div>
+      <div class="fg">
         <label>Modèle</label>
         <select id="oa-m">
           <option value="openai">openai ⭐</option>
           <option value="openai-fast">openai-fast</option>
-          <option value="gemini-fast">gemini-fast ✅ Vision</option>
-          <option value="claude-fast">claude-fast ✅ Vision</option>
-          <option value="kimi">kimi ✅ Vision</option>
+          <option value="gemini-fast">gemini-fast 👁️🔍</option>
+          <option value="claude-fast">claude-fast 👁️</option>
+          <option value="kimi">kimi 👁️</option>
           <option value="deepseek">deepseek</option>
+          <option value="grok">grok ⭐ Gratuit</option>
           <option value="perplexity-fast">perplexity-fast 🔍</option>
-          <option value="mistral">mistral</option>
+          <option value="mistral-large">mistral-large ⭐</option>
           <option value="nova">nova</option>
         </select>
       </div>
     </div>
-    <div class="form-group"><label>Image URL (optionnel — active la vision)</label><input id="oa-img" type="url" placeholder="https://example.com/image.jpg"></div>
-    <div class="url-box"><span id="oa-url">...</span><button class="cp" onclick="cp('oa-url')">📋</button></div>
-    <button class="btn btn-p" id="oa-btn" onclick="runOA()">⚡ Exécuter</button>
+    <div class="fg"><label>Image URL (optionnel — active la vision)</label><input id="oa-img" type="url" placeholder="https://example.com/image.jpg"></div>
+    <div class="ubox"><span id="oa-url">...</span><button class="cpb" onclick="cp('oa-url')">📋</button></div>
+    <button class="btn bp" id="oa-btn" onclick="runOA()">⚡ Exécuter</button>
   </div>
   <div class="card" id="oa-res" style="display:none">
-    <div class="card-title">📨 Réponse JSON</div>
-    <div id="oa-st"></div>
-    <div class="rb code" id="oa-r"></div>
+    <div class="ctitle">📨 Réponse JSON</div>
+    <div id="oa-st"></div><div class="rb rbc" id="oa-r"></div>
     <div class="timing" id="oa-t"></div>
-    <div style="margin-top:8px"><button class="btn btn-o btn-sm" onclick="cpT('oa-r')">📋 Copier JSON</button></div>
+    <div style="margin-top:8px"><button class="btn bo bsm" onclick="cpT('oa-r')">📋 Copier JSON</button></div>
   </div>
 </div>
 
-<!-- ═══ MODELS ═══ -->
+<!-- MODELS -->
 <div class="panel" id="panel-models">
   <div class="card">
-    <div class="card-title">📋 Tous les Modèles — Pollinations.ai</div>
-    <div class="info">🌸 Source officielle : <a href="https://enter.pollinations.ai/api/docs" target="_blank" style="color:var(--a2)">enter.pollinations.ai/api/docs</a> — Mis à jour : Avril 2026</div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;font-size:.75rem">
-      <span style="display:inline-flex;align-items:center;gap:4px"><span class="chip chip-free">✅ Gratuit</span> sans clé API</span>
-      <span style="display:inline-flex;align-items:center;gap:4px"><span class="chip chip-paid">💰 Pollen</span> clé requise</span>
-      <span style="display:inline-flex;align-items:center;gap:4px"><span class="chip chip-vision">👁️ Vision</span> analyse images</span>
-      <span style="display:inline-flex;align-items:center;gap:4px"><span class="chip chip-search">🔍 Search</span> web en temps réel</span>
+    <div class="ctitle">📋 Tous les Modèles — Pollinations.ai (10 Avril 2026)</div>
+    <div class="info">API : <a href="https://gen.pollinations.ai" target="_blank">gen.pollinations.ai</a> (OpenAI-compatible) · Clé gratuite : <a href="https://enter.pollinations.ai" target="_blank">enter.pollinations.ai</a></div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px;font-size:.74rem;align-items:center">
+      <span><span class="tag tf">✅ Gratuit</span></span>
+      <span><span class="tag tp">💰 Pollen</span></span>
+      <span><span class="tag tv">👁️ Vision</span></span>
+      <span><span class="tag ts">🔍 Search</span></span>
+      <span><span class="tag te">✏️ Edit</span></span>
+      <span><span class="tag tvid">🎬 Vidéo</span></span>
+      <span><span class="tag tmus">🎵 Musique</span></span>
     </div>
-
-    <div class="card-title" style="margin-top:4px">💬 Modèles Texte / Chat (37 total)</div>
-    <table class="tbl">
-      <thead><tr><th>ID Modèle</th><th>Nom / Description</th><th>Statut</th><th>Capacités</th></tr></thead>
-      <tbody id="text-model-table"></tbody>
-    </table>
-
-    <div class="card-title" style="margin-top:18px">🎨 Modèles Image (20 total)</div>
-    <table class="tbl">
-      <thead><tr><th>ID Modèle</th><th>Nom / Description</th><th>Statut</th><th>Édition</th></tr></thead>
-      <tbody id="img-model-table"></tbody>
-    </table>
+    <div class="ctitle">💬 Texte / Chat</div>
+    <table class="tbl"><thead><tr><th>ID</th><th>Nom</th><th>Statut</th><th>Caps</th></tr></thead><tbody id="ttbl"></tbody></table>
+    <div class="ctitle" style="margin-top:18px">🎨 Image</div>
+    <table class="tbl"><thead><tr><th>ID</th><th>Nom</th><th>Statut</th><th>Caps</th></tr></thead><tbody id="itbl"></tbody></table>
+    <div class="ctitle" style="margin-top:18px">🎬 Vidéo</div>
+    <table class="tbl"><thead><tr><th>ID</th><th>Nom</th><th>Statut</th></tr></thead><tbody id="vtbl"></tbody></table>
+    <div class="ctitle" style="margin-top:18px">🔊 Audio / TTS / Musique</div>
+    <table class="tbl"><thead><tr><th>ID</th><th>Nom</th><th>Type</th><th>Statut</th></tr></thead><tbody id="atbl"></tbody></table>
   </div>
 </div>
 
-<!-- ═══ DOCS ═══ -->
+<!-- DOCS -->
 <div class="panel" id="panel-docs">
   <div class="card">
-    <div class="card-title">📖 Documentation des Endpoints</div>
-    <div class="ep"><span class="mth">GET</span><span style="color:var(--a2)">/api/chat?query=Hello&model=openai&system=...</span><div class="ep-d">Chat texte — retourne JSON. 24 modèles gratuits disponibles.</div></div>
-    <div class="ep"><span class="mth">GET</span><span style="color:var(--a2)">/api/image?prompt=A+cat&model=flux&width=1024&height=1024</span><div class="ep-d">Génère image → retourne <strong>binaire direct</strong> (image/jpeg). Utilisable dans &lt;img src&gt;. flux et zimage sont 100% gratuits.</div></div>
-    <div class="ep"><span class="mth">GET</span><span style="color:var(--a2)">/api/image?prompt=Edit+this&model=nanobanana-pro&imgurl=https://...&width=1024&height=1024</span><div class="ep-d">Édition image-to-image. Paramètre <code>imgurl</code> = image source. nanobanana-pro = meilleur modèle d'édition (nécessite clé Pollen).</div></div>
-    <div class="ep"><span class="mth">GET</span><span style="color:var(--a2)">/api/search?query=Latest+AI+news&model=perplexity-fast</span><div class="ep-d">Recherche web temps réel. Modèles gratuits : perplexity-fast, perplexity-reasoning, gemini-search, gemini-fast, polly.</div></div>
-    <div class="ep"><span class="mth">GET</span><span style="color:var(--a2)">/api/openai?query=Hello&uid=3&model=gemini-fast&imgurl=https://...</span><div class="ep-d">Endpoint unifié. Vision activée si imgurl fourni. Le serveur récupère l'image → base64 → envoi inline.</div></div>
-    <div class="ep"><span class="mth">GET</span><span style="color:var(--a2)">/api/models</span><div class="ep-d">Liste complète de tous les modèles avec métadonnées.</div></div>
+    <div class="ctitle">📖 Documentation des Endpoints</div>
+    <div class="ep"><span class="mth">GET</span><span style="color:var(--c)">/api/chat?query=Hello&model=openai&system=...</span><div class="epd">Chat texte via gen.pollinations.ai (OpenAI-compat). Retourne JSON avec <code>response</code>.</div></div>
+    <div class="ep"><span class="mth">GET</span><span style="color:var(--c)">/api/image?prompt=A+cat&model=flux&width=1024&height=1024</span><div class="epd">Génère image → retourne binaire (image/jpeg). Utilisable dans &lt;img src&gt;. 8 modèles gratuits !</div></div>
+    <div class="ep"><span class="mth">GET</span><span style="color:var(--c)">/api/image?prompt=Edit&model=kontext&imgurl=https://...&width=1024&height=1024</span><div class="epd">Édition image-to-image. kontext GRATUIT !</div></div>
+    <div class="ep"><span class="mth">GET</span><span style="color:var(--c)">/api/video?prompt=A+sunset&model=ltx-2&duration=5&aspectRatio=16:9</span><div class="epd">Génère vidéo → retourne video/mp4. Gratuits : ltx-2, nova-reel. Timeout 5min.</div></div>
+    <div class="ep"><span class="mth">GET</span><span style="color:var(--c)">/api/audio?text=Hello&voice=nova&model=elevenlabs</span><div class="epd">TTS → audio/mpeg. Utilisable dans &lt;audio src&gt;. 22 voix disponibles.</div></div>
+    <div class="ep"><span class="mth">GET</span><span style="color:var(--c)">/api/music?prompt=Upbeat+pop&model=elevenmusic&duration=30</span><div class="epd">Génération musicale → audio/mpeg. elevenmusic (studio) ou acestep (paroles).</div></div>
+    <div class="ep"><span class="mth">GET</span><span style="color:var(--c)">/api/search?query=Latest+AI+news&model=perplexity-fast</span><div class="epd">Recherche web temps réel.</div></div>
+    <div class="ep"><span class="mth">GET</span><span style="color:var(--c)">/api/openai?query=Hello&uid=3&model=openai&imgurl=https://...(opt)</span><div class="epd">Endpoint unifié. Vision activée si imgurl fourni.</div></div>
+    <div class="ep"><span class="mth">GET</span><span style="color:var(--c)">/api/models</span><div class="epd">Liste complète texte + image + vidéo + audio avec métadonnées JSON.</div></div>
   </div>
   <div class="card">
-    <div class="card-title">🌸 À propos de Pollinations.ai</div>
-    <p style="font-size:.84rem;line-height:1.8;color:var(--mu)">
-      <strong style="color:var(--t)">Pollinations.ai</strong> est une plateforme d'IA générative <strong style="color:var(--t)">open-source</strong> basée à Berlin, Allemagne.<br>
-      Elle fournit un accès gratuit à des modèles de génération de texte, d'images, d'audio et de vidéo.<br><br>
-      • <strong style="color:var(--t)">Site</strong> : <a href="https://pollinations.ai" target="_blank" style="color:var(--a2)">pollinations.ai</a><br>
-      • <strong style="color:var(--t)">GitHub</strong> : <a href="https://github.com/pollinations/pollinations" target="_blank" style="color:var(--a2)">github.com/pollinations/pollinations</a><br>
-      • <strong style="color:var(--t)">API Docs</strong> : <a href="https://enter.pollinations.ai/api/docs" target="_blank" style="color:var(--a2)">enter.pollinations.ai/api/docs</a><br>
-      • <strong style="color:var(--t)">Base URL</strong> : <code style="color:var(--a2)">https://text.pollinations.ai</code> / <code style="color:var(--a2)">https://image.pollinations.ai</code><br>
-      • <strong style="color:var(--t)">Modèles payants</strong> : via <a href="https://enter.pollinations.ai" target="_blank" style="color:var(--a2)">enter.pollinations.ai</a> (Pollen credits, $1 ≈ 1 Pollen)
-    </p>
+    <div class="ctitle">🔑 Débloquer TOUS les modèles — Clé Pollen GRATUITE</div>
+    <div style="font-size:.83rem;line-height:1.9;color:var(--mu)">
+      <strong style="color:var(--t)">1.</strong> Va sur <a href="https://enter.pollinations.ai" target="_blank">enter.pollinations.ai</a> → crée un compte (GitHub OAuth)<br>
+      <strong style="color:var(--t)">2.</strong> Génère une clé <strong style="color:var(--a)">publiable (pk_...)</strong> dans Keys<br>
+      <strong style="color:var(--t)">3.</strong> Sur <strong>Render.com</strong> → Environment → <code style="background:rgba(129,140,248,.15);padding:2px 8px;border-radius:4px">POLLEN_KEY = pk_ta_cle</code><br>
+      <strong style="color:var(--t)">4.</strong> Redéploie → <strong style="color:var(--g)">Claude Sonnet, Gemini Pro, Veo, Seedance... débloqués !</strong><br><br>
+      💡 Tiers : 🌿 Seed 0.15/h · 🌸 Flower 0.4/h · 🍯 Nectar 0.8/h
+    </div>
   </div>
 </div>
 
-</div><!-- /wrap -->
+</div>
 
 <script>
 const B = window.location.origin;
 
-// All models data (synced with server)
-const TEXT_MODELS = [
-  {id:"openai",free:true,vision:false,search:false,name:"OpenAI GPT-5.4 Nano"},
-  {id:"openai-fast",free:true,vision:false,search:false,name:"OpenAI GPT-5 Nano"},
-  {id:"openai-large",free:true,vision:false,search:false,name:"OpenAI GPT-5.4"},
-  {id:"gemini-fast",free:true,vision:true,search:true,name:"Gemini 2.5 Flash Lite"},
-  {id:"gemini-search",free:true,vision:true,search:true,name:"Gemini 2.5 + Google Search"},
-  {id:"deepseek",free:true,vision:false,search:false,name:"DeepSeek V3.2"},
-  {id:"deepseek-reasoning",free:true,vision:false,search:false,name:"DeepSeek R1"},
-  {id:"mistral",free:true,vision:false,search:false,name:"Mistral Small 3.2"},
-  {id:"qwen-coder",free:true,vision:false,search:false,name:"Qwen3 Coder 30B"},
-  {id:"claude-fast",free:true,vision:true,search:false,name:"Claude Haiku 4.5"},
-  {id:"perplexity-fast",free:true,vision:false,search:true,name:"Perplexity Sonar"},
-  {id:"perplexity-reasoning",free:true,vision:false,search:true,name:"Perplexity Sonar R1"},
-  {id:"kimi",free:true,vision:true,search:false,name:"Moonshot Kimi K2.5"},
-  {id:"nova-fast",free:true,vision:false,search:false,name:"Amazon Nova Micro"},
-  {id:"nova",free:true,vision:false,search:false,name:"Amazon Nova 2 Lite"},
-  {id:"glm",free:true,vision:false,search:false,name:"Z.ai GLM-5 744B"},
-  {id:"minimax",free:true,vision:false,search:false,name:"MiniMax M2.5"},
-  {id:"mistral-large",free:true,vision:false,search:false,name:"Mistral Large 3"},
-  {id:"qwen-coder-large",free:true,vision:false,search:false,name:"Qwen3 Coder Next"},
-  {id:"qwen-large",free:true,vision:false,search:false,name:"Qwen3.5 Plus MoE"},
-  {id:"qwen-vision",free:true,vision:true,search:false,name:"Qwen3 VL Plus"},
-  {id:"qwen-safety",free:true,vision:false,search:false,name:"Qwen3Guard 8B"},
-  {id:"midijourney",free:true,vision:false,search:false,name:"MIDIjourney Music"},
-  {id:"polly",free:true,vision:false,search:true,name:"Polly AI Assistant"},
-  {id:"gemini",free:false,vision:true,search:true,name:"Gemini 3 Flash"},
-  {id:"gemini-flash-lite-3.1",free:false,vision:true,search:true,name:"Gemini 3.1 Flash Lite"},
-  {id:"gemini-large",free:false,vision:true,search:true,name:"Gemini 3.1 Pro 1M"},
-  {id:"claude",free:false,vision:true,search:false,name:"Claude Sonnet 4.6"},
-  {id:"claude-large",free:false,vision:true,search:false,name:"Claude Opus 4.6"},
-  {id:"grok",free:false,vision:false,search:false,name:"xAI Grok 4.1 Fast"},
-  {id:"grok-large",free:false,vision:false,search:false,name:"xAI Grok 4.20"},
-  {id:"midijourney-large",free:false,vision:false,search:false,name:"MIDIjourney Large"},
+const TMODELS = [
+  {id:"openai",free:true,vision:false,search:false,label:"OpenAI GPT-5.4 Nano"},
+  {id:"openai-fast",free:true,vision:false,search:false,label:"OpenAI GPT-5 Nano"},
+  {id:"openai-large",free:true,vision:false,search:false,label:"OpenAI GPT-5.4",isnew:true},
+  {id:"gemini-fast",free:true,vision:true,search:true,label:"Google Gemini 2.5 Flash Lite"},
+  {id:"gemini-search",free:true,vision:true,search:true,label:"Gemini 2.5 + Google Search"},
+  {id:"deepseek",free:true,vision:false,search:false,label:"DeepSeek V3.2"},
+  {id:"deepseek-reasoning",free:true,vision:false,search:false,label:"DeepSeek R1"},
+  {id:"mistral",free:true,vision:false,search:false,label:"Mistral Small 3.2"},
+  {id:"mistral-large",free:true,vision:false,search:false,label:"Mistral Large 3",isnew:true},
+  {id:"qwen-coder",free:true,vision:false,search:false,label:"Qwen3 Coder 30B",isnew:true},
+  {id:"qwen-coder-large",free:true,vision:false,search:false,label:"Qwen3 Coder Next"},
+  {id:"qwen-large",free:true,vision:false,search:false,label:"Qwen3.5 Plus MoE"},
+  {id:"qwen-vision",free:true,vision:true,search:false,label:"Qwen3 VL Plus"},
+  {id:"qwen-safety",free:true,vision:false,search:false,label:"Qwen3Guard 8B"},
+  {id:"claude-fast",free:true,vision:true,search:false,label:"Claude Haiku 4.5"},
+  {id:"kimi",free:true,vision:true,search:false,label:"Kimi K2.5"},
+  {id:"perplexity-fast",free:true,vision:false,search:true,label:"Perplexity Sonar"},
+  {id:"perplexity-reasoning",free:true,vision:false,search:true,label:"Perplexity Sonar R1"},
+  {id:"nova-fast",free:true,vision:false,search:false,label:"Amazon Nova Micro"},
+  {id:"nova",free:true,vision:false,search:false,label:"Amazon Nova 2 Lite"},
+  {id:"glm",free:true,vision:false,search:false,label:"Z.ai GLM-5 744B"},
+  {id:"minimax",free:true,vision:false,search:false,label:"MiniMax M2.5"},
+  {id:"grok",free:true,vision:false,search:false,label:"xAI Grok 4.1 Fast",isnew:true},
+  {id:"midijourney",free:true,vision:false,search:false,label:"MIDIjourney Music"},
+  {id:"polly",free:true,vision:false,search:true,label:"Polly AI"},
+  {id:"gemini",free:false,vision:true,search:true,label:"Gemini 3 Flash"},
+  {id:"gemini-large",free:false,vision:true,search:true,label:"Gemini 3.1 Pro 1M"},
+  {id:"claude",free:false,vision:true,search:false,label:"Claude Sonnet 4.6"},
+  {id:"claude-large",free:false,vision:true,search:false,label:"Claude Opus 4.6"},
+  {id:"grok-large",free:false,vision:false,search:false,label:"Grok 4.20 Reasoning",isnew:true},
 ];
-const IMG_MODELS = [
-  {id:"flux",free:true,edit:false,name:"Flux Schnell — Fast"},
-  {id:"zimage",free:true,edit:false,name:"Z-Image Turbo + 2x upscale"},
-  {id:"kontext",free:false,edit:true,name:"FLUX.1 Kontext — Edit"},
-  {id:"nanobanana",free:false,edit:true,name:"NanoBanana — Gemini 2.5 Flash"},
-  {id:"nanobanana-2",free:false,edit:true,name:"NanoBanana 2 — Gemini 3.1 Flash"},
-  {id:"nanobanana-pro",free:false,edit:true,name:"NanoBanana Pro — Gemini 3 (4K)"},
-  {id:"seedream5",free:false,edit:true,name:"Seedream 5.0 ByteDance"},
-  {id:"gptimage",free:false,edit:true,name:"GPT Image 1 Mini"},
-  {id:"gptimage-large",free:false,edit:true,name:"GPT Image 1.5"},
-  {id:"wan-image",free:false,edit:true,name:"Wan 2.7 Alibaba (2K)"},
-  {id:"wan-image-pro",free:false,edit:true,name:"Wan 2.7 Pro (4K)"},
-  {id:"qwen-image",free:false,edit:true,name:"Qwen Image Plus"},
-  {id:"grok-imagine",free:false,edit:false,name:"Grok Imagine xAI"},
-  {id:"klein",free:false,edit:true,name:"FLUX.2 Klein 4B"},
-  {id:"nova-canvas",free:false,edit:true,name:"Amazon Nova Canvas"},
+const IMODELS = [
+  {id:"flux",free:true,edit:false,label:"Flux Schnell"},
+  {id:"zimage",free:true,edit:false,label:"Z-Image Turbo + 2x upscale"},
+  {id:"kontext",free:true,edit:true,label:"FLUX.1 Kontext",isnew:true},
+  {id:"gptimage",free:true,edit:true,label:"GPT Image 1 Mini"},
+  {id:"gptimage-large",free:true,edit:true,label:"GPT Image 1.5",isnew:true},
+  {id:"klein",free:true,edit:true,label:"FLUX.2 Klein 4B"},
+  {id:"qwen-image",free:true,edit:true,label:"Qwen Image Plus"},
+  {id:"wan-image",free:true,edit:true,label:"Wan 2.7 Alibaba 2K"},
+  {id:"nanobanana",free:false,edit:true,label:"NanoBanana Gemini 2.5"},
+  {id:"nanobanana-2",free:false,edit:true,label:"NanoBanana 2 Gemini 3.1"},
+  {id:"nanobanana-pro",free:false,edit:true,label:"NanoBanana Pro Gemini 3"},
+  {id:"seedream5",free:false,edit:true,label:"Seedream 5.0 ByteDance"},
+  {id:"wan-image-pro",free:false,edit:true,label:"Wan 2.7 Pro 4K"},
+  {id:"nova-canvas",free:false,edit:true,label:"Amazon Nova Canvas"},
+  {id:"grok-imagine",free:false,edit:false,label:"Grok Imagine xAI"},
+  {id:"grok-imagine-pro",free:false,edit:false,label:"Grok Imagine Pro Aurora"},
+];
+const VMODELS = [
+  {id:"ltx-2",free:true,label:"LTX-2.3 Fast Text-to-Video"},
+  {id:"nova-reel",free:true,label:"Amazon Nova Reel (6-60s, 720p)"},
+  {id:"veo",free:false,label:"Google Veo 3.1 Fast (Preview)"},
+  {id:"seedance",free:false,label:"Seedance Lite BytePlus"},
+  {id:"seedance-pro",free:false,label:"Seedance Pro-Fast BytePlus"},
+  {id:"wan",free:false,label:"Wan 2.6 Alibaba (2-15s, 1080P)"},
+  {id:"wan-fast",free:false,label:"Wan 2.2 Fast (5s, 480P)"},
+  {id:"grok-video-pro",free:false,label:"Grok Video Pro xAI (720p, 1-15s)"},
+  {id:"p-video",free:false,label:"Pruna p-video (1080p)"},
+];
+const AMODELS = [
+  {id:"elevenlabs",free:true,type:"TTS",label:"ElevenLabs v3 TTS (expressif)"},
+  {id:"alloy/echo/nova...",free:true,type:"TTS",label:"OpenAI TTS Voices (10 voix)"},
+  {id:"elevenmusic",free:true,type:"Musique",label:"ElevenLabs Music Studio"},
+  {id:"acestep",free:true,type:"Musique",label:"ACE-Step 1.5 Turbo + Paroles"},
+  {id:"whisper",free:true,type:"STT",label:"Whisper Large V3"},
+  {id:"scribe",free:true,type:"STT",label:"ElevenLabs Scribe v2 (90+ langues)"},
 ];
 
-// Populate model tables
 window.addEventListener('DOMContentLoaded', () => {
-  const tt = document.getElementById('text-model-table');
-  TEXT_MODELS.forEach(m => {
+  const tt = document.getElementById('ttbl');
+  TMODELS.forEach(m => {
     const caps = [];
-    if (m.vision) caps.push('<span class="tag tag-vis">👁️ Vision</span>');
-    if (m.search) caps.push('<span class="tag tag-srch">🔍 Search</span>');
-    tt.innerHTML += `<tr>
-      <td><code>${m.id}</code></td>
-      <td>${m.name}</td>
-      <td>${m.free?'<span class="tag tag-free">✅ Gratuit</span>':'<span class="tag tag-paid">💰 Pollen</span>'}</td>
-      <td>${caps.join('')||'<span style="color:var(--mu)">Chat</span>'}</td>
-    </tr>`;
+    if(m.vision) caps.push('<span class="tag tv">👁️ Vision</span>');
+    if(m.search) caps.push('<span class="tag ts">🔍 Search</span>');
+    tt.innerHTML += `<tr><td><code>${m.id}</code>${m.isnew?' <span class="tag tnew">🆕</span>':''}</td><td>${m.label}</td><td>${m.free?'<span class="tag tf">✅ Gratuit</span>':'<span class="tag tp">💰 Pollen</span>'}</td><td>${caps.join('')||'<span style="color:var(--mu)">Chat</span>'}</td></tr>`;
   });
-  const it = document.getElementById('img-model-table');
-  IMG_MODELS.forEach(m => {
-    it.innerHTML += `<tr>
-      <td><code>${m.id}</code></td>
-      <td>${m.name}</td>
-      <td>${m.free?'<span class="tag tag-free">✅ Gratuit</span>':'<span class="tag tag-paid">💰 Pollen</span>'}</td>
-      <td>${m.edit?'<span class="tag tag-edit">✏️ Édition</span>':'<span style="color:var(--mu)">Génération</span>'}</td>
-    </tr>`;
+  const it = document.getElementById('itbl');
+  IMODELS.forEach(m => {
+    it.innerHTML += `<tr><td><code>${m.id}</code>${m.isnew?' <span class="tag tnew">🆕</span>':''}</td><td>${m.label}</td><td>${m.free?'<span class="tag tf">✅ Gratuit</span>':'<span class="tag tp">💰 Pollen</span>'}</td><td>${m.edit?'<span class="tag te">✏️ Edit</span>':'<span style="color:var(--mu)">Gen</span>'}</td></tr>`;
+  });
+  const vt = document.getElementById('vtbl');
+  VMODELS.forEach(m => {
+    vt.innerHTML += `<tr><td><code>${m.id}</code></td><td>${m.label}</td><td>${m.free?'<span class="tag tf">✅ Gratuit</span>':'<span class="tag tp">💰 Pollen</span>'}</td></tr>`;
+  });
+  const at = document.getElementById('atbl');
+  AMODELS.forEach(m => {
+    const tc = m.type==='TTS'?'ts':m.type==='Musique'?'tmus':'tv';
+    at.innerHTML += `<tr><td><code>${m.id}</code></td><td>${m.label}</td><td><span class="tag ${tc}">${m.type}</span></td><td>${m.free?'<span class="tag tf">✅ Gratuit</span>':'<span class="tag tp">💰 Pollen</span>'}</td></tr>`;
   });
 });
 
-// ── UTILS ──
-function sw(n,el){ document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active')); document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.getElementById('panel-'+n).classList.add('active'); el.classList.add('active'); }
-function setSt(id,t,m){ document.getElementById(id).innerHTML=`<div class="st ${t}">${t==='ld'?'<span class="spin"></span>':t==='ok'?'✅':'❌'} ${m}</div>`; }
-function cp(id){ navigator.clipboard.writeText(document.getElementById(id).textContent); const b=event.target; b.textContent='✅'; setTimeout(()=>b.textContent='📋',1400); }
-function cpT(id){ navigator.clipboard.writeText(document.getElementById(id).textContent); const b=event.target,o=b.textContent; b.textContent='✅ Copié!'; setTimeout(()=>b.textContent=o,1400); }
-function ld(id,on){ const b=document.getElementById(id); b.disabled=on; if(on){b._t=b.innerHTML;b.innerHTML='<span class="spin"></span> En cours...';}else b.innerHTML=b._t; }
+function sw(n,el){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById('panel-'+n).classList.add('active');el.classList.add('active');}
+function setSt(id,t,m){document.getElementById(id).innerHTML=`<div class="st ${t==='ok'?'stok':t==='err'?'sterr':'stld'}">${t==='ld'?'<span class="spin"></span>':t==='ok'?'✅':'❌'} ${m}</div>`;}
+function cp(id){navigator.clipboard.writeText(document.getElementById(id).textContent);const b=event.target;b.textContent='✅';setTimeout(()=>b.textContent='📋',1400);}
+function cpT(id){navigator.clipboard.writeText(document.getElementById(id).textContent);const b=event.target,o=b.textContent;b.textContent='✅ Copié!';setTimeout(()=>b.textContent=o,1400);}
+function ld(id,on){const b=document.getElementById(id);b.disabled=on;if(on){b._t=b.innerHTML;b.innerHTML='<span class="spin"></span> En cours...';}else b.innerHTML=b._t;}
 
-// ── CHAT ──
-function uChat(){ const q=document.getElementById('chat-q').value||'Hello'; const m=document.getElementById('chat-m').value; document.getElementById('chat-url').textContent=`${B}/api/chat?query=${encodeURIComponent(q)}&model=${m}`; }
-document.getElementById('chat-q').addEventListener('input',uChat); document.getElementById('chat-m').addEventListener('change',uChat); uChat();
+// CHAT
+function uChat(){const q=document.getElementById('chat-q').value||'Hello';const m=document.getElementById('chat-m').value;document.getElementById('chat-url').textContent=`${B}/api/chat?query=${encodeURIComponent(q)}&model=${m}`;}
+document.getElementById('chat-q').addEventListener('input',uChat);document.getElementById('chat-m').addEventListener('change',uChat);uChat();
 async function runChat(){
-  const q=document.getElementById('chat-q').value.trim(); if(!q) return alert('Entrez un message !');
-  const m=document.getElementById('chat-m').value; const s=document.getElementById('chat-sys').value;
+  const q=document.getElementById('chat-q').value.trim();if(!q)return alert('Entrez un message !');
+  const m=document.getElementById('chat-m').value;const s=document.getElementById('chat-sys').value;
   const url=`${B}/api/chat?query=${encodeURIComponent(q)}&model=${m}&system=${encodeURIComponent(s)}`;
-  document.getElementById('chat-url').textContent=url;
-  document.getElementById('chat-res').style.display='block';
-  setSt('chat-st','ld','En cours...'); ld('chat-btn',true);
-  const t0=Date.now();
-  try{ const r=await fetch(url); const d=await r.json(); const el=((Date.now()-t0)/1000).toFixed(2);
-    if(d.status){setSt('chat-st','ok',`${d.model} — ${el}s`); document.getElementById('chat-r').textContent=d.response;}
+  document.getElementById('chat-url').textContent=url;document.getElementById('chat-res').style.display='block';
+  setSt('chat-st','ld','En cours...');ld('chat-btn',true);const t0=Date.now();
+  try{const r=await fetch(url);const d=await r.json();const el=((Date.now()-t0)/1000).toFixed(2);
+    if(d.status){setSt('chat-st','ok',`${d.model} — ${el}s`);document.getElementById('chat-r').textContent=d.response;}
     else setSt('chat-st','err',d.error);
     document.getElementById('chat-t').textContent=`⏱️ ${el}s`;
   }catch(e){setSt('chat-st','err',e.message);}finally{ld('chat-btn',false);}
 }
 
-// ── IMAGE GEN ──
+// IMAGE GEN
 function uImg(){
-  const p=document.getElementById('img-p').value||'A cat'; const m=document.getElementById('img-m').value;
-  const [w,h]=document.getElementById('img-sz').value.split('x');
-  const en=document.getElementById('img-en').checked; const seed=document.getElementById('img-seed').value; const neg=document.getElementById('img-neg').value;
+  const p=document.getElementById('img-p').value||'A cat';const m=document.getElementById('img-m').value;
+  const[w,h]=document.getElementById('img-sz').value.split('x');
+  const en=document.getElementById('img-en').checked;const seed=document.getElementById('img-seed').value;const neg=document.getElementById('img-neg').value;
   let url=`${B}/api/image?prompt=${encodeURIComponent(p)}&model=${m}&width=${w}&height=${h}`;
-  if(en) url+='&enhance=true'; if(seed) url+=`&seed=${seed}`; if(neg) url+=`&negative_prompt=${encodeURIComponent(neg)}`;
+  if(en)url+='&enhance=true';if(seed)url+=`&seed=${seed}`;if(neg)url+=`&negative_prompt=${encodeURIComponent(neg)}`;
   document.getElementById('img-url').textContent=url;
 }
 ['img-p','img-seed','img-neg'].forEach(id=>document.getElementById(id).addEventListener('input',uImg));
 ['img-m','img-sz'].forEach(id=>document.getElementById(id).addEventListener('change',uImg));
-document.getElementById('img-en').addEventListener('change',uImg); uImg();
+document.getElementById('img-en').addEventListener('change',uImg);uImg();
 async function runImage(){
   const url=document.getElementById('img-url').textContent;
-  document.getElementById('img-res').style.display='block'; setSt('img-st','ld','Génération... (10-60s)'); ld('img-btn',true);
-  document.getElementById('img-box').innerHTML='<div class="img-ph">⏳<span>Génération en cours...</span></div>';
+  document.getElementById('img-res').style.display='block';setSt('img-st','ld','Génération... (10-60s)');ld('img-btn',true);
+  document.getElementById('img-box').innerHTML='<div class="imgph">⏳<span>Génération en cours...</span></div>';
   const t0=Date.now();
-  try{ const r=await fetch(url); if(!r.ok) throw new Error(`Erreur ${r.status}`);
-    const blob=await r.blob(); const el=((Date.now()-t0)/1000).toFixed(2); const obj=URL.createObjectURL(blob);
-    const img=document.createElement('img'); img.src=obj; img.className='img-res';
-    document.getElementById('img-box').innerHTML=''; document.getElementById('img-box').appendChild(img);
-    setSt('img-st','ok',`Générée en ${el}s`); document.getElementById('img-t').textContent=`⏱️ ${el}s`;
+  try{const r=await fetch(url);if(!r.ok)throw new Error(`Erreur ${r.status}`);
+    const blob=await r.blob();const el=((Date.now()-t0)/1000).toFixed(2);const obj=URL.createObjectURL(blob);
+    const img=document.createElement('img');img.src=obj;img.className='imgres';
+    document.getElementById('img-box').innerHTML='';document.getElementById('img-box').appendChild(img);
+    setSt('img-st','ok',`Générée en ${el}s`);document.getElementById('img-t').textContent=`⏱️ ${el}s`;
     document.getElementById('img-dl').href=obj;
-  }catch(e){setSt('img-st','err',e.message); document.getElementById('img-box').innerHTML=`<div class="img-ph">❌<span>${e.message}</span></div>`;}
+  }catch(e){setSt('img-st','err',e.message);document.getElementById('img-box').innerHTML=`<div class="imgph">❌<span>${e.message}</span></div>`;}
   finally{ld('img-btn',false);}
 }
 
-// ── IMAGE EDIT ──
+// IMAGE EDIT
 function uEdit(){
-  const p=document.getElementById('ed-p').value||'Edit'; const m=document.getElementById('ed-m').value;
-  const [w,h]=document.getElementById('ed-sz').value.split('x'); const img=document.getElementById('ed-img').value;
+  const p=document.getElementById('ed-p').value||'Edit';const m=document.getElementById('ed-m').value;
+  const[w,h]=document.getElementById('ed-sz').value.split('x');const img=document.getElementById('ed-img').value;
   let url=`${B}/api/image?prompt=${encodeURIComponent(p)}&model=${m}&width=${w}&height=${h}`;
-  if(img) url+=`&imgurl=${encodeURIComponent(img)}`;
+  if(img)url+=`&imgurl=${encodeURIComponent(img)}`;
   document.getElementById('ed-url').textContent=url;
 }
-document.getElementById('ed-p').addEventListener('input',uEdit); document.getElementById('ed-m').addEventListener('change',uEdit);
-document.getElementById('ed-sz').addEventListener('change',uEdit);
-document.getElementById('ed-img').addEventListener('input',()=>{ const v=document.getElementById('ed-img').value; if(v) document.getElementById('ed-src').src=v; uEdit(); }); uEdit();
+document.getElementById('ed-p').addEventListener('input',uEdit);
+['ed-m','ed-sz'].forEach(id=>document.getElementById(id).addEventListener('change',uEdit));
+document.getElementById('ed-img').addEventListener('input',()=>{const v=document.getElementById('ed-img').value;if(v)document.getElementById('ed-src').src=v;uEdit();});uEdit();
 async function runEdit(){
-  const img=document.getElementById('ed-img').value.trim(); if(!img) return alert('Entrez une URL d\'image !');
+  const img=document.getElementById('ed-img').value.trim();if(!img)return alert('Entrez une URL d\'image source !');
   const url=document.getElementById('ed-url').textContent;
-  document.getElementById('ed-res').style.display='block'; document.getElementById('ed-src').src=img;
-  setSt('ed-st','ld','Édition... (20-90s)'); ld('ed-btn',true);
-  document.getElementById('ed-box').innerHTML='<div class="img-ph" style="height:160px">⏳<span>Édition...</span></div>';
+  document.getElementById('ed-res').style.display='block';document.getElementById('ed-src').src=img;
+  setSt('ed-st','ld','Édition... (20-90s)');ld('ed-btn',true);
+  document.getElementById('ed-box').innerHTML='<div class="imgph" style="height:160px">⏳<span>Édition...</span></div>';
   const t0=Date.now();
-  try{ const r=await fetch(url); if(!r.ok) throw new Error(`Erreur ${r.status}`);
-    const blob=await r.blob(); const el=((Date.now()-t0)/1000).toFixed(2); const obj=URL.createObjectURL(blob);
-    const i=document.createElement('img'); i.src=obj; i.style.cssText='width:100%;border-radius:8px;border:1px solid var(--b)';
-    document.getElementById('ed-box').innerHTML=''; document.getElementById('ed-box').appendChild(i);
-    setSt('ed-st','ok',`Éditée en ${el}s`); document.getElementById('ed-t').textContent=`⏱️ ${el}s`;
-  }catch(e){setSt('ed-st','err',e.message); document.getElementById('ed-box').innerHTML=`<div class="img-ph" style="height:160px">❌<span>${e.message}</span></div>`;}
+  try{const r=await fetch(url);if(!r.ok)throw new Error(`Erreur ${r.status}`);
+    const blob=await r.blob();const el=((Date.now()-t0)/1000).toFixed(2);const obj=URL.createObjectURL(blob);
+    const i=document.createElement('img');i.src=obj;i.style.cssText='width:100%;border-radius:8px;border:1px solid var(--b)';
+    document.getElementById('ed-box').innerHTML='';document.getElementById('ed-box').appendChild(i);
+    setSt('ed-st','ok',`Éditée en ${el}s`);document.getElementById('ed-t').textContent=`⏱️ ${el}s`;
+  }catch(e){setSt('ed-st','err',e.message);document.getElementById('ed-box').innerHTML=`<div class="imgph" style="height:160px">❌<span>${e.message}</span></div>`;}
   finally{ld('ed-btn',false);}
 }
 
-// ── SEARCH ──
-function uSearch(){ const q=document.getElementById('sr-q').value||'Latest news'; const m=document.getElementById('sr-m').value; document.getElementById('sr-url').textContent=`${B}/api/search?query=${encodeURIComponent(q)}&model=${m}`; }
-document.getElementById('sr-q').addEventListener('input',uSearch); document.getElementById('sr-m').addEventListener('change',uSearch); uSearch();
-async function runSearch(){
-  const q=document.getElementById('sr-q').value.trim(); if(!q) return alert('Entrez une requête !');
-  const m=document.getElementById('sr-m').value; const url=`${B}/api/search?query=${encodeURIComponent(q)}&model=${m}`;
-  document.getElementById('sr-url').textContent=url;
-  document.getElementById('sr-res').style.display='block'; setSt('sr-st','ld','Recherche...'); ld('sr-btn',true);
+// VIDEO
+function uVid(){
+  const p=document.getElementById('vid-p').value||'A sunset';const m=document.getElementById('vid-m').value;
+  const dur=document.getElementById('vid-dur').value;const ar=document.getElementById('vid-ar').value;
+  const seed=document.getElementById('vid-seed').value;
+  let url=`${B}/api/video?prompt=${encodeURIComponent(p)}&model=${m}&duration=${dur}&aspectRatio=${encodeURIComponent(ar)}`;
+  if(seed)url+=`&seed=${seed}`;
+  document.getElementById('vid-url').textContent=url;
+}
+['vid-p','vid-seed'].forEach(id=>document.getElementById(id).addEventListener('input',uVid));
+['vid-m','vid-dur','vid-ar'].forEach(id=>document.getElementById(id).addEventListener('change',uVid));uVid();
+async function runVideo(){
+  const url=document.getElementById('vid-url').textContent;
+  document.getElementById('vid-res').style.display='block';
+  setSt('vid-st','ld','Génération vidéo... (1-5 min, patience !)');ld('vid-btn',true);
+  document.getElementById('vid-box').innerHTML='<div class="video-ph">⏳<span>Génération en cours... 1-5 min</span></div>';
   const t0=Date.now();
-  try{ const r=await fetch(url); const d=await r.json(); const el=((Date.now()-t0)/1000).toFixed(2);
-    if(d.status){setSt('sr-st','ok',`${d.model} — ${el}s`); document.getElementById('sr-r').textContent=d.response;}
+  try{
+    const r=await fetch(url);if(!r.ok)throw new Error(`Erreur ${r.status}`);
+    const ct=r.headers.get('content-type')||'';
+    const blob=await r.blob();const el=((Date.now()-t0)/1000).toFixed(2);const obj=URL.createObjectURL(blob);
+    if(ct.includes('video')||ct.includes('mp4')){
+      const vid=document.createElement('video');vid.src=obj;vid.controls=true;
+      vid.style.cssText='width:100%;border-radius:10px;border:2px solid var(--b);background:#000;margin-top:10px';
+      document.getElementById('vid-box').innerHTML='';document.getElementById('vid-box').appendChild(vid);
+    }else{
+      const img=document.createElement('img');img.src=obj;img.className='imgres';
+      document.getElementById('vid-box').innerHTML='';document.getElementById('vid-box').appendChild(img);
+    }
+    setSt('vid-st','ok',`Généré en ${el}s`);document.getElementById('vid-t').textContent=`⏱️ ${el}s`;
+    document.getElementById('vid-dl').href=obj;
+  }catch(e){setSt('vid-st','err',e.message);document.getElementById('vid-box').innerHTML=`<div class="video-ph">❌<span>${e.message}</span></div>`;}
+  finally{ld('vid-btn',false);}
+}
+
+// AUDIO TTS
+function uAud(){
+  const t=document.getElementById('aud-text').value||'Hello';const m=document.getElementById('aud-model').value;
+  const v=document.getElementById('aud-voice').value;
+  let url;
+  if(m==='elevenlabs')url=`${B}/api/audio?text=${encodeURIComponent(t)}&model=elevenlabs&voice=${v}`;
+  else url=`${B}/api/audio?text=${encodeURIComponent(t)}&voice=${m}`;
+  document.getElementById('aud-url').textContent=url;
+}
+document.getElementById('aud-text').addEventListener('input',uAud);
+['aud-model','aud-voice'].forEach(id=>document.getElementById(id).addEventListener('change',uAud));uAud();
+async function runAudio(){
+  const url=document.getElementById('aud-url').textContent;
+  document.getElementById('aud-res').style.display='block';
+  setSt('aud-st','ld','Synthèse vocale...');ld('aud-btn',true);
+  const t0=Date.now();
+  try{
+    const r=await fetch(url);if(!r.ok)throw new Error(`Erreur ${r.status}`);
+    const blob=await r.blob();const el=((Date.now()-t0)/1000).toFixed(2);const obj=URL.createObjectURL(blob);
+    const audio=document.createElement('audio');audio.src=obj;audio.controls=true;
+    document.getElementById('aud-box').innerHTML='';document.getElementById('aud-box').appendChild(audio);
+    setSt('aud-st','ok',`Synthétisé en ${el}s`);document.getElementById('aud-t').textContent=`⏱️ ${el}s`;
+    document.getElementById('aud-dl').href=obj;
+  }catch(e){setSt('aud-st','err',e.message);document.getElementById('aud-box').innerHTML=`<div class="audio-ph">❌<span>${e.message}</span></div>`;}
+  finally{ld('aud-btn',false);}
+}
+
+// MUSIC
+function uMus(){
+  const p=document.getElementById('mus-p').value||'Happy song';const m=document.getElementById('mus-m').value;
+  const dur=document.getElementById('mus-dur').value;
+  document.getElementById('mus-url').textContent=`${B}/api/music?prompt=${encodeURIComponent(p)}&model=${m}&duration=${dur}`;
+}
+document.getElementById('mus-p').addEventListener('input',uMus);
+['mus-m','mus-dur'].forEach(id=>document.getElementById(id).addEventListener('change',uMus));uMus();
+async function runMusic(){
+  const url=document.getElementById('mus-url').textContent;
+  document.getElementById('mus-res').style.display='block';
+  setSt('mus-st','ld','Génération musicale... (30-90s)');ld('mus-btn',true);
+  const t0=Date.now();
+  try{
+    const r=await fetch(url);if(!r.ok)throw new Error(`Erreur ${r.status}`);
+    const blob=await r.blob();const el=((Date.now()-t0)/1000).toFixed(2);const obj=URL.createObjectURL(blob);
+    const audio=document.createElement('audio');audio.src=obj;audio.controls=true;
+    document.getElementById('mus-box').innerHTML='';document.getElementById('mus-box').appendChild(audio);
+    setSt('mus-st','ok',`Musique générée en ${el}s`);document.getElementById('mus-t').textContent=`⏱️ ${el}s`;
+    document.getElementById('mus-dl').href=obj;
+  }catch(e){setSt('mus-st','err',e.message);document.getElementById('mus-box').innerHTML=`<div class="audio-ph">❌<span>${e.message}</span></div>`;}
+  finally{ld('mus-btn',false);}
+}
+
+// SEARCH
+function uSearch(){const q=document.getElementById('sr-q').value||'News';const m=document.getElementById('sr-m').value;document.getElementById('sr-url').textContent=`${B}/api/search?query=${encodeURIComponent(q)}&model=${m}`;}
+document.getElementById('sr-q').addEventListener('input',uSearch);document.getElementById('sr-m').addEventListener('change',uSearch);uSearch();
+async function runSearch(){
+  const q=document.getElementById('sr-q').value.trim();if(!q)return alert('Entrez une requête !');
+  const m=document.getElementById('sr-m').value;const url=`${B}/api/search?query=${encodeURIComponent(q)}&model=${m}`;
+  document.getElementById('sr-url').textContent=url;document.getElementById('sr-res').style.display='block';
+  setSt('sr-st','ld','Recherche...');ld('sr-btn',true);const t0=Date.now();
+  try{const r=await fetch(url);const d=await r.json();const el=((Date.now()-t0)/1000).toFixed(2);
+    if(d.status){setSt('sr-st','ok',`${d.model} — ${el}s`);document.getElementById('sr-r').textContent=d.response;}
     else setSt('sr-st','err',d.error);
     document.getElementById('sr-t').textContent=`⏱️ ${el}s`;
   }catch(e){setSt('sr-st','err',e.message);}finally{ld('sr-btn',false);}
 }
 
-// ── VISION ──
-function uVis(){ const q=document.getElementById('vis-q').value||'Describe'; const m=document.getElementById('vis-m').value; const img=document.getElementById('vis-url-in').value;
-  document.getElementById('vis-url-d').textContent=`${B}/api/openai?query=${encodeURIComponent(q)}&model=${m}&uid=1&imgurl=${encodeURIComponent(img)}`; }
-document.getElementById('vis-q').addEventListener('input',uVis); document.getElementById('vis-m').addEventListener('change',uVis);
-document.getElementById('vis-url-in').addEventListener('input',()=>{ const v=document.getElementById('vis-url-in').value;
-  document.getElementById('vis-prev').innerHTML=v?`<img src="${v}" style="max-height:140px;border-radius:8px;border:1px solid var(--b)">`:'' ; uVis(); }); uVis();
+// VISION
+function uVis(){const q=document.getElementById('vis-q').value||'Describe';const m=document.getElementById('vis-m').value;const img=document.getElementById('vis-i').value;
+  document.getElementById('vis-url').textContent=`${B}/api/openai?query=${encodeURIComponent(q)}&model=${m}&uid=1&imgurl=${encodeURIComponent(img)}`;}
+document.getElementById('vis-q').addEventListener('input',uVis);document.getElementById('vis-m').addEventListener('change',uVis);
+document.getElementById('vis-i').addEventListener('input',()=>{const v=document.getElementById('vis-i').value;
+  document.getElementById('vis-prev').innerHTML=v?`<img src="${v}" style="max-height:140px;border-radius:8px;border:1px solid var(--b)">`:'' ;uVis();});uVis();
 async function runVision(){
-  const img=document.getElementById('vis-url-in').value.trim(); if(!img) return alert('Entrez une URL d\'image !');
-  const url=document.getElementById('vis-url-d').textContent;
-  document.getElementById('vis-res').style.display='block'; setSt('vis-st','ld','Analyse...'); ld('vis-btn',true);
-  const t0=Date.now();
-  try{ const r=await fetch(url); const d=await r.json(); const el=((Date.now()-t0)/1000).toFixed(2);
-    if(d.status){setSt('vis-st','ok',`${d.model_used} 👁️ — ${el}s`); document.getElementById('vis-r').textContent=d.response;}
+  const img=document.getElementById('vis-i').value.trim();if(!img)return alert('Entrez une URL d\'image !');
+  const url=document.getElementById('vis-url').textContent;
+  document.getElementById('vis-res').style.display='block';setSt('vis-st','ld','Analyse...');ld('vis-btn',true);const t0=Date.now();
+  try{const r=await fetch(url);const d=await r.json();const el=((Date.now()-t0)/1000).toFixed(2);
+    if(d.status){setSt('vis-st','ok',`${d.model_used} 👁️ — ${el}s`);document.getElementById('vis-r').textContent=d.response;}
     else setSt('vis-st','err',d.error);
     document.getElementById('vis-t').textContent=`⏱️ ${el}s`;
   }catch(e){setSt('vis-st','err',e.message);}finally{ld('vis-btn',false);}
 }
 
-// ── OPENAI COMPAT ──
-function uOA(){ const q=document.getElementById('oa-q').value||'Hello'; const uid=document.getElementById('oa-uid').value||'1'; const m=document.getElementById('oa-m').value; const img=document.getElementById('oa-img').value;
-  let url=`${B}/api/openai?query=${encodeURIComponent(q)}&uid=${uid}&model=${m}`; if(img) url+=`&imgurl=${encodeURIComponent(img)}`;
-  document.getElementById('oa-url').textContent=url; }
+// OPENAI COMPAT
+function uOA(){const q=document.getElementById('oa-q').value||'Hello';const uid=document.getElementById('oa-uid').value||'1';const m=document.getElementById('oa-m').value;const img=document.getElementById('oa-img').value;
+  let url=`${B}/api/openai?query=${encodeURIComponent(q)}&uid=${uid}&model=${m}`;if(img)url+=`&imgurl=${encodeURIComponent(img)}`;
+  document.getElementById('oa-url').textContent=url;}
 ['oa-q','oa-uid','oa-img'].forEach(id=>document.getElementById(id).addEventListener('input',uOA));
-document.getElementById('oa-m').addEventListener('change',uOA); uOA();
+document.getElementById('oa-m').addEventListener('change',uOA);uOA();
 async function runOA(){
   const url=document.getElementById('oa-url').textContent;
-  document.getElementById('oa-res').style.display='block'; setSt('oa-st','ld','En cours...'); ld('oa-btn',true);
-  const t0=Date.now();
-  try{ const r=await fetch(url); const d=await r.json(); const el=((Date.now()-t0)/1000).toFixed(2);
-    if(d.status) setSt('oa-st','ok',`${d.model_used}${d.vision_mode?' 👁️':''} — ${el}s`);
-    else setSt('oa-st','err',d.error);
-    document.getElementById('oa-r').textContent=JSON.stringify(d,null,2);
-    document.getElementById('oa-t').textContent=`⏱️ ${el}s`;
+  document.getElementById('oa-res').style.display='block';setSt('oa-st','ld','En cours...');ld('oa-btn',true);const t0=Date.now();
+  try{const r=await fetch(url);const d=await r.json();const el=((Date.now()-t0)/1000).toFixed(2);
+    if(d.status)setSt('oa-st','ok',`${d.model_used}${d.vision_mode?' 👁️':''} — ${el}s`);else setSt('oa-st','err',d.error);
+    document.getElementById('oa-r').textContent=JSON.stringify(d,null,2);document.getElementById('oa-t').textContent=`⏱️ ${el}s`;
   }catch(e){setSt('oa-st','err',e.message);}finally{ld('oa-btn',false);}
 }
 </script>
