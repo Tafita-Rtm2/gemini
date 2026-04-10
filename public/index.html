@@ -1,556 +1,719 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>NexusAI — Free AI Chat</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌸 Free AI API — Pollinations.ai</title>
 <style>
-  :root {
-    --bg: #0a0a0f;
-    --surface: #12121a;
-    --surface2: #1c1c28;
-    --border: #2a2a3d;
-    --accent: #7c6fff;
-    --accent2: #ff6b9d;
-    --accent3: #00e5c9;
-    --text: #e8e8f0;
-    --text-dim: #7878a0;
-    --user-bubble: #1e1c3a;
-    --ai-bubble: #12121a;
-  }
+:root{--bg:#080b12;--s:#0f1219;--card:#151b26;--b:#1e2738;--a:#6366f1;--a2:#22d3ee;--a3:#10b981;--a4:#f59e0b;--a5:#ec4899;--t:#e2e8f0;--mu:#64748b;--ok:#10b981;--err:#ef4444;--warn:#f59e0b}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--t);min-height:100vh}
+header{background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 50%,#0c1a2e 100%);border-bottom:1px solid var(--b);padding:14px 20px;display:flex;align-items:center;gap:12px}
+.logo{font-size:1.6rem}
+.htxt h1{font-size:1.2rem;font-weight:800}
+.htxt h1 span{background:linear-gradient(90deg,var(--a2),var(--a5));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.htxt small{font-size:.72rem;color:var(--mu)}
+.hbadges{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.badge{padding:3px 10px;border-radius:20px;font-size:.68rem;font-weight:700}
+.badge-green{background:rgba(16,185,129,.15);border:1px solid var(--ok);color:var(--ok)}
+.badge-blue{background:rgba(99,102,241,.15);border:1px solid var(--a);color:var(--a)}
+.badge-pink{background:rgba(236,72,153,.15);border:1px solid var(--a5);color:var(--a5)}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+/* PROVIDER BANNER */
+.provider-banner{background:linear-gradient(135deg,rgba(34,211,238,.08),rgba(99,102,241,.08));border:1px solid rgba(34,211,238,.25);margin:16px 20px 0;border-radius:10px;padding:10px 16px;display:flex;align-items:center;gap:12px;font-size:.82rem}
+.provider-banner .picon{font-size:1.4rem}
+.provider-banner a{color:var(--a2);text-decoration:none}
+.provider-banner a:hover{text-decoration:underline}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Syne', sans-serif;
-    height: 100dvh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
+/* TABS */
+.tabs{display:flex;gap:3px;padding:12px 20px 0;background:var(--s);border-bottom:1px solid var(--b);overflow-x:auto}
+.tab{padding:9px 16px;border-radius:8px 8px 0 0;cursor:pointer;font-weight:600;font-size:.8rem;color:var(--mu);transition:all .2s;border:none;background:transparent;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.tab:hover{color:var(--t);background:rgba(255,255,255,.05)}
+.tab.active{color:var(--a2);background:var(--card);border:1px solid var(--b);border-bottom:1px solid var(--card);margin-bottom:-1px}
 
-  /* ── Noise overlay ── */
-  body::before {
-    content: '';
-    position: fixed; inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-    pointer-events: none; z-index: 999; opacity: 0.4;
-  }
+/* LAYOUT */
+.wrap{max-width:1080px;margin:0 auto;padding:20px}
+.panel{display:none}.panel.active{display:block}
+.card{background:var(--card);border:1px solid var(--b);border-radius:12px;padding:18px;margin-bottom:14px}
+.card-title{font-size:.9rem;font-weight:700;color:var(--a2);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.form-group{margin-bottom:12px}
+label{display:block;font-size:.78rem;color:var(--mu);margin-bottom:5px;font-weight:500}
+input,select,textarea{width:100%;padding:9px 12px;background:var(--s);border:1px solid var(--b);border-radius:8px;color:var(--t);font-size:.88rem;outline:none;transition:border-color .2s;font-family:inherit}
+input:focus,select:focus,textarea:focus{border-color:var(--a2)}
+textarea{resize:vertical;min-height:65px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:580px){.g2{grid-template-columns:1fr}}
 
-  /* ── Header ── */
-  header {
-    display: flex; align-items: center; gap: 12px;
-    padding: 14px 20px;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
-    position: relative;
-  }
+/* BUTTONS */
+.btn{padding:9px 20px;border:none;border-radius:8px;font-weight:700;font-size:.88rem;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{opacity:.88;transform:translateY(-1px)}.btn:active{transform:none}
+button:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
+.btn-sm{padding:5px 11px;font-size:.76rem}
+.btn-p{background:linear-gradient(135deg,var(--a),#8b5cf6);color:#fff}
+.btn-c{background:linear-gradient(135deg,var(--a2),#0891b2);color:#000}
+.btn-g{background:linear-gradient(135deg,var(--a3),#059669);color:#fff}
+.btn-y{background:linear-gradient(135deg,var(--a4),#d97706);color:#fff}
+.btn-pk{background:linear-gradient(135deg,var(--a5),#db2777);color:#fff}
+.btn-o{background:transparent;border:1px solid var(--b);color:var(--mu)}
+.btn-o:hover{border-color:var(--a2);color:var(--a2)}
 
-  .logo {
-    width: 36px; height: 36px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Space Mono', monospace;
-    font-size: 16px; font-weight: 700; color: #fff;
-    flex-shrink: 0;
-  }
+/* URL BOX */
+.url-box{background:var(--s);border:1px solid var(--b);border-radius:8px;padding:8px 11px;font-family:monospace;font-size:.72rem;color:var(--a2);word-break:break-all;margin:10px 0;display:flex;align-items:center;gap:8px}
+.url-box span{flex:1}
+.cp{background:transparent;border:none;color:var(--mu);cursor:pointer;padding:1px 6px;border-radius:4px;font-size:.8rem}
+.cp:hover{color:var(--a2)}
 
-  .header-info h1 {
-    font-size: 18px; font-weight: 800; letter-spacing: -0.5px;
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  }
+/* RESPONSE */
+.rb{background:var(--s);border:1px solid var(--b);border-radius:8px;padding:13px;min-height:90px;font-size:.85rem;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.rb.code{font-family:monospace;font-size:.74rem}
 
-  .header-info p {
-    font-size: 11px; color: var(--text-dim); font-family: 'Space Mono', monospace;
-  }
+/* STATUS */
+.st{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:700;margin-bottom:7px}
+.st.ok{background:rgba(16,185,129,.15);color:var(--ok);border:1px solid var(--ok)}
+.st.err{background:rgba(239,68,68,.15);color:var(--err);border:1px solid var(--err)}
+.st.ld{background:rgba(99,102,241,.15);color:var(--a);border:1px solid var(--a)}
+.spin{width:13px;height:13px;border:2px solid rgba(99,102,241,.3);border-top-color:var(--a);border-radius:50%;animation:spin .8s linear infinite;display:inline-block;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-  .header-right {
-    margin-left: auto;
-    display: flex; align-items: center; gap: 10px;
-  }
+/* IMAGE */
+.img-res{border-radius:10px;max-width:100%;border:2px solid var(--b);margin-top:10px;display:block}
+.img-ph{background:var(--s);border:2px dashed var(--b);border-radius:10px;height:240px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:var(--mu);font-size:.85rem;margin-top:10px}
+.timing{font-size:.7rem;color:var(--mu);text-align:right;margin-top:5px}
 
-  .model-select {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 6px 10px;
-    border-radius: 8px;
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    cursor: pointer;
-    outline: none;
-  }
+/* INFO BOXES */
+.info{background:rgba(34,211,238,.07);border:1px solid rgba(34,211,238,.25);border-radius:8px;padding:10px 13px;font-size:.8rem;color:var(--a2);margin-bottom:12px;line-height:1.6}
+.warn{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.25);border-radius:8px;padding:10px 13px;font-size:.8rem;color:var(--warn);margin-bottom:12px;line-height:1.6}
+.ok-box{background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.25);border-radius:8px;padding:10px 13px;font-size:.8rem;color:var(--ok);margin-bottom:12px;line-height:1.6}
 
-  .api-link {
-    font-size: 11px; font-family: 'Space Mono', monospace;
-    color: var(--accent3);
-    text-decoration: none;
-    padding: 6px 12px;
-    border: 1px solid var(--accent3);
-    border-radius: 8px;
-    transition: all 0.2s;
-  }
-  .api-link:hover { background: var(--accent3); color: #000; }
+/* MODEL CHIPS */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{padding:4px 11px;border-radius:20px;font-size:.72rem;font-family:monospace;cursor:default}
+.chip-free{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.4);color:var(--ok)}
+.chip-paid{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);color:var(--err);opacity:.7}
+.chip-search{background:rgba(34,211,238,.12);border:1px solid rgba(34,211,238,.4);color:var(--a2)}
+.chip-vision{background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.4);color:#a5b4fc}
 
-  /* ── Chat area ── */
-  #chat {
-    flex: 1;
-    overflow-y: auto;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    scroll-behavior: smooth;
-  }
+/* MODEL TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:.78rem;margin-top:10px}
+.tbl th{background:var(--s);color:var(--mu);padding:7px 10px;text-align:left;border-bottom:1px solid var(--b);font-weight:600}
+.tbl td{padding:7px 10px;border-bottom:1px solid rgba(30,39,56,.6)}
+.tbl tr:hover td{background:rgba(255,255,255,.02)}
+.tag{display:inline-block;padding:1px 7px;border-radius:10px;font-size:.65rem;margin:1px;font-weight:600}
+.tag-free{background:rgba(16,185,129,.2);color:var(--ok)}
+.tag-paid{background:rgba(239,68,68,.2);color:var(--err)}
+.tag-vis{background:rgba(99,102,241,.2);color:#a5b4fc}
+.tag-srch{background:rgba(34,211,238,.2);color:var(--a2)}
+.tag-edit{background:rgba(245,158,11,.2);color:var(--warn)}
 
-  #chat::-webkit-scrollbar { width: 4px; }
-  #chat::-webkit-scrollbar-track { background: transparent; }
-  #chat::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-  /* ── Welcome screen ── */
-  .welcome {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    flex: 1; text-align: center; padding: 40px 20px; gap: 20px;
-    animation: fadeIn 0.6s ease;
-  }
-
-  .welcome-logo {
-    width: 80px; height: 80px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    border-radius: 24px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 36px;
-    box-shadow: 0 0 60px rgba(124,111,255,0.3);
-  }
-
-  .welcome h2 {
-    font-size: 28px; font-weight: 800;
-    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  }
-
-  .welcome p { color: var(--text-dim); font-size: 14px; max-width: 380px; line-height: 1.6; }
-
-  .chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 8px; }
-
-  .chip {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--text-dim);
-    padding: 8px 14px;
-    border-radius: 20px;
-    font-size: 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-family: 'Space Mono', monospace;
-  }
-  .chip:hover { border-color: var(--accent); color: var(--accent); }
-
-  /* ── Messages ── */
-  .msg {
-    display: flex; gap: 10px; align-items: flex-start;
-    animation: slideUp 0.3s ease;
-    max-width: 100%;
-  }
-
-  @keyframes slideUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes fadeIn {
-    from { opacity: 0; } to { opacity: 1; }
-  }
-
-  .msg.user { flex-direction: row-reverse; }
-
-  .avatar {
-    width: 32px; height: 32px; border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px; flex-shrink: 0;
-  }
-  .msg.user .avatar { background: linear-gradient(135deg, var(--accent), var(--accent2)); }
-  .msg.ai .avatar {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; color: var(--accent);
-  }
-
-  .bubble {
-    max-width: min(75%, 600px);
-    padding: 12px 16px;
-    border-radius: 16px;
-    font-size: 14px;
-    line-height: 1.7;
-    word-break: break-word;
-  }
-
-  .msg.user .bubble {
-    background: var(--user-bubble);
-    border: 1px solid rgba(124,111,255,0.3);
-    border-top-right-radius: 4px;
-    color: var(--text);
-  }
-
-  .msg.ai .bubble {
-    background: var(--ai-bubble);
-    border: 1px solid var(--border);
-    border-top-left-radius: 4px;
-  }
-
-  .bubble img.uploaded {
-    max-width: 200px; max-height: 150px;
-    border-radius: 8px; margin-bottom: 8px; display: block;
-  }
-
-  .model-badge {
-    font-size: 10px; font-family: 'Space Mono', monospace;
-    color: var(--accent3); display: block; margin-bottom: 4px;
-  }
-
-  /* ── Typing indicator ── */
-  .typing { display: flex; gap: 4px; padding: 4px 0; }
-  .typing span {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--accent);
-    animation: bounce 1.2s infinite;
-  }
-  .typing span:nth-child(2) { animation-delay: 0.2s; }
-  .typing span:nth-child(3) { animation-delay: 0.4s; }
-  @keyframes bounce {
-    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-    30% { transform: translateY(-6px); opacity: 1; }
-  }
-
-  /* ── Preview image ── */
-  #preview-wrap {
-    display: none;
-    padding: 8px 20px;
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-  }
-  #preview-wrap.show { display: flex; align-items: center; gap: 10px; }
-  #preview-img { width: 48px; height: 48px; object-fit: cover; border-radius: 8px; }
-  #preview-wrap button {
-    background: transparent; border: none; color: var(--text-dim);
-    cursor: pointer; font-size: 18px; padding: 4px;
-  }
-  #preview-wrap span { font-size: 12px; color: var(--text-dim); font-family: 'Space Mono', monospace; }
-
-  /* ── Input area ── */
-  .input-area {
-    padding: 12px 16px;
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-    flex-shrink: 0;
-  }
-
-  .input-row {
-    display: flex; gap: 8px; align-items: flex-end;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 8px 8px 8px 14px;
-    transition: border-color 0.2s;
-  }
-  .input-row:focus-within { border-color: var(--accent); }
-
-  #msg-input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: var(--text);
-    font-family: 'Syne', sans-serif;
-    font-size: 14px;
-    resize: none;
-    max-height: 120px;
-    line-height: 1.5;
-  }
-  #msg-input::placeholder { color: var(--text-dim); }
-
-  .input-btns { display: flex; gap: 4px; align-items: center; }
-
-  .icon-btn {
-    width: 34px; height: 34px;
-    background: transparent;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--text-dim);
-    font-size: 16px;
-    transition: all 0.2s;
-    flex-shrink: 0;
-  }
-  .icon-btn:hover { border-color: var(--accent); color: var(--accent); }
-
-  #send-btn {
-    width: 34px; height: 34px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    color: #fff;
-    font-size: 16px;
-    transition: transform 0.15s, opacity 0.2s;
-    flex-shrink: 0;
-  }
-  #send-btn:hover { transform: scale(1.05); }
-  #send-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-
-  .footer-hint {
-    text-align: center;
-    font-size: 10px;
-    color: var(--text-dim);
-    font-family: 'Space Mono', monospace;
-    margin-top: 8px;
-  }
-
-  /* ─── Scrollbar ── */
-  #msg-input::-webkit-scrollbar { width: 3px; }
-  #msg-input::-webkit-scrollbar-thumb { background: var(--border); }
-
-  /* ─── Mobile ── */
-  @media (max-width: 600px) {
-    .api-link { display: none; }
-    .bubble { max-width: 90%; }
-  }
+/* ENDPOINT CARDS */
+.ep{background:var(--s);border:1px solid var(--b);border-radius:8px;padding:11px 13px;margin-bottom:8px;font-family:monospace;font-size:.77rem}
+.mth{display:inline-block;background:rgba(16,185,129,.15);color:var(--ok);border:1px solid rgba(16,185,129,.3);padding:1px 7px;border-radius:4px;font-size:.65rem;font-weight:700;margin-right:6px}
+.ep-d{font-family:sans-serif;font-size:.76rem;color:var(--mu);margin-top:5px}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">N</div>
-  <div class="header-info">
-    <h1>NexusAI</h1>
-    <p>Free · No Login · Multi-Model</p>
+  <div class="logo">🌸</div>
+  <div class="htxt">
+    <h1>Free AI API <span>Server v3.0</span></h1>
+    <small>Fournisseur : Pollinations.ai — Open Source, Berlin 🇩🇪</small>
   </div>
-  <div class="header-right">
-    <select class="model-select" id="model-select">
-      <option value="auto">⚡ Auto</option>
-      <option value="gpt-5-2">GPT-5.2</option>
-      <option value="claude-sonnet">Claude Sonnet</option>
-      <option value="claude-opus">Claude Opus</option>
-      <option value="gemini-3-pro">Gemini 3 Pro</option>
-      <option value="deepseek-r1">DeepSeek R1</option>
-    </select>
-    <a href="/api-test.html" class="api-link">API Docs</a>
+  <div class="hbadges">
+    <div class="badge badge-green">✅ 100% GRATUIT</div>
+    <div class="badge badge-blue">🌸 Pollinations.ai</div>
+    <div class="badge badge-pink">v3.0</div>
   </div>
 </header>
 
-<div id="chat">
-  <div class="welcome" id="welcome">
-    <div class="welcome-logo">🧠</div>
-    <h2>NexusAI</h2>
-    <p>Chat avec GPT-5.2, Claude, Gemini et plus — gratuitement, sans inscription. Envoie des images, des fichiers PDF, Word et Excel.</p>
-    <div class="chips">
-      <div class="chip" onclick="quickSend('Explique-moi l\'IA en termes simples')">🤖 Explique l'IA</div>
-      <div class="chip" onclick="quickSend('Écris un poème sur la mer')">✍️ Écris un poème</div>
-      <div class="chip" onclick="quickSend('Aide-moi à coder en Python')">💻 Code Python</div>
-      <div class="chip" onclick="quickSend('Traduis: Hello, how are you?')">🌍 Traduction</div>
+<div class="provider-banner">
+  <div class="picon">🌸</div>
+  <div>
+    <strong>Fournisseur : <a href="https://pollinations.ai" target="_blank">Pollinations.ai</a></strong> — Plateforme open-source gratuite basée à Berlin. 
+    Accès à <strong>GPT-5, Claude, Gemini, DeepSeek, Perplexity, Flux, NanoBanana</strong> et plus — sans inscription, sans clé API pour les modèles gratuits.
+    Docs : <a href="https://enter.pollinations.ai/api/docs" target="_blank">enter.pollinations.ai/api/docs</a>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="sw('chat',this)">💬 Chat</button>
+  <button class="tab" onclick="sw('image',this)">🎨 Image Gen</button>
+  <button class="tab" onclick="sw('edit',this)">✏️ Image Edit</button>
+  <button class="tab" onclick="sw('search',this)">🔍 Web Search</button>
+  <button class="tab" onclick="sw('vision',this)">👁️ Vision</button>
+  <button class="tab" onclick="sw('openai',this)">⚡ /api/openai</button>
+  <button class="tab" onclick="sw('models',this)">📋 Modèles</button>
+  <button class="tab" onclick="sw('docs',this)">📖 Docs</button>
+</div>
+
+<div class="wrap">
+
+<!-- ═══ CHAT ═══ -->
+<div class="panel active" id="panel-chat">
+  <div class="card">
+    <div class="card-title">💬 Chat / Text Generation — <code style="font-size:.72rem">GET /api/chat</code></div>
+    <div class="ok-box">✅ <strong>24 modèles gratuits</strong> : GPT-5.4, Claude Haiku, Gemini 2.5, DeepSeek V3.2, Perplexity, Kimi, Mistral, Qwen, Amazon Nova, GLM, MiniMax et plus !</div>
+    <div class="form-group">
+      <label>Message</label>
+      <textarea id="chat-q">Bonjour ! Présente-toi et dis-moi quelles sont tes capacités.</textarea>
+    </div>
+    <div class="g2">
+      <div class="form-group">
+        <label>Modèle (✅ = gratuit)</label>
+        <select id="chat-m">
+          <optgroup label="── OpenAI (Gratuits) ✅">
+            <option value="openai">openai — GPT-5.4 Nano ⭐</option>
+            <option value="openai-fast">openai-fast — GPT-5 Nano</option>
+            <option value="openai-large">openai-large — GPT-5.4</option>
+          </optgroup>
+          <optgroup label="── Anthropic (Gratuit) ✅">
+            <option value="claude-fast">claude-fast — Claude Haiku 4.5 ✅ Vision</option>
+          </optgroup>
+          <optgroup label="── Google Gemini (Gratuits) ✅">
+            <option value="gemini-fast">gemini-fast — Gemini 2.5 Lite ✅ Vision</option>
+            <option value="gemini-search">gemini-search — Gemini + Google 🔍</option>
+          </optgroup>
+          <optgroup label="── DeepSeek (Gratuits) ✅">
+            <option value="deepseek">deepseek — DeepSeek V3.2</option>
+            <option value="deepseek-reasoning">deepseek-reasoning — DeepSeek R1</option>
+          </optgroup>
+          <optgroup label="── Perplexity (Gratuits ✅ + Search)">
+            <option value="perplexity-fast">perplexity-fast — Sonar Web 🔍</option>
+            <option value="perplexity-reasoning">perplexity-reasoning — Sonar R1 🔍</option>
+          </optgroup>
+          <optgroup label="── Moonshot (Gratuit) ✅">
+            <option value="kimi">kimi — Kimi K2.5 ✅ Vision</option>
+          </optgroup>
+          <optgroup label="── Mistral (Gratuits) ✅">
+            <option value="mistral">mistral — Mistral Small 3.2</option>
+            <option value="mistral-large">mistral-large — Mistral Large 3</option>
+          </optgroup>
+          <optgroup label="── Alibaba Qwen (Gratuits) ✅">
+            <option value="qwen-coder">qwen-coder — Qwen3 Coder 30B</option>
+            <option value="qwen-coder-large">qwen-coder-large — Qwen3 Coder Next</option>
+            <option value="qwen-large">qwen-large — Qwen3.5 Plus MoE</option>
+            <option value="qwen-vision">qwen-vision — Qwen3 VL ✅ Vision</option>
+            <option value="qwen-safety">qwen-safety — Qwen3Guard Safety</option>
+          </optgroup>
+          <optgroup label="── Amazon Nova (Gratuits) ✅">
+            <option value="nova-fast">nova-fast — Nova Micro</option>
+            <option value="nova">nova — Nova 2 Lite 1M ctx</option>
+          </optgroup>
+          <optgroup label="── Z.ai / MiniMax / MIDIjourney (Gratuits) ✅">
+            <option value="glm">glm — GLM-5 744B MoE</option>
+            <option value="minimax">minimax — MiniMax M2.5</option>
+            <option value="midijourney">midijourney — AI Music</option>
+          </optgroup>
+          <optgroup label="── Pollinations Special (Gratuit) ✅">
+            <option value="polly">polly — Polly AI Assistant 🔍</option>
+          </optgroup>
+          <optgroup label="── Anthropic Payants 💰">
+            <option value="claude">claude — Claude Sonnet 4.6 💰</option>
+            <option value="claude-large">claude-large — Claude Opus 4.6 💰</option>
+          </optgroup>
+          <optgroup label="── Google Payants 💰">
+            <option value="gemini">gemini — Gemini 3 Flash 💰</option>
+            <option value="gemini-large">gemini-large — Gemini 3.1 Pro 💰</option>
+          </optgroup>
+          <optgroup label="── xAI Grok Payants 💰">
+            <option value="grok">grok — Grok 4.1 Fast 💰</option>
+            <option value="grok-large">grok-large — Grok 4.20 Reasoning 💰</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>System Prompt</label>
+        <input id="chat-sys" value="You are a helpful AI assistant.">
+      </div>
+    </div>
+    <div class="url-box"><span id="chat-url">...</span><button class="cp" onclick="cp('chat-url')">📋</button></div>
+    <button class="btn btn-p" id="chat-btn" onclick="runChat()">🚀 Envoyer</button>
+  </div>
+  <div class="card" id="chat-res" style="display:none">
+    <div class="card-title">📨 Réponse</div>
+    <div id="chat-st"></div>
+    <div class="rb" id="chat-r"></div>
+    <div class="timing" id="chat-t"></div>
+    <div style="margin-top:8px"><button class="btn btn-o btn-sm" onclick="cpT('chat-r')">📋 Copier</button></div>
+  </div>
+</div>
+
+<!-- ═══ IMAGE GEN ═══ -->
+<div class="panel" id="panel-image">
+  <div class="card">
+    <div class="card-title">🎨 Génération d'Image — <code style="font-size:.72rem">GET /api/image</code></div>
+    <div class="ok-box">🖼️ Retourne l'image <strong>directement en binaire</strong> — utilisable dans <code>&lt;img src="/api/image?..."&gt;</code></div>
+    <div class="warn">⚠️ Seuls <strong>flux</strong> et <strong>zimage</strong> sont 100% gratuits sans clé. Les autres (nanobanana, gptimage, kontext…) nécessitent une clé Pollen.</div>
+    <div class="form-group">
+      <label>Prompt</label>
+      <textarea id="img-p">A majestic dragon soaring over a cyberpunk city at night, neon reflections on wet streets, 4K photorealistic</textarea>
+    </div>
+    <div class="g2">
+      <div class="form-group">
+        <label>Modèle</label>
+        <select id="img-m">
+          <optgroup label="── 100% Gratuits ✅">
+            <option value="flux">flux — Flux Schnell ⭐ (le plus rapide)</option>
+            <option value="zimage">zimage — Z-Image Turbo + 2x upscale</option>
+          </optgroup>
+          <optgroup label="── Nécessitent clé Pollen 💰">
+            <option value="nanobanana-pro">nanobanana-pro — Gemini 3 Pro (4K) 🍌⭐</option>
+            <option value="nanobanana-2">nanobanana-2 — Gemini 3.1 Flash 🍌</option>
+            <option value="nanobanana">nanobanana — Gemini 2.5 Flash 🍌</option>
+            <option value="gptimage">gptimage — GPT Image 1 Mini</option>
+            <option value="gptimage-large">gptimage-large — GPT Image 1.5</option>
+            <option value="kontext">kontext — FLUX.1 Kontext (edit)</option>
+            <option value="klein">klein — FLUX.2 Klein 4B</option>
+            <option value="wan-image">wan-image — Wan 2.7 Alibaba (2K)</option>
+            <option value="wan-image-pro">wan-image-pro — Wan 2.7 Pro (4K)</option>
+            <option value="qwen-image">qwen-image — Qwen Image Plus</option>
+            <option value="seedream5">seedream5 — Seedream 5.0 ByteDance</option>
+            <option value="grok-imagine">grok-imagine — Grok Imagine xAI</option>
+            <option value="nova-canvas">nova-canvas — Amazon Nova Canvas</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Résolution</label>
+        <select id="img-sz">
+          <option value="1024x1024">1024×1024 (Carré)</option>
+          <option value="1280x720">1280×720 (16:9 Paysage)</option>
+          <option value="720x1280">720×1280 (9:16 Portrait)</option>
+          <option value="768x1344">768×1344 (Portrait)</option>
+          <option value="1344x768">1344×768 (Paysage)</option>
+          <option value="512x512">512×512 (Petit / Rapide)</option>
+        </select>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="form-group"><label><input type="checkbox" id="img-en"> ✨ Enhance prompt (IA améliore)</label></div>
+      <div class="form-group"><label>Seed (optionnel)</label><input id="img-seed" type="number" placeholder="Ex: 42"></div>
+    </div>
+    <div class="form-group"><label>Negative Prompt (optionnel, flux/zimage seulement)</label><input id="img-neg" placeholder="blurry, low quality, deformed..."></div>
+    <div class="url-box"><span id="img-url">...</span><button class="cp" onclick="cp('img-url')">📋</button></div>
+    <button class="btn btn-c" id="img-btn" onclick="runImage()">🎨 Générer</button>
+  </div>
+  <div class="card" id="img-res" style="display:none">
+    <div class="card-title">🖼️ Image Générée</div>
+    <div id="img-st"></div>
+    <div id="img-box"><div class="img-ph">🖼️<span>L'image apparaîtra ici</span></div></div>
+    <div class="timing" id="img-t"></div>
+    <div style="margin-top:8px;display:flex;gap:7px;flex-wrap:wrap">
+      <a id="img-dl" class="btn btn-o btn-sm" download="ai-image.jpg">⬇️ Télécharger</a>
+      <button class="btn btn-o btn-sm" onclick="cp('img-url')">📋 Copier URL</button>
     </div>
   </div>
 </div>
 
-<!-- Image preview -->
-<div id="preview-wrap">
-  <img id="preview-img" src="" alt="preview"/>
-  <span id="preview-label">Image prête</span>
-  <button onclick="clearFile()">✕</button>
+<!-- ═══ IMAGE EDIT ═══ -->
+<div class="panel" id="panel-edit">
+  <div class="card">
+    <div class="card-title">✏️ Édition d'Image (Image-to-Image) — <code style="font-size:.72rem">GET /api/image?imgurl=...</code></div>
+    <div class="info">✏️ Fournissez une image source + une instruction. Le serveur envoie <code>?image=URL</code> à Pollinations.</div>
+    <div class="warn">⚠️ Les meilleurs modèles d'édition (nanobanana-pro, kontext, klein) nécessitent une clé Pollen. <strong>klein</strong> et <strong>nanobanana-pro</strong> sont les meilleurs pour l'édition précise.</div>
+    <div class="form-group"><label>URL de l'image source</label><input id="ed-img" type="url" placeholder="https://example.com/photo.jpg"></div>
+    <div class="form-group"><label>Instruction d'édition</label><textarea id="ed-p">Transform this image into a beautiful anime art style, keep the same composition and characters</textarea></div>
+    <div class="g2">
+      <div class="form-group">
+        <label>Modèle d'édition</label>
+        <select id="ed-m">
+          <optgroup label="── Avec clé Pollen 💰">
+            <option value="nanobanana-pro">nanobanana-pro — Gemini 3 Pro (Meilleur) ⭐</option>
+            <option value="nanobanana-2">nanobanana-2 — Gemini 3.1 Flash</option>
+            <option value="nanobanana">nanobanana — Gemini 2.5 Flash</option>
+            <option value="kontext">kontext — FLUX.1 Kontext ⭐</option>
+            <option value="klein">klein — FLUX.2 Klein 4B</option>
+            <option value="gptimage">gptimage — GPT Image 1 Mini</option>
+            <option value="wan-image">wan-image — Wan 2.7 Alibaba</option>
+            <option value="qwen-image">qwen-image — Qwen Image Plus</option>
+          </optgroup>
+          <optgroup label="── Gratuits (résultats variables) ✅">
+            <option value="flux">flux — Flux Schnell (pas optimisé édition)</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Résolution</label>
+        <select id="ed-sz">
+          <option value="1024x1024">1024×1024</option>
+          <option value="1280x720">1280×720</option>
+          <option value="768x1344">768×1344</option>
+        </select>
+      </div>
+    </div>
+    <div class="url-box"><span id="ed-url">...</span><button class="cp" onclick="cp('ed-url')">📋</button></div>
+    <button class="btn btn-p" id="ed-btn" onclick="runEdit()">✏️ Éditer l'image</button>
+  </div>
+  <div class="card" id="ed-res" style="display:none">
+    <div class="card-title">🖼️ Résultat de l'édition</div>
+    <div id="ed-st"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div><div style="font-size:.75rem;color:var(--mu);margin-bottom:5px">📸 Source</div><img id="ed-src" style="width:100%;border-radius:8px;border:1px solid var(--b)"></div>
+      <div><div style="font-size:.75rem;color:var(--mu);margin-bottom:5px">✨ Résultat</div><div id="ed-box"><div class="img-ph" style="height:160px">✨<span>Résultat ici</span></div></div></div>
+    </div>
+    <div class="timing" id="ed-t"></div>
+  </div>
 </div>
 
-<!-- Input -->
-<div class="input-area">
-  <div class="input-row">
-    <textarea id="msg-input" rows="1" placeholder="Envoie un message..." autocomplete="off"></textarea>
-    <div class="input-btns">
-      <button class="icon-btn" onclick="document.getElementById('file-input').click()" title="Joindre image/fichier">📎</button>
-      <button id="send-btn" onclick="sendMessage()" title="Envoyer">➤</button>
+<!-- ═══ SEARCH ═══ -->
+<div class="panel" id="panel-search">
+  <div class="card">
+    <div class="card-title">🔍 Web Search — <code style="font-size:.72rem">GET /api/search</code></div>
+    <div class="ok-box">🌐 <strong>Modèles de recherche gratuits</strong> : Perplexity Sonar, Gemini Search, Polly — résultats web temps réel !</div>
+    <div class="form-group"><label>Requête de recherche</label><textarea id="sr-q">Quelles sont les dernières nouvelles en intelligence artificielle aujourd'hui ?</textarea></div>
+    <div class="form-group">
+      <label>Modèle (tous gratuits ✅ + recherche web)</label>
+      <select id="sr-m">
+        <option value="perplexity-fast">perplexity-fast — Perplexity Sonar ⭐ (web search rapide)</option>
+        <option value="perplexity-reasoning">perplexity-reasoning — Perplexity Sonar R1 (raisonnement)</option>
+        <option value="gemini-search">gemini-search — Gemini 2.5 + Google Search 🔍</option>
+        <option value="gemini-fast">gemini-fast — Gemini 2.5 Flash Lite</option>
+        <option value="polly">polly — Polly AI (GitHub + Web + Code)</option>
+      </select>
     </div>
+    <div class="url-box"><span id="sr-url">...</span><button class="cp" onclick="cp('sr-url')">📋</button></div>
+    <button class="btn btn-g" id="sr-btn" onclick="runSearch()">🔍 Rechercher</button>
   </div>
-  <input type="file" id="file-input" accept="image/*,.pdf,.docx,.xlsx" style="display:none" onchange="handleFile(this)"/>
-  <p class="footer-hint">NexusAI · Propulsé par aifreeforever.com · <a href="/api-test.html" style="color:var(--accent3);text-decoration:none">API publique disponible</a></p>
+  <div class="card" id="sr-res" style="display:none">
+    <div class="card-title">📰 Résultats</div>
+    <div id="sr-st"></div>
+    <div class="rb" id="sr-r"></div>
+    <div class="timing" id="sr-t"></div>
+    <div style="margin-top:8px"><button class="btn btn-o btn-sm" onclick="cpT('sr-r')">📋 Copier</button></div>
+  </div>
 </div>
+
+<!-- ═══ VISION ═══ -->
+<div class="panel" id="panel-vision">
+  <div class="card">
+    <div class="card-title">👁️ Vision — Analyse d'Image — <code style="font-size:.72rem">GET /api/openai?imgurl=...</code></div>
+    <div class="ok-box">✅ <strong>Vision fonctionnelle !</strong> Le serveur récupère l'image côté serveur → base64 → envoi inline au modèle.</div>
+    <div class="form-group"><label>URL de l'image à analyser</label><input id="vis-url-in" type="url" value="https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/320px-PNG_transparency_demonstration_1.png"></div>
+    <div id="vis-prev" style="margin-bottom:10px"></div>
+    <div class="form-group"><label>Question sur l'image</label><textarea id="vis-q">Décris cette image en détail. Qu'est-ce que tu vois ? Quelles couleurs, formes et objets ?</textarea></div>
+    <div class="form-group">
+      <label>Modèle Vision (tous gratuits ✅)</label>
+      <select id="vis-m">
+        <option value="gemini-fast">gemini-fast — Gemini 2.5 Flash Lite ⭐ (Gratuit + Rapide)</option>
+        <option value="claude-fast">claude-fast — Claude Haiku 4.5 ✅</option>
+        <option value="kimi">kimi — Kimi K2.5 Vision ✅</option>
+        <option value="qwen-vision">qwen-vision — Qwen3 VL Plus ✅</option>
+        <option value="openai">openai — GPT-5.4 Nano</option>
+        <option value="openai-large">openai-large — GPT-5.4</option>
+      </select>
+    </div>
+    <div class="url-box"><span id="vis-url-d">...</span><button class="cp" onclick="cp('vis-url-d')">📋</button></div>
+    <button class="btn btn-y" id="vis-btn" onclick="runVision()">👁️ Analyser l'image</button>
+  </div>
+  <div class="card" id="vis-res" style="display:none">
+    <div class="card-title">🧠 Analyse</div>
+    <div id="vis-st"></div>
+    <div class="rb" id="vis-r"></div>
+    <div class="timing" id="vis-t"></div>
+    <div style="margin-top:8px"><button class="btn btn-o btn-sm" onclick="cpT('vis-r')">📋 Copier</button></div>
+  </div>
+</div>
+
+<!-- ═══ OPENAI COMPAT ═══ -->
+<div class="panel" id="panel-openai">
+  <div class="card">
+    <div class="card-title">⚡ Endpoint Unifié — <code style="font-size:.72rem">GET /api/openai</code> (format reixz)</div>
+    <div class="info">🔗 Compatible format reixz : <code>/api/openai?query=Hello&uid=3&model=openai&imgurl=(optionnel)</code><br>Si <code>imgurl</code> fourni → Vision activée automatiquement.</div>
+    <div class="form-group"><label>Query</label><input id="oa-q" value="Présente-toi et décris tes capacités."></div>
+    <div class="g2">
+      <div class="form-group"><label>UID</label><input id="oa-uid" value="1"></div>
+      <div class="form-group">
+        <label>Modèle</label>
+        <select id="oa-m">
+          <option value="openai">openai ⭐</option>
+          <option value="openai-fast">openai-fast</option>
+          <option value="gemini-fast">gemini-fast ✅ Vision</option>
+          <option value="claude-fast">claude-fast ✅ Vision</option>
+          <option value="kimi">kimi ✅ Vision</option>
+          <option value="deepseek">deepseek</option>
+          <option value="perplexity-fast">perplexity-fast 🔍</option>
+          <option value="mistral">mistral</option>
+          <option value="nova">nova</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group"><label>Image URL (optionnel — active la vision)</label><input id="oa-img" type="url" placeholder="https://example.com/image.jpg"></div>
+    <div class="url-box"><span id="oa-url">...</span><button class="cp" onclick="cp('oa-url')">📋</button></div>
+    <button class="btn btn-p" id="oa-btn" onclick="runOA()">⚡ Exécuter</button>
+  </div>
+  <div class="card" id="oa-res" style="display:none">
+    <div class="card-title">📨 Réponse JSON</div>
+    <div id="oa-st"></div>
+    <div class="rb code" id="oa-r"></div>
+    <div class="timing" id="oa-t"></div>
+    <div style="margin-top:8px"><button class="btn btn-o btn-sm" onclick="cpT('oa-r')">📋 Copier JSON</button></div>
+  </div>
+</div>
+
+<!-- ═══ MODELS ═══ -->
+<div class="panel" id="panel-models">
+  <div class="card">
+    <div class="card-title">📋 Tous les Modèles — Pollinations.ai</div>
+    <div class="info">🌸 Source officielle : <a href="https://enter.pollinations.ai/api/docs" target="_blank" style="color:var(--a2)">enter.pollinations.ai/api/docs</a> — Mis à jour : Avril 2026</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;font-size:.75rem">
+      <span style="display:inline-flex;align-items:center;gap:4px"><span class="chip chip-free">✅ Gratuit</span> sans clé API</span>
+      <span style="display:inline-flex;align-items:center;gap:4px"><span class="chip chip-paid">💰 Pollen</span> clé requise</span>
+      <span style="display:inline-flex;align-items:center;gap:4px"><span class="chip chip-vision">👁️ Vision</span> analyse images</span>
+      <span style="display:inline-flex;align-items:center;gap:4px"><span class="chip chip-search">🔍 Search</span> web en temps réel</span>
+    </div>
+
+    <div class="card-title" style="margin-top:4px">💬 Modèles Texte / Chat (37 total)</div>
+    <table class="tbl">
+      <thead><tr><th>ID Modèle</th><th>Nom / Description</th><th>Statut</th><th>Capacités</th></tr></thead>
+      <tbody id="text-model-table"></tbody>
+    </table>
+
+    <div class="card-title" style="margin-top:18px">🎨 Modèles Image (20 total)</div>
+    <table class="tbl">
+      <thead><tr><th>ID Modèle</th><th>Nom / Description</th><th>Statut</th><th>Édition</th></tr></thead>
+      <tbody id="img-model-table"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══ DOCS ═══ -->
+<div class="panel" id="panel-docs">
+  <div class="card">
+    <div class="card-title">📖 Documentation des Endpoints</div>
+    <div class="ep"><span class="mth">GET</span><span style="color:var(--a2)">/api/chat?query=Hello&model=openai&system=...</span><div class="ep-d">Chat texte — retourne JSON. 24 modèles gratuits disponibles.</div></div>
+    <div class="ep"><span class="mth">GET</span><span style="color:var(--a2)">/api/image?prompt=A+cat&model=flux&width=1024&height=1024</span><div class="ep-d">Génère image → retourne <strong>binaire direct</strong> (image/jpeg). Utilisable dans &lt;img src&gt;. flux et zimage sont 100% gratuits.</div></div>
+    <div class="ep"><span class="mth">GET</span><span style="color:var(--a2)">/api/image?prompt=Edit+this&model=nanobanana-pro&imgurl=https://...&width=1024&height=1024</span><div class="ep-d">Édition image-to-image. Paramètre <code>imgurl</code> = image source. nanobanana-pro = meilleur modèle d'édition (nécessite clé Pollen).</div></div>
+    <div class="ep"><span class="mth">GET</span><span style="color:var(--a2)">/api/search?query=Latest+AI+news&model=perplexity-fast</span><div class="ep-d">Recherche web temps réel. Modèles gratuits : perplexity-fast, perplexity-reasoning, gemini-search, gemini-fast, polly.</div></div>
+    <div class="ep"><span class="mth">GET</span><span style="color:var(--a2)">/api/openai?query=Hello&uid=3&model=gemini-fast&imgurl=https://...</span><div class="ep-d">Endpoint unifié. Vision activée si imgurl fourni. Le serveur récupère l'image → base64 → envoi inline.</div></div>
+    <div class="ep"><span class="mth">GET</span><span style="color:var(--a2)">/api/models</span><div class="ep-d">Liste complète de tous les modèles avec métadonnées.</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">🌸 À propos de Pollinations.ai</div>
+    <p style="font-size:.84rem;line-height:1.8;color:var(--mu)">
+      <strong style="color:var(--t)">Pollinations.ai</strong> est une plateforme d'IA générative <strong style="color:var(--t)">open-source</strong> basée à Berlin, Allemagne.<br>
+      Elle fournit un accès gratuit à des modèles de génération de texte, d'images, d'audio et de vidéo.<br><br>
+      • <strong style="color:var(--t)">Site</strong> : <a href="https://pollinations.ai" target="_blank" style="color:var(--a2)">pollinations.ai</a><br>
+      • <strong style="color:var(--t)">GitHub</strong> : <a href="https://github.com/pollinations/pollinations" target="_blank" style="color:var(--a2)">github.com/pollinations/pollinations</a><br>
+      • <strong style="color:var(--t)">API Docs</strong> : <a href="https://enter.pollinations.ai/api/docs" target="_blank" style="color:var(--a2)">enter.pollinations.ai/api/docs</a><br>
+      • <strong style="color:var(--t)">Base URL</strong> : <code style="color:var(--a2)">https://text.pollinations.ai</code> / <code style="color:var(--a2)">https://image.pollinations.ai</code><br>
+      • <strong style="color:var(--t)">Modèles payants</strong> : via <a href="https://enter.pollinations.ai" target="_blank" style="color:var(--a2)">enter.pollinations.ai</a> (Pollen credits, $1 ≈ 1 Pollen)
+    </p>
+  </div>
+</div>
+
+</div><!-- /wrap -->
 
 <script>
-  let history = [];
-  let selectedFile = null;
-  let fileBase64 = null;
+const B = window.location.origin;
 
-  const chatEl = document.getElementById('chat');
-  const inputEl = document.getElementById('msg-input');
-  const sendBtn = document.getElementById('send-btn');
+// All models data (synced with server)
+const TEXT_MODELS = [
+  {id:"openai",free:true,vision:false,search:false,name:"OpenAI GPT-5.4 Nano"},
+  {id:"openai-fast",free:true,vision:false,search:false,name:"OpenAI GPT-5 Nano"},
+  {id:"openai-large",free:true,vision:false,search:false,name:"OpenAI GPT-5.4"},
+  {id:"gemini-fast",free:true,vision:true,search:true,name:"Gemini 2.5 Flash Lite"},
+  {id:"gemini-search",free:true,vision:true,search:true,name:"Gemini 2.5 + Google Search"},
+  {id:"deepseek",free:true,vision:false,search:false,name:"DeepSeek V3.2"},
+  {id:"deepseek-reasoning",free:true,vision:false,search:false,name:"DeepSeek R1"},
+  {id:"mistral",free:true,vision:false,search:false,name:"Mistral Small 3.2"},
+  {id:"qwen-coder",free:true,vision:false,search:false,name:"Qwen3 Coder 30B"},
+  {id:"claude-fast",free:true,vision:true,search:false,name:"Claude Haiku 4.5"},
+  {id:"perplexity-fast",free:true,vision:false,search:true,name:"Perplexity Sonar"},
+  {id:"perplexity-reasoning",free:true,vision:false,search:true,name:"Perplexity Sonar R1"},
+  {id:"kimi",free:true,vision:true,search:false,name:"Moonshot Kimi K2.5"},
+  {id:"nova-fast",free:true,vision:false,search:false,name:"Amazon Nova Micro"},
+  {id:"nova",free:true,vision:false,search:false,name:"Amazon Nova 2 Lite"},
+  {id:"glm",free:true,vision:false,search:false,name:"Z.ai GLM-5 744B"},
+  {id:"minimax",free:true,vision:false,search:false,name:"MiniMax M2.5"},
+  {id:"mistral-large",free:true,vision:false,search:false,name:"Mistral Large 3"},
+  {id:"qwen-coder-large",free:true,vision:false,search:false,name:"Qwen3 Coder Next"},
+  {id:"qwen-large",free:true,vision:false,search:false,name:"Qwen3.5 Plus MoE"},
+  {id:"qwen-vision",free:true,vision:true,search:false,name:"Qwen3 VL Plus"},
+  {id:"qwen-safety",free:true,vision:false,search:false,name:"Qwen3Guard 8B"},
+  {id:"midijourney",free:true,vision:false,search:false,name:"MIDIjourney Music"},
+  {id:"polly",free:true,vision:false,search:true,name:"Polly AI Assistant"},
+  {id:"gemini",free:false,vision:true,search:true,name:"Gemini 3 Flash"},
+  {id:"gemini-flash-lite-3.1",free:false,vision:true,search:true,name:"Gemini 3.1 Flash Lite"},
+  {id:"gemini-large",free:false,vision:true,search:true,name:"Gemini 3.1 Pro 1M"},
+  {id:"claude",free:false,vision:true,search:false,name:"Claude Sonnet 4.6"},
+  {id:"claude-large",free:false,vision:true,search:false,name:"Claude Opus 4.6"},
+  {id:"grok",free:false,vision:false,search:false,name:"xAI Grok 4.1 Fast"},
+  {id:"grok-large",free:false,vision:false,search:false,name:"xAI Grok 4.20"},
+  {id:"midijourney-large",free:false,vision:false,search:false,name:"MIDIjourney Large"},
+];
+const IMG_MODELS = [
+  {id:"flux",free:true,edit:false,name:"Flux Schnell — Fast"},
+  {id:"zimage",free:true,edit:false,name:"Z-Image Turbo + 2x upscale"},
+  {id:"kontext",free:false,edit:true,name:"FLUX.1 Kontext — Edit"},
+  {id:"nanobanana",free:false,edit:true,name:"NanoBanana — Gemini 2.5 Flash"},
+  {id:"nanobanana-2",free:false,edit:true,name:"NanoBanana 2 — Gemini 3.1 Flash"},
+  {id:"nanobanana-pro",free:false,edit:true,name:"NanoBanana Pro — Gemini 3 (4K)"},
+  {id:"seedream5",free:false,edit:true,name:"Seedream 5.0 ByteDance"},
+  {id:"gptimage",free:false,edit:true,name:"GPT Image 1 Mini"},
+  {id:"gptimage-large",free:false,edit:true,name:"GPT Image 1.5"},
+  {id:"wan-image",free:false,edit:true,name:"Wan 2.7 Alibaba (2K)"},
+  {id:"wan-image-pro",free:false,edit:true,name:"Wan 2.7 Pro (4K)"},
+  {id:"qwen-image",free:false,edit:true,name:"Qwen Image Plus"},
+  {id:"grok-imagine",free:false,edit:false,name:"Grok Imagine xAI"},
+  {id:"klein",free:false,edit:true,name:"FLUX.2 Klein 4B"},
+  {id:"nova-canvas",free:false,edit:true,name:"Amazon Nova Canvas"},
+];
 
-  // Auto-resize textarea
-  inputEl.addEventListener('input', () => {
-    inputEl.style.height = 'auto';
-    inputEl.style.height = Math.min(inputEl.scrollHeight, 120) + 'px';
+// Populate model tables
+window.addEventListener('DOMContentLoaded', () => {
+  const tt = document.getElementById('text-model-table');
+  TEXT_MODELS.forEach(m => {
+    const caps = [];
+    if (m.vision) caps.push('<span class="tag tag-vis">👁️ Vision</span>');
+    if (m.search) caps.push('<span class="tag tag-srch">🔍 Search</span>');
+    tt.innerHTML += `<tr>
+      <td><code>${m.id}</code></td>
+      <td>${m.name}</td>
+      <td>${m.free?'<span class="tag tag-free">✅ Gratuit</span>':'<span class="tag tag-paid">💰 Pollen</span>'}</td>
+      <td>${caps.join('')||'<span style="color:var(--mu)">Chat</span>'}</td>
+    </tr>`;
   });
-
-  // Enter to send (Shift+Enter = newline)
-  inputEl.addEventListener('keydown', e => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  const it = document.getElementById('img-model-table');
+  IMG_MODELS.forEach(m => {
+    it.innerHTML += `<tr>
+      <td><code>${m.id}</code></td>
+      <td>${m.name}</td>
+      <td>${m.free?'<span class="tag tag-free">✅ Gratuit</span>':'<span class="tag tag-paid">💰 Pollen</span>'}</td>
+      <td>${m.edit?'<span class="tag tag-edit">✏️ Édition</span>':'<span style="color:var(--mu)">Génération</span>'}</td>
+    </tr>`;
   });
+});
 
-  function quickSend(text) {
-    inputEl.value = text;
-    sendMessage();
-  }
+// ── UTILS ──
+function sw(n,el){ document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active')); document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active')); document.getElementById('panel-'+n).classList.add('active'); el.classList.add('active'); }
+function setSt(id,t,m){ document.getElementById(id).innerHTML=`<div class="st ${t}">${t==='ld'?'<span class="spin"></span>':t==='ok'?'✅':'❌'} ${m}</div>`; }
+function cp(id){ navigator.clipboard.writeText(document.getElementById(id).textContent); const b=event.target; b.textContent='✅'; setTimeout(()=>b.textContent='📋',1400); }
+function cpT(id){ navigator.clipboard.writeText(document.getElementById(id).textContent); const b=event.target,o=b.textContent; b.textContent='✅ Copié!'; setTimeout(()=>b.textContent=o,1400); }
+function ld(id,on){ const b=document.getElementById(id); b.disabled=on; if(on){b._t=b.innerHTML;b.innerHTML='<span class="spin"></span> En cours...';}else b.innerHTML=b._t; }
 
-  function handleFile(input) {
-    const file = input.files[0];
-    if (!file) return;
-    selectedFile = file;
+// ── CHAT ──
+function uChat(){ const q=document.getElementById('chat-q').value||'Hello'; const m=document.getElementById('chat-m').value; document.getElementById('chat-url').textContent=`${B}/api/chat?query=${encodeURIComponent(q)}&model=${m}`; }
+document.getElementById('chat-q').addEventListener('input',uChat); document.getElementById('chat-m').addEventListener('change',uChat); uChat();
+async function runChat(){
+  const q=document.getElementById('chat-q').value.trim(); if(!q) return alert('Entrez un message !');
+  const m=document.getElementById('chat-m').value; const s=document.getElementById('chat-sys').value;
+  const url=`${B}/api/chat?query=${encodeURIComponent(q)}&model=${m}&system=${encodeURIComponent(s)}`;
+  document.getElementById('chat-url').textContent=url;
+  document.getElementById('chat-res').style.display='block';
+  setSt('chat-st','ld','En cours...'); ld('chat-btn',true);
+  const t0=Date.now();
+  try{ const r=await fetch(url); const d=await r.json(); const el=((Date.now()-t0)/1000).toFixed(2);
+    if(d.status){setSt('chat-st','ok',`${d.model} — ${el}s`); document.getElementById('chat-r').textContent=d.response;}
+    else setSt('chat-st','err',d.error);
+    document.getElementById('chat-t').textContent=`⏱️ ${el}s`;
+  }catch(e){setSt('chat-st','err',e.message);}finally{ld('chat-btn',false);}
+}
 
-    const wrap = document.getElementById('preview-wrap');
-    const label = document.getElementById('preview-label');
-    label.textContent = file.name;
+// ── IMAGE GEN ──
+function uImg(){
+  const p=document.getElementById('img-p').value||'A cat'; const m=document.getElementById('img-m').value;
+  const [w,h]=document.getElementById('img-sz').value.split('x');
+  const en=document.getElementById('img-en').checked; const seed=document.getElementById('img-seed').value; const neg=document.getElementById('img-neg').value;
+  let url=`${B}/api/image?prompt=${encodeURIComponent(p)}&model=${m}&width=${w}&height=${h}`;
+  if(en) url+='&enhance=true'; if(seed) url+=`&seed=${seed}`; if(neg) url+=`&negative_prompt=${encodeURIComponent(neg)}`;
+  document.getElementById('img-url').textContent=url;
+}
+['img-p','img-seed','img-neg'].forEach(id=>document.getElementById(id).addEventListener('input',uImg));
+['img-m','img-sz'].forEach(id=>document.getElementById(id).addEventListener('change',uImg));
+document.getElementById('img-en').addEventListener('change',uImg); uImg();
+async function runImage(){
+  const url=document.getElementById('img-url').textContent;
+  document.getElementById('img-res').style.display='block'; setSt('img-st','ld','Génération... (10-60s)'); ld('img-btn',true);
+  document.getElementById('img-box').innerHTML='<div class="img-ph">⏳<span>Génération en cours...</span></div>';
+  const t0=Date.now();
+  try{ const r=await fetch(url); if(!r.ok) throw new Error(`Erreur ${r.status}`);
+    const blob=await r.blob(); const el=((Date.now()-t0)/1000).toFixed(2); const obj=URL.createObjectURL(blob);
+    const img=document.createElement('img'); img.src=obj; img.className='img-res';
+    document.getElementById('img-box').innerHTML=''; document.getElementById('img-box').appendChild(img);
+    setSt('img-st','ok',`Générée en ${el}s`); document.getElementById('img-t').textContent=`⏱️ ${el}s`;
+    document.getElementById('img-dl').href=obj;
+  }catch(e){setSt('img-st','err',e.message); document.getElementById('img-box').innerHTML=`<div class="img-ph">❌<span>${e.message}</span></div>`;}
+  finally{ld('img-btn',false);}
+}
 
-    if (file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onload = e => {
-        fileBase64 = e.target.result;
-        document.getElementById('preview-img').src = fileBase64;
-        wrap.classList.add('show');
-      };
-      reader.readAsDataURL(file);
-    } else {
-      document.getElementById('preview-img').src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><text y="30" font-size="30">📄</text></svg>';
-      wrap.classList.add('show');
-      const reader = new FileReader();
-      reader.onload = e => { fileBase64 = e.target.result; };
-      reader.readAsDataURL(file);
-    }
-    input.value = '';
-  }
+// ── IMAGE EDIT ──
+function uEdit(){
+  const p=document.getElementById('ed-p').value||'Edit'; const m=document.getElementById('ed-m').value;
+  const [w,h]=document.getElementById('ed-sz').value.split('x'); const img=document.getElementById('ed-img').value;
+  let url=`${B}/api/image?prompt=${encodeURIComponent(p)}&model=${m}&width=${w}&height=${h}`;
+  if(img) url+=`&imgurl=${encodeURIComponent(img)}`;
+  document.getElementById('ed-url').textContent=url;
+}
+document.getElementById('ed-p').addEventListener('input',uEdit); document.getElementById('ed-m').addEventListener('change',uEdit);
+document.getElementById('ed-sz').addEventListener('change',uEdit);
+document.getElementById('ed-img').addEventListener('input',()=>{ const v=document.getElementById('ed-img').value; if(v) document.getElementById('ed-src').src=v; uEdit(); }); uEdit();
+async function runEdit(){
+  const img=document.getElementById('ed-img').value.trim(); if(!img) return alert('Entrez une URL d\'image !');
+  const url=document.getElementById('ed-url').textContent;
+  document.getElementById('ed-res').style.display='block'; document.getElementById('ed-src').src=img;
+  setSt('ed-st','ld','Édition... (20-90s)'); ld('ed-btn',true);
+  document.getElementById('ed-box').innerHTML='<div class="img-ph" style="height:160px">⏳<span>Édition...</span></div>';
+  const t0=Date.now();
+  try{ const r=await fetch(url); if(!r.ok) throw new Error(`Erreur ${r.status}`);
+    const blob=await r.blob(); const el=((Date.now()-t0)/1000).toFixed(2); const obj=URL.createObjectURL(blob);
+    const i=document.createElement('img'); i.src=obj; i.style.cssText='width:100%;border-radius:8px;border:1px solid var(--b)';
+    document.getElementById('ed-box').innerHTML=''; document.getElementById('ed-box').appendChild(i);
+    setSt('ed-st','ok',`Éditée en ${el}s`); document.getElementById('ed-t').textContent=`⏱️ ${el}s`;
+  }catch(e){setSt('ed-st','err',e.message); document.getElementById('ed-box').innerHTML=`<div class="img-ph" style="height:160px">❌<span>${e.message}</span></div>`;}
+  finally{ld('ed-btn',false);}
+}
 
-  function clearFile() {
-    selectedFile = null; fileBase64 = null;
-    document.getElementById('preview-wrap').classList.remove('show');
-    document.getElementById('preview-img').src = '';
-  }
+// ── SEARCH ──
+function uSearch(){ const q=document.getElementById('sr-q').value||'Latest news'; const m=document.getElementById('sr-m').value; document.getElementById('sr-url').textContent=`${B}/api/search?query=${encodeURIComponent(q)}&model=${m}`; }
+document.getElementById('sr-q').addEventListener('input',uSearch); document.getElementById('sr-m').addEventListener('change',uSearch); uSearch();
+async function runSearch(){
+  const q=document.getElementById('sr-q').value.trim(); if(!q) return alert('Entrez une requête !');
+  const m=document.getElementById('sr-m').value; const url=`${B}/api/search?query=${encodeURIComponent(q)}&model=${m}`;
+  document.getElementById('sr-url').textContent=url;
+  document.getElementById('sr-res').style.display='block'; setSt('sr-st','ld','Recherche...'); ld('sr-btn',true);
+  const t0=Date.now();
+  try{ const r=await fetch(url); const d=await r.json(); const el=((Date.now()-t0)/1000).toFixed(2);
+    if(d.status){setSt('sr-st','ok',`${d.model} — ${el}s`); document.getElementById('sr-r').textContent=d.response;}
+    else setSt('sr-st','err',d.error);
+    document.getElementById('sr-t').textContent=`⏱️ ${el}s`;
+  }catch(e){setSt('sr-st','err',e.message);}finally{ld('sr-btn',false);}
+}
 
-  async function sendMessage() {
-    const text = inputEl.value.trim();
-    if (!text && !selectedFile) return;
-    if (sendBtn.disabled) return;
+// ── VISION ──
+function uVis(){ const q=document.getElementById('vis-q').value||'Describe'; const m=document.getElementById('vis-m').value; const img=document.getElementById('vis-url-in').value;
+  document.getElementById('vis-url-d').textContent=`${B}/api/openai?query=${encodeURIComponent(q)}&model=${m}&uid=1&imgurl=${encodeURIComponent(img)}`; }
+document.getElementById('vis-q').addEventListener('input',uVis); document.getElementById('vis-m').addEventListener('change',uVis);
+document.getElementById('vis-url-in').addEventListener('input',()=>{ const v=document.getElementById('vis-url-in').value;
+  document.getElementById('vis-prev').innerHTML=v?`<img src="${v}" style="max-height:140px;border-radius:8px;border:1px solid var(--b)">`:'' ; uVis(); }); uVis();
+async function runVision(){
+  const img=document.getElementById('vis-url-in').value.trim(); if(!img) return alert('Entrez une URL d\'image !');
+  const url=document.getElementById('vis-url-d').textContent;
+  document.getElementById('vis-res').style.display='block'; setSt('vis-st','ld','Analyse...'); ld('vis-btn',true);
+  const t0=Date.now();
+  try{ const r=await fetch(url); const d=await r.json(); const el=((Date.now()-t0)/1000).toFixed(2);
+    if(d.status){setSt('vis-st','ok',`${d.model_used} 👁️ — ${el}s`); document.getElementById('vis-r').textContent=d.response;}
+    else setSt('vis-st','err',d.error);
+    document.getElementById('vis-t').textContent=`⏱️ ${el}s`;
+  }catch(e){setSt('vis-st','err',e.message);}finally{ld('vis-btn',false);}
+}
 
-    // Hide welcome
-    document.getElementById('welcome')?.remove();
-
-    const model = document.getElementById('model-select').value;
-
-    // Add user message
-    addMessage('user', text, fileBase64 && selectedFile?.type.startsWith('image/') ? fileBase64 : null);
-
-    // Push to history
-    history.push({ role: 'user', content: text });
-
-    // Clear input
-    inputEl.value = '';
-    inputEl.style.height = 'auto';
-    sendBtn.disabled = true;
-
-    // Typing indicator
-    const typingId = addTyping();
-
-    try {
-      const formData = new FormData();
-      formData.append('message', text);
-      formData.append('history', JSON.stringify(history.slice(-10)));
-      formData.append('model', model);
-      if (selectedFile) {
-        formData.append('file', selectedFile);
-      }
-
-      const res = await fetch('/api/chat', { method: 'POST', body: formData });
-      const data = await res.json();
-
-      removeTyping(typingId);
-
-      const answer = data.response || data.error || 'Erreur inconnue';
-      addMessage('ai', answer, null, data.model_used);
-      history.push({ role: 'assistant', content: answer });
-
-    } catch (err) {
-      removeTyping(typingId);
-      addMessage('ai', '⚠️ Erreur: ' + err.message);
-    }
-
-    clearFile();
-    sendBtn.disabled = false;
-    inputEl.focus();
-  }
-
-  function addMessage(role, text, imgSrc, model) {
-    const div = document.createElement('div');
-    div.className = `msg ${role}`;
-
-    const avatar = document.createElement('div');
-    avatar.className = 'avatar';
-    avatar.textContent = role === 'user' ? '👤' : 'AI';
-
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble';
-
-    if (model) {
-      const badge = document.createElement('span');
-      badge.className = 'model-badge';
-      badge.textContent = '⚡ ' + model;
-      bubble.appendChild(badge);
-    }
-
-    if (imgSrc) {
-      const img = document.createElement('img');
-      img.className = 'uploaded';
-      img.src = imgSrc;
-      bubble.appendChild(img);
-    }
-
-    const p = document.createElement('div');
-    p.style.whiteSpace = 'pre-wrap';
-    p.textContent = text;
-    bubble.appendChild(p);
-
-    div.appendChild(avatar);
-    div.appendChild(bubble);
-    chatEl.appendChild(div);
-    chatEl.scrollTop = chatEl.scrollHeight;
-    return div;
-  }
-
-  function addTyping() {
-    const id = 'typing-' + Date.now();
-    const div = document.createElement('div');
-    div.className = 'msg ai';
-    div.id = id;
-
-    const avatar = document.createElement('div');
-    avatar.className = 'avatar';
-    avatar.textContent = 'AI';
-
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble';
-    bubble.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
-
-    div.appendChild(avatar);
-    div.appendChild(bubble);
-    chatEl.appendChild(div);
-    chatEl.scrollTop = chatEl.scrollHeight;
-    return id;
-  }
-
-  function removeTyping(id) {
-    document.getElementById(id)?.remove();
-  }
+// ── OPENAI COMPAT ──
+function uOA(){ const q=document.getElementById('oa-q').value||'Hello'; const uid=document.getElementById('oa-uid').value||'1'; const m=document.getElementById('oa-m').value; const img=document.getElementById('oa-img').value;
+  let url=`${B}/api/openai?query=${encodeURIComponent(q)}&uid=${uid}&model=${m}`; if(img) url+=`&imgurl=${encodeURIComponent(img)}`;
+  document.getElementById('oa-url').textContent=url; }
+['oa-q','oa-uid','oa-img'].forEach(id=>document.getElementById(id).addEventListener('input',uOA));
+document.getElementById('oa-m').addEventListener('change',uOA); uOA();
+async function runOA(){
+  const url=document.getElementById('oa-url').textContent;
+  document.getElementById('oa-res').style.display='block'; setSt('oa-st','ld','En cours...'); ld('oa-btn',true);
+  const t0=Date.now();
+  try{ const r=await fetch(url); const d=await r.json(); const el=((Date.now()-t0)/1000).toFixed(2);
+    if(d.status) setSt('oa-st','ok',`${d.model_used}${d.vision_mode?' 👁️':''} — ${el}s`);
+    else setSt('oa-st','err',d.error);
+    document.getElementById('oa-r').textContent=JSON.stringify(d,null,2);
+    document.getElementById('oa-t').textContent=`⏱️ ${el}s`;
+  }catch(e){setSt('oa-st','err',e.message);}finally{ld('oa-btn',false);}
+}
 </script>
 </body>
 </html>
